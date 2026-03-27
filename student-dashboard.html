@@ -3,73 +3,1225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard | DLSU Advising</title>
+    <title>Student Dashboard — DECEE Academic Advising</title>
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/custom.css">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dlsu-green: #00703C;
+            --dlsu-green-dark: #005a30;
+            --dlsu-green-light: #e8f5ee;
+            --dlsu-green-muted: #4a9e6f;
+            --dlsu-white: #ffffff;
+            --dlsu-gray-50: #f8faf9;
+            --dlsu-gray-100: #f0f4f2;
+            --dlsu-gray-200: #e2e8e5;
+            --dlsu-gray-400: #94a89c;
+            --dlsu-gray-600: #5a6b60;
+            --dlsu-gray-800: #2d3a32;
+            --dlsu-warning: #e6a817;
+            --dlsu-danger: #c0392b;
+            --dlsu-info: #2980b9;
+            --sidebar-collapsed: 70px;
+            --sidebar-expanded: 250px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--dlsu-gray-50);
+            color: var(--dlsu-gray-800);
+            min-height: 100vh;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-collapsed);
+            height: 100vh;
+            background: var(--dlsu-green);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            border-radius: 0 18px 18px 0;
+        }
+
+        .sidebar.expanded {
+            width: var(--sidebar-expanded);
+        }
+
+        /* ── Brand ── */
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            min-height: 68px;
+            overflow: hidden;
+        }
+
+        .sidebar-brand .brand-icon {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-brand .brand-text {
+            opacity: 0;
+            white-space: nowrap;
+            margin-left: 0.75rem;
+            transition: opacity 0.15s ease;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar.expanded .sidebar-brand {
+            justify-content: flex-start;
+            padding-left: 1rem;
+        }
+
+        .sidebar.expanded .brand-text {
+            opacity: 1;
+            width: auto;
+        }
+
+        .sidebar-brand h6 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .sidebar-brand small {
+            font-size: 0.63rem;
+            opacity: 0.6;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── Nav ── */
+        .sidebar-nav {
+            flex: 1;
+            padding: 0.6rem 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .nav-section-label {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            white-space: nowrap;
+            color: rgba(255, 255, 255, 0.4);
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            padding: 0 1.1rem;
+            transition: max-height 0.3s ease, opacity 0.2s ease, padding 0.3s ease;
+        }
+
+        .sidebar.expanded .nav-section-label {
+            max-height: 30px;
+            opacity: 1;
+            padding: 0.7rem 1.1rem 0.3rem;
+        }
+
+        .nav-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0.4rem 1.1rem;
+            transition: opacity 0.2s ease;
+        }
+
+        .sidebar.expanded .nav-divider {
+            opacity: 0;
+            margin: 0;
+            height: 0;
+        }
+
+        /* ── Nav Links ── */
+        .sidebar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.65rem 0;
+            margin: 2px 0.5rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            white-space: nowrap;
+            position: relative;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .sidebar-nav .nav-link i {
+            font-size: 1.2rem;
+            width: 22px;
+            min-width: 22px;
+            text-align: center;
+            transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar-nav .nav-link .link-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            margin-left: 0;
+            transition: opacity 0.15s ease, width 0.3s ease, margin 0.3s ease;
+        }
+
+        /* Expanded state: left-align */
+        .sidebar.expanded .nav-link {
+            justify-content: flex-start;
+            padding: 0.55rem 0.75rem;
+            margin: 2px 0.5rem;
+        }
+
+        .sidebar.expanded .nav-link i {
+            margin-left: 0.35rem;
+        }
+
+        .sidebar.expanded .nav-link .link-text {
+            opacity: 1;
+            width: auto;
+            margin-left: 0.75rem;
+        }
+
+        .sidebar-nav .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .sidebar-nav .nav-link.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.18);
+            font-weight: 600;
+        }
+
+        .sidebar-nav .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: -0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 20px;
+            background: white;
+            border-radius: 0 3px 3px 0;
+        }
+
+        /* ── Footer ── */
+        .sidebar-footer {
+            padding: 0.85rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            display: flex;
+            justify-content: center;
+        }
+
+        .sidebar.expanded .sidebar-footer {
+            justify-content: flex-start;
+            padding-left: 1rem;
+        }
+
+        .sidebar-footer .user-card {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .sidebar-footer .avatar {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .sidebar-footer .user-info {
+            opacity: 0;
+            white-space: nowrap;
+            width: 0;
+            overflow: hidden;
+            transition: opacity 0.15s ease;
+        }
+
+        .sidebar.expanded .sidebar-footer .user-info {
+            opacity: 1;
+            width: auto;
+        }
+
+        .sidebar-footer .user-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .sidebar-footer .user-id {
+            font-size: 0.65rem;
+            opacity: 0.6;
+        }
+
+        /* ── Main Content ── */
+        .main-content {
+            margin-left: var(--sidebar-collapsed);
+            min-height: 100vh;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .main-content.shifted {
+            margin-left: var(--sidebar-expanded);
+        }
+
+        /* ── Top Bar ── */
+        .topbar {
+            background: white;
+            padding: 0.85rem 2rem;
+            border-bottom: 1px solid var(--dlsu-gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-left h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--dlsu-gray-800);
+        }
+
+        .topbar-left p {
+            font-size: 0.78rem;
+            color: var(--dlsu-gray-400);
+            margin: 0;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .topbar-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            border: 1px solid var(--dlsu-gray-200);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dlsu-gray-600);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .topbar-btn:hover {
+            background: var(--dlsu-gray-100);
+            color: var(--dlsu-green);
+        }
+
+        .topbar-btn .notif-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--dlsu-danger);
+            border-radius: 50%;
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            border: 2px solid white;
+        }
+
+        .hamburger-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--dlsu-gray-800);
+            cursor: pointer;
+            margin-right: 0.75rem;
+        }
+
+        /* ── Page Body ── */
+        .page-body {
+            padding: 1.75rem 2rem;
+        }
+
+        /* ── Welcome Banner ── */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--dlsu-green) 0%, var(--dlsu-green-dark) 100%);
+            border-radius: 14px;
+            padding: 1.75rem 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+
+        .welcome-banner::after {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 50%;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            right: 80px;
+            width: 150px;
+            height: 150px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 50%;
+        }
+
+        .welcome-banner h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .welcome-banner p {
+            font-size: 0.85rem;
+            opacity: 0.85;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-banner .term-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(255, 255, 255, 0.18);
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* ── Stats Cards ── */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid var(--dlsu-gray-200);
+            height: 100%;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 15px rgba(0, 112, 60, 0.08);
+        }
+
+        .stat-card .stat-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            margin-bottom: 0.85rem;
+        }
+
+        .stat-icon.green {
+            background: var(--dlsu-green-light);
+            color: var(--dlsu-green);
+        }
+
+        .stat-icon.blue {
+            background: #e8f0fe;
+            color: var(--dlsu-info);
+        }
+
+        .stat-icon.amber {
+            background: #fef7e0;
+            color: var(--dlsu-warning);
+        }
+
+        .stat-icon.red {
+            background: #fdeaea;
+            color: var(--dlsu-danger);
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--dlsu-gray-400);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.65rem;
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--dlsu-gray-800);
+        }
+
+        .stat-card .stat-sub {
+            font-size: 0.73rem;
+            color: var(--dlsu-gray-400);
+            margin-top: 0.15rem;
+        }
+
+        /* ── Section Headers ── */
+        .section-header {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dlsu-gray-800);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-header .view-all {
+            font-size: 0.78rem;
+            color: var(--dlsu-green);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .section-header .view-all:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Content Cards ── */
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--dlsu-gray-200);
+            overflow: hidden;
+        }
+
+        .content-card .card-body-inner {
+            padding: 1.25rem;
+        }
+
+        /* ── Adviser Card ── */
+        .adviser-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.25rem;
+            background: var(--dlsu-green-light);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .adviser-card .adviser-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--dlsu-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .adviser-card .adviser-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--dlsu-gray-800);
+        }
+
+        .adviser-card .adviser-dept {
+            font-size: 0.73rem;
+            color: var(--dlsu-gray-600);
+        }
+
+        /* ── Notifications ── */
+        .notif-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid var(--dlsu-gray-100);
+        }
+
+        .notif-item:last-child {
+            border-bottom: none;
+        }
+
+        .notif-dot-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 0.4rem;
+            flex-shrink: 0;
+        }
+
+        .notif-dot-indicator.unread {
+            background: var(--dlsu-green);
+        }
+
+        .notif-dot-indicator.read {
+            background: var(--dlsu-gray-200);
+        }
+
+        .notif-item .notif-text {
+            font-size: 0.8rem;
+            color: var(--dlsu-gray-800);
+            line-height: 1.45;
+        }
+
+        .notif-item .notif-time {
+            font-size: 0.68rem;
+            color: var(--dlsu-gray-400);
+            margin-top: 0.2rem;
+        }
+
+        /* ── Quick Actions ── */
+        .quick-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1.15rem 0.75rem;
+            background: white;
+            border: 1px solid var(--dlsu-gray-200);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--dlsu-gray-800);
+            height: 100%;
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--dlsu-green);
+            background: var(--dlsu-green-light);
+            color: var(--dlsu-green);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 112, 60, 0.1);
+        }
+
+        .quick-action-btn i {
+            font-size: 1.35rem;
+            color: var(--dlsu-green);
+        }
+
+        .quick-action-btn span {
+            font-size: 0.73rem;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* ── Current Subjects Table ── */
+        .subjects-table {
+            width: 100%;
+            font-size: 0.8rem;
+        }
+
+        .subjects-table thead th {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--dlsu-gray-400);
+            font-weight: 600;
+            padding: 0.65rem 0.85rem;
+            border-bottom: 1px solid var(--dlsu-gray-200);
+            background: var(--dlsu-gray-50);
+        }
+
+        .subjects-table tbody td {
+            padding: 0.7rem 0.85rem;
+            border-bottom: 1px solid var(--dlsu-gray-100);
+            vertical-align: middle;
+        }
+
+        .subjects-table .course-code {
+            font-weight: 700;
+            color: var(--dlsu-green);
+        }
+
+        .badge-prereq {
+            font-size: 0.65rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        /* ── Advising Status ── */
+        .advising-status {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+        }
+
+        .advising-status.pending {
+            background: #fef7e0;
+            border: 1px solid #f5dfa0;
+        }
+
+        .advising-status.approved {
+            background: var(--dlsu-green-light);
+            border: 1px solid #b8e0c8;
+        }
+
+        .advising-status .status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .advising-status.pending .status-icon {
+            background: var(--dlsu-warning);
+            color: white;
+        }
+
+        .advising-status.approved .status-icon {
+            background: var(--dlsu-green);
+            color: white;
+        }
+
+        .advising-status .status-label {
+            font-size: 0.73rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .advising-status .status-desc {
+            font-size: 0.78rem;
+            color: var(--dlsu-gray-600);
+        }
+
+        /* ── Failed Units Meter ── */
+        .failed-units-meter {
+            padding: 1rem 1.25rem;
+        }
+
+        .meter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.5rem;
+        }
+
+        .meter-header .meter-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--dlsu-gray-800);
+        }
+
+        .meter-header .meter-value {
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .meter-bar {
+            height: 8px;
+            background: var(--dlsu-gray-100);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .meter-bar .meter-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .meter-bar .meter-fill.safe {
+            background: var(--dlsu-green);
+        }
+
+        .meter-bar .meter-fill.warning {
+            background: var(--dlsu-warning);
+        }
+
+        .meter-bar .meter-fill.danger {
+            background: var(--dlsu-danger);
+        }
+
+        .meter-thresholds {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.35rem;
+        }
+
+        .meter-thresholds span {
+            font-size: 0.62rem;
+            color: var(--dlsu-gray-400);
+        }
+
+        /* ── Mobile Overlay ── */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 991.98px) {
+            .sidebar {
+                width: 0;
+                border-radius: 0;
+            }
+
+            .sidebar.expanded {
+                width: var(--sidebar-expanded);
+            }
+
+            .sidebar-overlay.active {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .main-content.shifted {
+                margin-left: 0;
+            }
+
+            .hamburger-btn {
+                display: block;
+            }
+
+            .page-body {
+                padding: 1.25rem 1rem;
+            }
+
+            .topbar {
+                padding: 0.85rem 1rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .welcome-banner {
+                padding: 1.25rem;
+            }
+
+            .welcome-banner h2 {
+                font-size: 1.15rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">DLSU Advising</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="student-dashboard.html">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="advising-form.html">Submit Form</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" id="logoutBtn">Logout</a></li>
-                </ul>
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">
+                <i class="bi bi-mortarboard-fill"></i>
+            </div>
+            <div class="brand-text">
+                <h6>DECEE Advising</h6>
+                <small>De La Salle University</small>
             </div>
         </div>
-    </nav>
 
-    <main class="container mt-5">
-        <div class="row gap-4">
-            
-            <section class="col-lg-4">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body">
-                        <h4 class="card-title">My Profile</h4>
-                        <p><strong>Name:</strong> <span id="studentName">Loading...</span></p>
-                        <p><strong>ID:</strong> <span id="studentIdNum">Loading...</span></p>
-                        <p><strong>Program:</strong> <span id="studentProgram">Loading...</span></p>
-                    </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a href="#" class="nav-link active">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span class="link-text">Dashboard</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-journal-text"></i>
+                <span class="link-text">Academic History</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-file-earmark-check"></i>
+                <span class="link-text">Study Plan</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-list-check"></i>
+                <span class="link-text">Program Checklist</span>
+            </a>
+
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Advising</div>
+            <a href="#" class="nav-link">
+                <i class="bi bi-calendar-event"></i>
+                <span class="link-text">Appointments</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-chat-left-text"></i>
+                <span class="link-text">Concerns</span>
+            </a>
+
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Account</div>
+            <a href="#" class="nav-link">
+                <i class="bi bi-person"></i>
+                <span class="link-text">Profile</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-gear"></i>
+                <span class="link-text">Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="avatar">BM</div>
+                <div class="user-info">
+                    <div class="user-name">Bianca M.</div>
+                    <div class="user-id">12012345 · BS-CpE</div>
                 </div>
-            </section>
-
-            <section class="col-lg-7">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="card-title mb-1">Current Term Advising</h4>
-                            <p class="text-muted mb-0">Status: <span class="badge bg-warning text-dark">Pending Clearance</span></p>
-                        </div>
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#advisingModal">View Details</button>
-                    </div>
-                </div>
-            </section>
-
+            </div>
         </div>
-    </main>
+    </aside>
 
-    <div class="modal fade" id="advisingModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Advising Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- ── Main Content ── -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="d-flex align-items-center">
+                <button class="hamburger-btn" id="hamburgerBtn">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="topbar-left">
+                    <h1>Dashboard</h1>
+                    <p>Academic Year 2025–2026 · Term 2</p>
                 </div>
-                <div class="modal-body">
-                    <p>Your advising form is currently under review by your professor. Please check back later.</p>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                    <span class="notif-dot"></span>
+                </button>
+                <button class="topbar-btn" title="Log out">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Page Body -->
+        <div class="page-body">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <h2>Good afternoon, Bianca!</h2>
+                <p>You're on Term 8 of 12 in the BS Computer Engineering program. Keep it up — you're on track!</p>
+                <span class="term-badge">
+                    <i class="bi bi-calendar3"></i>
+                    Advising Period: Mar 24 – Apr 4, 2026
+                </span>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="bi bi-book"></i>
+                        </div>
+                        <div class="stat-label">Units Completed</div>
+                        <div class="stat-value">138</div>
+                        <div class="stat-sub">of 200 required</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="bi bi-bar-chart-line"></i>
+                        </div>
+                        <div class="stat-label">Cumulative GPA</div>
+                        <div class="stat-value">2.85</div>
+                        <div class="stat-sub">Last term: 3.10</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon amber">
+                            <i class="bi bi-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-label">Failed Units</div>
+                        <div class="stat-value">6</div>
+                        <div class="stat-sub">30 max allowed</div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div class="stat-label">Current Term</div>
+                        <div class="stat-value">8</div>
+                        <div class="stat-sub">of 12 terms</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <!-- Left Column -->
+                <div class="col-lg-8">
+                    <!-- Advising Status -->
+                    <div class="section-header">
+                        <span>Advising Status</span>
+                    </div>
+                    <div class="advising-status pending mb-4">
+                        <div class="status-icon">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                        <div>
+                            <div class="status-label" style="color: var(--dlsu-warning);">Pending Review</div>
+                            <div class="status-desc">Your study plan for Term 9 was submitted on Mar 25, 2026. Awaiting adviser approval.</div>
+                        </div>
+                    </div>
+
+                    <!-- Current Enrolled Subjects -->
+                    <div class="section-header">
+                        <span>Current Enrolled Subjects</span>
+                        <a href="#" class="view-all">View all <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    <div class="content-card mb-4">
+                        <table class="subjects-table">
+                            <thead>
+                                <tr>
+                                    <th>Course Code</th>
+                                    <th>Course Name</th>
+                                    <th>Units</th>
+                                    <th>Prerequisite</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="course-code">LBYCPG3</td>
+                                    <td>Online Technologies Lab</td>
+                                    <td>1</td>
+                                    <td><span class="badge-prereq bg-success bg-opacity-10 text-success">LBYCPG2 ✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="course-code">OPESSYS</td>
+                                    <td>Operating Systems</td>
+                                    <td>3</td>
+                                    <td><span class="badge-prereq bg-success bg-opacity-10 text-success">CCDATRCL ✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="course-code">NSSECU1</td>
+                                    <td>Network Security 1</td>
+                                    <td>3</td>
+                                    <td><span class="badge-prereq bg-success bg-opacity-10 text-success">CCNETCM ✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="course-code">CALENG1</td>
+                                    <td>Engineering Calculus</td>
+                                    <td>3</td>
+                                    <td><span class="badge-prereq bg-success bg-opacity-10 text-success">CALENG0 ✓</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="course-code">FINRIMA</td>
+                                    <td>Financial Risk Management</td>
+                                    <td>3</td>
+                                    <td><span class="badge-prereq" style="background: var(--dlsu-gray-100); color: var(--dlsu-gray-400);">None</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="section-header">
+                        <span>Quick Actions</span>
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-4 col-md">
+                            <a href="#" class="quick-action-btn">
+                                <i class="bi bi-file-earmark-plus"></i>
+                                <span>Submit Study Plan</span>
+                            </a>
+                        </div>
+                        <div class="col-4 col-md">
+                            <a href="#" class="quick-action-btn">
+                                <i class="bi bi-calendar-plus"></i>
+                                <span>Book Appointment</span>
+                            </a>
+                        </div>
+                        <div class="col-4 col-md">
+                            <a href="#" class="quick-action-btn">
+                                <i class="bi bi-eye"></i>
+                                <span>View Checklist</span>
+                            </a>
+                        </div>
+                        <div class="col-4 col-md">
+                            <a href="#" class="quick-action-btn">
+                                <i class="bi bi-download"></i>
+                                <span>Download Booklet</span>
+                            </a>
+                        </div>
+                        <div class="col-4 col-md">
+                            <a href="#" class="quick-action-btn">
+                                <i class="bi bi-chat-left-dots"></i>
+                                <span>Send Concern</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-lg-4">
+                    <!-- Assigned Adviser -->
+                    <div class="section-header">
+                        <span>Assigned Adviser</span>
+                    </div>
+                    <div class="adviser-card">
+                        <div class="adviser-avatar">RC</div>
+                        <div>
+                            <div class="adviser-name">Dr. Roberto Cruz</div>
+                            <div class="adviser-dept">DECEE · CpE Program</div>
+                        </div>
+                    </div>
+
+                    <!-- Failed Units Tracker -->
+                    <div class="content-card mb-4">
+                        <div class="failed-units-meter">
+                            <div class="meter-header">
+                                <span class="meter-label">Failed Units Tracker</span>
+                                <span class="meter-value" style="color: var(--dlsu-green);">6 / 30</span>
+                            </div>
+                            <div class="meter-bar">
+                                <div class="meter-fill safe" style="width: 20%;"></div>
+                            </div>
+                            <div class="meter-thresholds">
+                                <span>0</span>
+                                <span style="color: var(--dlsu-warning);">15 (warning)</span>
+                                <span style="color: var(--dlsu-danger);">30 (max)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Notifications -->
+                    <div class="section-header">
+                        <span>Notifications</span>
+                        <a href="#" class="view-all">See all</a>
+                    </div>
+                    <div class="content-card">
+                        <div class="card-body-inner">
+                            <div class="notif-item">
+                                <div class="notif-dot-indicator unread"></div>
+                                <div>
+                                    <div class="notif-text"><strong>Advising period is now open.</strong> Please submit your study plan for Term 9 before Apr 4.</div>
+                                    <div class="notif-time">2 days ago</div>
+                                </div>
+                            </div>
+                            <div class="notif-item">
+                                <div class="notif-dot-indicator unread"></div>
+                                <div>
+                                    <div class="notif-text">Dr. Cruz has posted <strong>new available slots</strong> for advising appointments.</div>
+                                    <div class="notif-time">3 days ago</div>
+                                </div>
+                            </div>
+                            <div class="notif-item">
+                                <div class="notif-dot-indicator read"></div>
+                                <div>
+                                    <div class="notif-text">Your Term 8 study plan was <strong>approved</strong>.</div>
+                                    <div class="notif-time">2 weeks ago</div>
+                                </div>
+                            </div>
+                            <div class="notif-item">
+                                <div class="notif-dot-indicator read"></div>
+                                <div>
+                                    <div class="notif-text">Grade for <strong>LBYCPG2</strong> has been posted: 2.5</div>
+                                    <div class="notif-time">1 month ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/app.js"></script>
+    <script>
+        // ── Elements ──
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const overlay = document.getElementById('sidebarOverlay');
+        const hamburger = document.getElementById('hamburgerBtn');
+        const isMobile = () => window.innerWidth < 992;
+
+        // ── Desktop: hover to expand, main content shifts ──
+        sidebar.addEventListener('mouseenter', () => {
+            if (!isMobile()) {
+                sidebar.classList.add('expanded');
+                mainContent.classList.add('shifted');
+            }
+        });
+
+        sidebar.addEventListener('mouseleave', () => {
+            if (!isMobile()) {
+                sidebar.classList.remove('expanded');
+                mainContent.classList.remove('shifted');
+            }
+        });
+
+        // ── Mobile: hamburger toggle ──
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('expanded');
+            overlay.classList.toggle('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('expanded');
+            overlay.classList.remove('active');
+        });
+
+        // ── Dynamic Greeting ──
+        const greetingEl = document.querySelector('.welcome-banner h2');
+        const hour = new Date().getHours();
+        let greeting = 'Good morning';
+        if (hour >= 12 && hour < 18) greeting = 'Good afternoon';
+        else if (hour >= 18) greeting = 'Good evening';
+        greetingEl.textContent = `${greeting}, Bianca!`;
+    </script>
 </body>
 </html>
