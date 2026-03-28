@@ -1,0 +1,294 @@
+/* ══ Student Concerns — Page Styles ══ */
+
+.page-body {
+    padding: 1.75rem 2rem;
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+.page-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--dlsu-green);
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-subtitle {
+    font-size: 0.82rem;
+    color: var(--dlsu-gray-400);
+    margin-bottom: 1.5rem;
+}
+
+/* Summary Row */
+.summary-row {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+}
+
+.summary-chip {
+    background: white;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 10px;
+    padding: 0.55rem 1rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.summary-chip .chip-count {
+    font-weight: 800;
+}
+
+.summary-chip .chip-count.green {
+    color: var(--dlsu-green);
+}
+
+.summary-chip .chip-count.amber {
+    color: var(--dlsu-warning);
+}
+
+.summary-chip .chip-count.blue {
+    color: var(--dlsu-info);
+}
+
+/* Filter Chips */
+.filter-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    padding: 0.35rem 0.85rem;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    background: white;
+    color: var(--dlsu-gray-600);
+    transition: all 0.2s;
+}
+
+.filter-chip:hover {
+    border-color: var(--dlsu-green-muted);
+}
+
+.filter-chip.active {
+    background: var(--dlsu-green);
+    color: white;
+    border-color: var(--dlsu-green);
+}
+
+/* Concern Card */
+.concern-card {
+    background: white;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 12px;
+    padding: 1.15rem 1.35rem;
+    margin-bottom: 0.85rem;
+    transition: box-shadow 0.2s;
+}
+
+.concern-card:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.concern-card.unread {
+    border-left: 3px solid var(--dlsu-warning);
+}
+
+.concern-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.65rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.concern-student {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.concern-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--dlsu-green-light);
+    color: var(--dlsu-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.72rem;
+    flex-shrink: 0;
+}
+
+.concern-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.concern-id {
+    font-size: 0.7rem;
+    color: var(--dlsu-gray-400);
+}
+
+.concern-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.concern-term {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    background: var(--dlsu-green-light);
+    color: var(--dlsu-green);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.concern-date {
+    font-size: 0.7rem;
+    color: var(--dlsu-gray-400);
+}
+
+/* Status Badges */
+.concern-status {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+}
+
+.concern-status.new {
+    background: #fef3dc;
+    color: #b8860b;
+}
+
+.concern-status.read {
+    background: var(--dlsu-gray-100);
+    color: var(--dlsu-gray-600);
+}
+
+.concern-status.replied {
+    background: #e4edfb;
+    color: #1a56a8;
+}
+
+/* Message */
+.concern-message {
+    font-size: 0.82rem;
+    color: var(--dlsu-gray-800);
+    line-height: 1.55;
+    margin-bottom: 0.85rem;
+}
+
+/* Existing Reply */
+.existing-reply {
+    padding: 0.85rem 1rem;
+    background: var(--dlsu-gray-50);
+    border-radius: 10px;
+    border-left: 3px solid var(--dlsu-green);
+    margin-bottom: 0.75rem;
+}
+
+.reply-header {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--dlsu-green);
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.reply-text {
+    font-size: 0.8rem;
+    color: var(--dlsu-gray-600);
+    line-height: 1.5;
+}
+
+/* Reply Compose */
+.reply-compose {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+}
+
+.reply-compose textarea {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 60px;
+    outline: none;
+}
+
+.reply-compose textarea:focus {
+    border-color: var(--dlsu-green);
+    box-shadow: 0 0 0 3px var(--dlsu-green-light);
+}
+
+.btn-reply {
+    padding: 0.5rem 1rem;
+    background: var(--dlsu-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    white-space: nowrap;
+    align-self: flex-end;
+}
+
+.btn-reply:hover {
+    background: var(--dlsu-green-dark);
+}
+
+/* Mark as Read Button */
+.btn-mark-read {
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 6px;
+    background: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    color: var(--dlsu-gray-600);
+    transition: all 0.15s;
+}
+
+.btn-mark-read:hover {
+    background: var(--dlsu-gray-100);
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .page-body {
+        padding: 1.25rem 1rem;
+    }
+}
