@@ -1,0 +1,227 @@
+/* ══ Email System — Page Styles ══ */
+
+.page-body {
+    padding: 1.75rem 2rem;
+    max-width: 920px;
+    margin: 0 auto;
+}
+
+.page-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--dlsu-green);
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.page-subtitle {
+    font-size: 0.82rem;
+    color: var(--dlsu-gray-400);
+    margin-bottom: 1.75rem;
+}
+
+/* Mode Toggle */
+.mode-toggle {
+    display: flex;
+    background: var(--dlsu-gray-100);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 1.5rem;
+    width: fit-content;
+}
+
+.mode-btn {
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    background: transparent;
+    color: var(--dlsu-gray-400);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.mode-btn.active {
+    background: white;
+    color: var(--dlsu-green);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Section Card */
+.section-card {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid var(--dlsu-gray-200);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title i {
+    color: var(--dlsu-green);
+}
+
+.section-desc {
+    font-size: 0.78rem;
+    color: var(--dlsu-gray-400);
+    margin-bottom: 1.15rem;
+}
+
+/* Form Controls */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label-custom {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--dlsu-gray-800);
+    margin-bottom: 0.35rem;
+    display: block;
+}
+
+.form-label-custom .required {
+    color: var(--dlsu-danger);
+}
+
+.form-control-custom {
+    width: 100%;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control-custom:focus {
+    border-color: var(--dlsu-green);
+    box-shadow: 0 0 0 3px var(--dlsu-green-light);
+}
+
+textarea.form-control-custom {
+    resize: vertical;
+    min-height: 140px;
+}
+
+select.form-control-custom {
+    cursor: pointer;
+}
+
+/* Send Button */
+.btn-send {
+    padding: 0.6rem 1.75rem;
+    background: var(--dlsu-green);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-send:hover {
+    background: var(--dlsu-green-dark);
+}
+
+/* Recipient Info */
+.recipient-info {
+    font-size: 0.75rem;
+    color: var(--dlsu-gray-400);
+    margin-top: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.recipient-info i {
+    color: var(--dlsu-green);
+}
+
+/* Sent History */
+.sent-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--dlsu-gray-100);
+}
+
+.sent-item:last-child {
+    border-bottom: none;
+}
+
+.sent-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.sent-icon.bulk {
+    background: var(--dlsu-green-light);
+    color: var(--dlsu-green);
+}
+
+.sent-icon.individual {
+    background: #e4edfb;
+    color: #1a56a8;
+}
+
+.sent-subject {
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.sent-meta {
+    font-size: 0.72rem;
+    color: var(--dlsu-gray-400);
+    margin-top: 0.1rem;
+}
+
+.sent-preview {
+    font-size: 0.78rem;
+    color: var(--dlsu-gray-600);
+    margin-top: 0.25rem;
+    line-height: 1.4;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .page-body {
+        padding: 1.25rem 1rem;
+    }
+}
