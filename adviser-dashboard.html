@@ -5,40 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard — Adviser Portal</title>
 
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <!-- ✅ Shared CSS (sidebar, topbar, layout) -->
     <link rel="stylesheet" href="css/shared.css">
-    <!-- ✅ Page-specific CSS -->
     <link rel="stylesheet" href="css/dashboard.css">
 </head>
 
 <body data-page-title="Dashboard" data-page-subtitle="Adviser Portal · Term 2, AY 2025–2026">
 
-    <!-- ✅ Sidebar loads here -->
+
     <div id="sidebar-container"></div>
-
-    <!-- Main Content -->
     <div class="main-content" id="mainContent">
-
-        <!-- ✅ Topbar loads here -->
         <div id="topbar-container"></div>
-
-        <!-- Page Body -->
         <div class="page-body">
-            <!-- Welcome Banner -->
             <div class="welcome-banner">
                 <h2 id="greetingText">Good afternoon, Dr. Cruz!</h2>
                 <p>You have <strong>5 pending study plans</strong> to review and <strong>2 upcoming appointments</strong> today.</p>
                 <span class="term-badge"><i class="bi bi-calendar3"></i> Advising Period: Mar 24 – Apr 4, 2026</span>
             </div>
 
-            <!-- Stats + Recent Activity side by side -->
             <div class="row g-4 mb-4">
                 <div class="col-lg-8">
                     <div class="row g-3">
@@ -60,7 +47,6 @@
                 </div>
             </div>
 
-            <!-- At-Risk Students -->
             <div class="section-header"><span>At-Risk Students</span><a href="my-advisees.html" class="view-all">View all advisees <i class="bi bi-arrow-right"></i></a></div>
             <div class="content-card mb-4">
                 <table class="risk-table">
@@ -73,7 +59,6 @@
                 </table>
             </div>
 
-            <!-- Quick Actions -->
             <div class="section-header"><span>Quick Actions</span></div>
             <div class="row g-3 mb-4">
                 <div class="col-4 col-md"><a href="advising-forms.html" class="quick-action-btn"><i class="bi bi-file-earmark-check"></i><span>Review Study Plans</span></a></div>
@@ -85,13 +70,9 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- ✅ Shared JS -->
     <script src="js/shared.js"></script>
-    <!-- ✅ Component Loader -->
     <script src="js/load-components.js"></script>
-    <!-- ✅ Page-specific JS -->
     <script src="js/dashboard.js"></script>
 </body>
 </html>
