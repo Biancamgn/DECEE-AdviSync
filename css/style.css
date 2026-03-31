@@ -866,6 +866,74 @@ body {
 .prereq-type-dot.soft { background: var(--dlsu-warning); }
 .prereq-type-dot.co   { background: var(--dlsu-info); }
 
+/* ── Advising: Workload Cards ── */
+.workload-card {
+    background: white;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 12px;
+    padding: 1.15rem;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+    height: 100%;
+}
+
+.workload-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 112, 60, 0.08);
+    transform: translateY(-1px);
+}
+
+.workload-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.workload-status-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.workload-status-badge.overloaded {
+    background: #fdeaea;
+    color: var(--dlsu-danger);
+}
+
+.workload-status-badge.optimal {
+    background: var(--dlsu-green-light);
+    color: var(--dlsu-green);
+}
+
+.workload-status-badge.low {
+    background: #e8f0fe;
+    color: var(--dlsu-info);
+}
+
+/* ── Advising: Bulk Assign Bar ── */
+.bulk-assign-bar {
+    position: fixed;
+    bottom: -80px;
+    left: var(--sidebar-collapsed);
+    right: 0;
+    background: white;
+    border-top: 1px solid var(--dlsu-gray-200);
+    padding: 0.85rem 1.5rem;
+    z-index: 100;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+    transition: bottom 0.3s ease, left 0.3s ease;
+}
+
+.bulk-assign-bar.visible {
+    bottom: 0;
+}
+
 /* ── Mobile Overlay ── */
 .sidebar-overlay {
     display: none;
@@ -1149,4 +1217,32 @@ body.dark-mode .prereq-badge.soft {
 
 body.dark-mode .prereq-badge.co {
     background: rgba(41, 128, 185, 0.15);
+}
+
+/* Dark Mode: Advising */
+body.dark-mode .workload-card {
+    background: #22262e;
+    border-color: #2d323c;
+}
+
+body.dark-mode .workload-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .workload-status-badge.overloaded {
+    background: rgba(192, 57, 43, 0.15);
+}
+
+body.dark-mode .workload-status-badge.optimal {
+    background: rgba(0, 112, 60, 0.15);
+}
+
+body.dark-mode .workload-status-badge.low {
+    background: rgba(41, 128, 185, 0.15);
+}
+
+body.dark-mode .bulk-assign-bar {
+    background: #22262e;
+    border-top-color: #2d323c;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
 }
