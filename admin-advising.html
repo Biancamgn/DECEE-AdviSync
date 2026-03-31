@@ -167,9 +167,9 @@
                         </div>
                         <select class="form-select form-select-sm" id="workloadFilter" style="max-width: 180px; border-color: var(--dlsu-gray-200); font-size: 0.82rem;">
                             <option value="all">All Workloads</option>
-                            <option value="overloaded">Overloaded (>50)</option>
+                            <option value="overloaded">Overloaded (&gt;50)</option>
                             <option value="optimal">Optimal (30–50)</option>
-                            <option value="low">Low (<30)</option>
+                            <option value="low">Low (&lt;30)</option>
                         </select>
                     </div>
 
@@ -369,6 +369,9 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/admin-advising.js"></script>
 </body>
 </html>

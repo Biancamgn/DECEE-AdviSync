@@ -1,8 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
     // ═══════════════════════════════════════════════════════════════════════
-    // SHARED UI: Sidebar, Dark Mode, Clock, Profile
+    // ROUTE GUARD + SHARED UI
     // ═══════════════════════════════════════════════════════════════════════
+    const currentUser = await requireAuth(['admin']);
+    if (!currentUser) return;
+
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const overlay = document.getElementById('sidebarOverlay');
@@ -37,11 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.toggle('dark-mode');
         const icon = darkModeBtn.querySelector('i');
         icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-        // Re-render charts with updated colors
         renderEnrollmentChart();
         renderYearDistChart();
         renderCoursePerformanceChart();
     });
+
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });
 
     // Chart.js global defaults
     Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
@@ -53,12 +58,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ═══════════════════════════════════════════════════════════════════════
     // TAB 1: ENROLLMENT STATISTICS
+    // Uses hardcoded historical data (enrollment trends are not live-tracked)
+    // Year distribution is populated from Supabase
     // ═══════════════════════════════════════════════════════════════════════
     const enrollmentData = {
         years: ['2019–20', '2020–21', '2021–22', '2022–23', '2023–24', '2024–25', '2025–26'],
         bscpe: [480, 510, 530, 560, 590, 618, 650],
         bsece: [420, 430, 460, 490, 520, 534, 600],
     };
+
+    // Fetch current year distribution from Supabase
+    let yearDistData = [0, 0, 0, 0];
+    try {
+        const { data: studentRows, error } = await supabaseClient
+            .from('students')
+            .select('year_level, profiles!inner(status)')
+            .eq('profiles.status', 'active');
+
+        if (!error && studentRows) {
+            studentRows.forEach(s => {
+                if (s.year_level >= 1 && s.year_level <= 4) {
+                    yearDistData[s.year_level - 1]++;
+                }
+            });
+        }
+    } catch (e) {
+        console.warn('Year distribution fetch failed:', e);
+        yearDistData = [380, 330, 300, 240]; // fallback
+    }
 
     let enrollmentChart;
     function renderEnrollmentChart() {
@@ -117,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             data: {
                 labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'],
                 datasets: [{
-                    data: [380, 330, 300, 240],
+                    data: yearDistData,
                     backgroundColor: ['#00703c', '#2980b9', '#e6a817', '#c0392b'],
                     borderWidth: 0,
                     hoverOffset: 6,
@@ -141,30 +168,28 @@ document.addEventListener('DOMContentLoaded', () => {
     renderYearDistChart();
 
     // ═══════════════════════════════════════════════════════════════════════
-    // TAB 2: FAILED UNITS REPORT
+    // TAB 2: FAILED UNITS REPORT (from at_risk_students view)
     // ═══════════════════════════════════════════════════════════════════════
-    const failedStudents = [
-        // Warning (15-24 units)
-        { id: '12210101', name: 'Mark Rivera',      program: 'BSCpE',  year: 3, failedUnits: 18, adviser: 'Dr. Jane Smith' },
-        { id: '12210102', name: 'Anna Gonzales',    program: 'BSECE', year: 4, failedUnits: 21, adviser: 'Engr. John Doe' },
-        { id: '12210103', name: 'Paulo Reyes',      program: 'BSCpE',  year: 2, failedUnits: 15, adviser: 'Dr. Alan Turing' },
-        { id: '12210104', name: 'Maria Santos',     program: 'BSECE', year: 3, failedUnits: 24, adviser: 'Engr. Ada Lovelace' },
-        { id: '12210105', name: 'Jose Cruz',        program: 'BSCpE',  year: 4, failedUnits: 18, adviser: 'Dr. Grace Hopper' },
-        { id: '12210106', name: 'Sophia Tan',       program: 'BSCpE',  year: 3, failedUnits: 21, adviser: 'Dr. Jane Smith' },
-        { id: '12210107', name: 'Leo Castillo',     program: 'BSECE', year: 2, failedUnits: 15, adviser: 'Engr. Nikola Tesla' },
-        { id: '12210108', name: 'Grace Lim',        program: 'BSCpE',  year: 4, failedUnits: 18, adviser: 'Dr. Alan Turing' },
-        { id: '12210109', name: 'Nathan Aquino',    program: 'BSECE', year: 3, failedUnits: 21, adviser: 'Engr. John Doe' },
-        { id: '12210110', name: 'Ella Villanueva',  program: 'BSCpE',  year: 2, failedUnits: 15, adviser: 'Dr. Jane Smith' },
-        { id: '12210111', name: 'Rico Mendoza',     program: 'BSECE', year: 4, failedUnits: 24, adviser: 'Engr. Ada Lovelace' },
-        { id: '12210112', name: 'Teresa Diaz',      program: 'BSCpE',  year: 3, failedUnits: 18, adviser: 'Dr. Grace Hopper' },
-        // Critical (25+ units)
-        { id: '12210201', name: 'Pedro Garcia',     program: 'BSCpE',  year: 4, failedUnits: 30, adviser: 'Dr. Jane Smith' },
-        { id: '12210202', name: 'Linda Bautista',   program: 'BSECE', year: 3, failedUnits: 27, adviser: 'Engr. John Doe' },
-        { id: '12210203', name: 'David Torres',     program: 'BSCpE',  year: 4, failedUnits: 33, adviser: 'Dr. Alan Turing' },
-        { id: '12210204', name: 'Carmen Flores',    program: 'BSECE', year: 3, failedUnits: 25, adviser: 'Engr. Nikola Tesla' },
-        { id: '12210205', name: 'Roberto Pineda',   program: 'BSCpE',  year: 4, failedUnits: 28, adviser: 'Dr. Grace Hopper' },
-        { id: '12210206', name: 'Jessica Santiago',  program: 'BSECE', year: 4, failedUnits: 31, adviser: 'Engr. Ada Lovelace' },
-    ];
+    let failedStudents = [];
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('at_risk_students')
+            .select('*');
+
+        if (!error && data) {
+            failedStudents = data.map(s => ({
+                id: s.student_id,
+                name: s.full_name,
+                program: s.program,
+                year: s.year_level,
+                failedUnits: s.failed_units,
+                adviser: s.adviser_name || 'Unassigned'
+            }));
+        }
+    } catch (e) {
+        console.warn('At-risk students fetch failed:', e);
+    }
 
     function getFailStatus(units) {
         if (units >= 25) return 'critical';
@@ -213,13 +238,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('failedSearch').addEventListener('input', renderFailedTable);
     document.getElementById('failedStatusFilter').addEventListener('change', renderFailedTable);
     document.getElementById('failedProgramFilter').addEventListener('change', renderFailedTable);
-
-    // Render on tab show
     document.getElementById('failed-tab').addEventListener('shown.bs.tab', renderFailedTable);
     renderFailedTable();
 
     // ═══════════════════════════════════════════════════════════════════════
     // TAB 3: COURSE PERFORMANCE ANALYTICS
+    // Note: Enrollment-level pass/fail data is not tracked in current schema.
+    // Using mock data as placeholder until grade records are implemented.
     // ═══════════════════════════════════════════════════════════════════════
     const coursePerformanceData = {
         BSCpE: [
@@ -358,19 +383,37 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCoursePerformanceChart();
 
     // ═══════════════════════════════════════════════════════════════════════
-    // TAB 4: PROFESSOR WORKLOAD REPORT
+    // TAB 4: PROFESSOR WORKLOAD REPORT (from faculty_workload view)
     // ═══════════════════════════════════════════════════════════════════════
-    const facultyWorkload = [
-        { name: 'Dr. Jane Smith',     dept: 'DECEE', advisees: 55, reviewed: 40, pending: 15, initials: 'JS' },
-        { name: 'Engr. John Doe',     dept: 'DECEE', advisees: 42, reviewed: 38, pending: 4,  initials: 'JD' },
-        { name: 'Dr. Alan Turing',    dept: 'DECEE', advisees: 48, reviewed: 45, pending: 3,  initials: 'AT' },
-        { name: 'Engr. Ada Lovelace', dept: 'DECEE', advisees: 38, reviewed: 30, pending: 8,  initials: 'AL' },
-        { name: 'Dr. Grace Hopper',   dept: 'DECEE', advisees: 50, reviewed: 42, pending: 8,  initials: 'GH' },
-        { name: 'Engr. Nikola Tesla', dept: 'DECEE', advisees: 35, reviewed: 25, pending: 10, initials: 'NT' },
-    ];
+    let facultyWorkload = [];
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('faculty_workload')
+            .select('*');
+
+        if (!error && data) {
+            facultyWorkload = data.map(f => ({
+                name: `${f.first_name} ${f.last_name}`,
+                dept: f.department || 'DECEE',
+                advisees: f.total_advisees || 0,
+                reviewed: f.plans_reviewed || 0,
+                pending: f.plans_pending || 0,
+                initials: f.first_name[0] + f.last_name[0]
+            }));
+        }
+    } catch (e) {
+        console.warn('Faculty workload fetch failed:', e);
+    }
 
     function renderWorkloadTable() {
         const tbody = document.getElementById('workloadBody');
+
+        if (facultyWorkload.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4" style="color:var(--dlsu-gray-400); font-size:0.82rem;">No faculty data available.</td></tr>`;
+            return;
+        }
+
         tbody.innerHTML = facultyWorkload.map(f => {
             const total = f.reviewed + f.pending;
             const pct = total > 0 ? ((f.reviewed / total) * 100).toFixed(0) : 0;

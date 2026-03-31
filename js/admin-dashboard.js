@@ -1,4 +1,8 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+
+    // ── Route Guard: Admin only ──
+    const currentUser = await requireAuth(['admin']);
+    if (!currentUser) return;
 
     // ── Elements ──
     const sidebar = document.getElementById('sidebar');
@@ -80,13 +84,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ── Sign Out ──
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) {
+        signOutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            signOut();
+        });
+    }
+
     // =========================================================================
-    // MOCK DATA — Replace with Supabase fetches later
+    // FETCH DASHBOARD DATA FROM SUPABASE
     // =========================================================================
-    const totalStudents = 1250;
-    const clearedStudents = 850;
-    const notClearedStudents = 400;
-    const atRiskStudents = 45;
+    let totalStudents = 0, clearedStudents = 0, notClearedStudents = 0, atRiskStudents = 0;
+
+    try {
+        const { data: stats, error } = await supabaseClient
+            .from('dashboard_stats')
+            .select('*')
+            .single();
+
+        if (!error && stats) {
+            totalStudents = stats.total_students || 0;
+            clearedStudents = stats.cleared || 0;
+            notClearedStudents = stats.not_cleared || 0;
+            atRiskStudents = stats.at_risk || 0;
+        }
+    } catch (e) {
+        console.warn('Dashboard stats fetch failed, using defaults:', e);
+    }
 
     document.getElementById('totalStudents').textContent = totalStudents.toLocaleString();
     document.getElementById('clearedStudents').textContent = clearedStudents.toLocaleString();
@@ -126,12 +152,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =========================================================================
-    // STUDENT DISTRIBUTION — Bar Chart
+    // STUDENT DISTRIBUTION — Bar Chart (from Supabase)
     // =========================================================================
-    const distributionCtx = document.getElementById('distributionChart').getContext('2d');
-    const bscpeData = [150, 130, 120, 100];
-    const bseceData = [200, 190, 180, 180];
+    let bscpeByYear = [0, 0, 0, 0];
+    let bseceByYear = [0, 0, 0, 0];
 
+    try {
+        const { data: studentRows, error } = await supabaseClient
+            .from('students')
+            .select('program, year_level, profiles!inner(status)')
+            .eq('profiles.status', 'active');
+
+        if (!error && studentRows) {
+            studentRows.forEach(s => {
+                const yr = s.year_level;
+                if (yr >= 1 && yr <= 4) {
+                    if (s.program === 'BSCpE') bscpeByYear[yr - 1]++;
+                    else if (s.program === 'BSECE') bseceByYear[yr - 1]++;
+                }
+            });
+        }
+    } catch (e) {
+        console.warn('Student distribution fetch failed:', e);
+    }
+
+    const distributionCtx = document.getElementById('distributionChart').getContext('2d');
     new Chart(distributionCtx, {
         type: 'bar',
         data: {
@@ -139,13 +184,13 @@ document.addEventListener('DOMContentLoaded', () => {
             datasets: [
                 {
                     label: 'BSCpE',
-                    data: bscpeData,
+                    data: bscpeByYear,
                     backgroundColor: '#00703C',
                     borderRadius: 6
                 },
                 {
                     label: 'BSECE',
-                    data: bseceData,
+                    data: bseceByYear,
                     backgroundColor: '#2980b9',
                     borderRadius: 6
                 }
@@ -179,40 +224,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =========================================================================
-    // ADVISER MONITORING TABLE
+    // ADVISER MONITORING TABLE (from faculty_workload view)
     // =========================================================================
-    const mockAdvisers = [
-        { name: 'Dr. Jane Smith',      program: 'BSCpE',  reviewed: 45, total: 50 },
-        { name: 'Engr. John Doe',      program: 'BSECE',  reviewed: 30, total: 60 },
-        { name: 'Dr. Alan Turing',     program: 'BSCpE',  reviewed: 50, total: 50 },
-        { name: 'Engr. Ada Lovelace',  program: 'BSECE',  reviewed: 10, total: 40 },
-        { name: 'Dr. Grace Hopper',    program: 'BSCpE',  reviewed: 25, total: 50 }
-    ];
-
     const advisersList = document.getElementById('advisersList');
 
-    mockAdvisers.forEach(adviser => {
-        const pct = Math.round((adviser.reviewed / adviser.total) * 100);
+    try {
+        const { data: workload, error } = await supabaseClient
+            .from('faculty_workload')
+            .select('*');
 
-        let fillClass = 'safe';
-        if (pct === 100) fillClass = 'done';
-        else if (pct < 30) fillClass = 'danger';
-        else if (pct < 70) fillClass = 'warning';
+        if (!error && workload && workload.length > 0) {
+            workload.forEach(adviser => {
+                const reviewed = adviser.plans_reviewed || 0;
+                const total = adviser.total_advisees || 0;
+                const pct = total > 0 ? Math.round((reviewed / total) * 100) : 0;
 
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="prof-name">${adviser.name}</td>
-            <td><span class="badge-program">${adviser.program}</span></td>
-            <td>${adviser.reviewed} / ${adviser.total}</td>
-            <td>
-                <div class="d-flex align-items-center gap-2">
-                    <span style="width:35px; font-size:0.75rem; font-weight:700; color:var(--dlsu-gray-600);">${pct}%</span>
-                    <div class="progress-track flex-grow-1">
-                        <div class="progress-fill ${fillClass}" style="width: ${pct}%"></div>
-                    </div>
-                </div>
-            </td>
-        `;
-        advisersList.appendChild(row);
-    });
+                let fillClass = 'safe';
+                if (pct === 100) fillClass = 'done';
+                else if (pct < 30) fillClass = 'danger';
+                else if (pct < 70) fillClass = 'warning';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="prof-name">Dr. ${adviser.first_name} ${adviser.last_name}</td>
+                    <td><span class="badge-program">${adviser.department || 'DECEE'}</span></td>
+                    <td>${reviewed} / ${total}</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span style="width:35px; font-size:0.75rem; font-weight:700; color:var(--dlsu-gray-600);">${pct}%</span>
+                            <div class="progress-track flex-grow-1">
+                                <div class="progress-fill ${fillClass}" style="width: ${pct}%"></div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                advisersList.appendChild(row);
+            });
+        } else {
+            // Fallback: show "No data" message
+            advisersList.innerHTML = `<tr><td colspan="4" class="text-center py-3" style="color:var(--dlsu-gray-400); font-size:0.82rem;">No faculty data available. Seed the database to populate this table.</td></tr>`;
+        }
+    } catch (e) {
+        console.warn('Faculty workload fetch failed:', e);
+        advisersList.innerHTML = `<tr><td colspan="4" class="text-center py-3" style="color:var(--dlsu-gray-400); font-size:0.82rem;">Unable to load adviser data.</td></tr>`;
+    }
 });

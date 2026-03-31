@@ -1,8 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
     // ═══════════════════════════════════════════════════════════════════════
-    // SHARED UI: Sidebar, Dark Mode, Clock, Profile
+    // ROUTE GUARD + SHARED UI
     // ═══════════════════════════════════════════════════════════════════════
+    const currentUser = await requireAuth(['admin']);
+    if (!currentUser) return;
+
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const overlay = document.getElementById('sidebarOverlay');
@@ -39,109 +42,56 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // MOCK CURRICULUM DATA (12-term structure)
-    // ═══════════════════════════════════════════════════════════════════════
-    let bscpeCourses = [
-        // Term 1 – Year 1
-        { code: 'LBYCPD1', title: 'Computer Programming 1', units: 3, term: 1, year: 1, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        { code: 'LBYMATH', title: 'Mathematics for Engineers', units: 3, term: 1, year: 1, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        { code: 'GEUSELF', title: 'Understanding the Self', units: 3, term: 1, year: 1, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        { code: 'GEFCOMM', title: 'Purposive Communication', units: 3, term: 1, year: 1, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        { code: 'GEETHIC', title: 'Ethics', units: 3, term: 1, year: 1, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        // Term 2
-        { code: 'LBYCPD2', title: 'Computer Programming 2', units: 3, term: 2, year: 1, hardPrereqs: ['LBYCPD1'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYCALC', title: 'Calculus 1', units: 3, term: 2, year: 1, hardPrereqs: ['LBYMATH'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYPHY1', title: 'Physics 1', units: 4, term: 2, year: 1, hardPrereqs: ['LBYMATH'], softPrereqs: [], coReqs: [] },
-        { code: 'GELITPH', title: 'Philippine Literature', units: 3, term: 2, year: 1, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        // Term 3
-        { code: 'LBYCPD3', title: 'Data Structures & Algorithms', units: 3, term: 3, year: 1, hardPrereqs: ['LBYCPD2'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYCAL2', title: 'Calculus 2', units: 3, term: 3, year: 1, hardPrereqs: ['LBYCALC'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYPHY2', title: 'Physics 2', units: 4, term: 3, year: 1, hardPrereqs: ['LBYPHY1'], softPrereqs: [], coReqs: [] },
-        // Term 4 – Year 2
-        { code: 'LBYCPG1', title: 'Discrete Mathematics', units: 3, term: 4, year: 2, hardPrereqs: ['LBYCPD2'], softPrereqs: ['LBYCAL2'], coReqs: [] },
-        { code: 'LBYCAL3', title: 'Differential Equations', units: 3, term: 4, year: 2, hardPrereqs: ['LBYCAL2'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYCIRK', title: 'Circuit Analysis', units: 3, term: 4, year: 2, hardPrereqs: ['LBYPHY2'], softPrereqs: [], coReqs: [] },
-        // Term 5
-        { code: 'LBYCPG2', title: 'Computer Organization', units: 3, term: 5, year: 2, hardPrereqs: ['LBYCPG1', 'LBYCPD3'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYNUM', title: 'Numerical Methods', units: 3, term: 5, year: 2, hardPrereqs: ['LBYCAL3'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYEC01', title: 'Electronics 1', units: 3, term: 5, year: 2, hardPrereqs: ['LBYCIRK'], softPrereqs: [], coReqs: [] },
-        // Term 6
-        { code: 'LBYCPOS', title: 'Operating Systems', units: 3, term: 6, year: 2, hardPrereqs: ['LBYCPG2'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYSIG1', title: 'Signals & Systems', units: 3, term: 6, year: 2, hardPrereqs: ['LBYCAL3'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYEC02', title: 'Electronics 2', units: 3, term: 6, year: 2, hardPrereqs: ['LBYEC01'], softPrereqs: [], coReqs: [] },
-        // Term 7 – Year 3
-        { code: 'LBYCPNW', title: 'Computer Networks', units: 3, term: 7, year: 3, hardPrereqs: ['LBYCPOS'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYCPDB', title: 'Database Systems', units: 3, term: 7, year: 3, hardPrereqs: ['LBYCPD3'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYEMBD', title: 'Embedded Systems', units: 3, term: 7, year: 3, hardPrereqs: ['LBYCPG2'], softPrereqs: [], coReqs: ['LBYEC02'] },
-        // Term 8
-        { code: 'LBYCPSE', title: 'Software Engineering', units: 3, term: 8, year: 3, hardPrereqs: ['LBYCPDB', 'LBYCPOS'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYDSGN', title: 'Digital Design', units: 3, term: 8, year: 3, hardPrereqs: ['LBYEMBD'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYCPAI', title: 'Artificial Intelligence', units: 3, term: 8, year: 3, hardPrereqs: ['LBYCPD3', 'LBYCPG1'], softPrereqs: ['LBYNUM'], coReqs: [] },
-        // Term 9
-        { code: 'LBYTH1A', title: 'Thesis 1', units: 3, term: 9, year: 3, hardPrereqs: ['LBYCPSE'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYCPSC', title: 'Computer Security', units: 3, term: 9, year: 3, hardPrereqs: ['LBYCPNW'], softPrereqs: [], coReqs: [] },
-        // Term 10 – Year 4
-        { code: 'LBYTH2A', title: 'Thesis 2', units: 3, term: 10, year: 4, hardPrereqs: ['LBYTH1A'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYCPEL', title: 'CpE Elective 1', units: 3, term: 10, year: 4, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        // Term 11
-        { code: 'LBYTH3A', title: 'Thesis 3', units: 3, term: 11, year: 4, hardPrereqs: ['LBYTH2A'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYCPE2', title: 'CpE Elective 2', units: 3, term: 11, year: 4, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        // Term 12
-        { code: 'LBYOJTA', title: 'On-the-Job Training', units: 6, term: 12, year: 4, hardPrereqs: ['LBYTH3A'], softPrereqs: [], coReqs: [] },
-    ];
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });
 
-    let bseceCourses = [
-        // Term 1 – Year 1
-        { code: 'LBYEC10', title: 'Intro to Electronics Engineering', units: 3, term: 1, year: 1, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        { code: 'LBYMTH1', title: 'Engineering Mathematics 1', units: 3, term: 1, year: 1, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        { code: 'GEUSELF', title: 'Understanding the Self', units: 3, term: 1, year: 1, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        { code: 'GEFCOMM', title: 'Purposive Communication', units: 3, term: 1, year: 1, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        // Term 2
-        { code: 'LBYEC20', title: 'Circuit Theory 1', units: 3, term: 2, year: 1, hardPrereqs: ['LBYMTH1'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYMTH2', title: 'Engineering Mathematics 2', units: 3, term: 2, year: 1, hardPrereqs: ['LBYMTH1'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYEP01', title: 'Engineering Physics 1', units: 4, term: 2, year: 1, hardPrereqs: ['LBYMTH1'], softPrereqs: [], coReqs: [] },
-        // Term 3
-        { code: 'LBYEC30', title: 'Circuit Theory 2', units: 3, term: 3, year: 1, hardPrereqs: ['LBYEC20'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYMTH3', title: 'Differential Equations', units: 3, term: 3, year: 1, hardPrereqs: ['LBYMTH2'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYEP02', title: 'Engineering Physics 2', units: 4, term: 3, year: 1, hardPrereqs: ['LBYEP01'], softPrereqs: [], coReqs: [] },
-        // Term 4 – Year 2
-        { code: 'LBYEC40', title: 'Electronics 1', units: 3, term: 4, year: 2, hardPrereqs: ['LBYEC30'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYSIG1', title: 'Signals & Systems', units: 3, term: 4, year: 2, hardPrereqs: ['LBYMTH3'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYEC4P', title: 'ECE Programming', units: 3, term: 4, year: 2, hardPrereqs: [], softPrereqs: ['LBYMTH2'], coReqs: [] },
-        // Term 5
-        { code: 'LBYEC50', title: 'Electronics 2', units: 3, term: 5, year: 2, hardPrereqs: ['LBYEC40'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYEM01', title: 'Electromagnetics 1', units: 3, term: 5, year: 2, hardPrereqs: ['LBYEP02', 'LBYMTH3'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYDSP1', title: 'Digital Signal Processing', units: 3, term: 5, year: 2, hardPrereqs: ['LBYSIG1'], softPrereqs: [], coReqs: [] },
-        // Term 6
-        { code: 'LBYEC60', title: 'Electronics 3', units: 3, term: 6, year: 2, hardPrereqs: ['LBYEC50'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYEM02', title: 'Electromagnetics 2', units: 3, term: 6, year: 2, hardPrereqs: ['LBYEM01'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYCOM1', title: 'Communications 1', units: 3, term: 6, year: 2, hardPrereqs: ['LBYDSP1'], softPrereqs: [], coReqs: [] },
-        // Term 7 – Year 3
-        { code: 'LBYCOM2', title: 'Communications 2', units: 3, term: 7, year: 3, hardPrereqs: ['LBYCOM1'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYPSYS', title: 'Power Systems', units: 3, term: 7, year: 3, hardPrereqs: ['LBYEC60'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYMICR', title: 'Microprocessors', units: 3, term: 7, year: 3, hardPrereqs: ['LBYEC4P', 'LBYEC50'], softPrereqs: [], coReqs: [] },
-        // Term 8
-        { code: 'LBYCOM3', title: 'Communications 3', units: 3, term: 8, year: 3, hardPrereqs: ['LBYCOM2'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYCTRL', title: 'Control Systems', units: 3, term: 8, year: 3, hardPrereqs: ['LBYSIG1'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYECD1', title: 'ECE Design 1', units: 3, term: 8, year: 3, hardPrereqs: ['LBYMICR'], softPrereqs: [], coReqs: [] },
-        // Term 9
-        { code: 'LBYETH1', title: 'ECE Thesis 1', units: 3, term: 9, year: 3, hardPrereqs: ['LBYECD1'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYECEL', title: 'ECE Elective 1', units: 3, term: 9, year: 3, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        // Term 10 – Year 4
-        { code: 'LBYETH2', title: 'ECE Thesis 2', units: 3, term: 10, year: 4, hardPrereqs: ['LBYETH1'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYECE2', title: 'ECE Elective 2', units: 3, term: 10, year: 4, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        // Term 11
-        { code: 'LBYETH3', title: 'ECE Thesis 3', units: 3, term: 11, year: 4, hardPrereqs: ['LBYETH2'], softPrereqs: [], coReqs: [] },
-        { code: 'LBYECE3', title: 'ECE Elective 3', units: 3, term: 11, year: 4, hardPrereqs: [], softPrereqs: [], coReqs: [] },
-        // Term 12
-        { code: 'LBYEOJT', title: 'On-the-Job Training', units: 6, term: 12, year: 4, hardPrereqs: ['LBYETH3'], softPrereqs: [], coReqs: [] },
-    ];
+    // ═══════════════════════════════════════════════════════════════════════
+    // FETCH COURSES FROM SUPABASE
+    // ═══════════════════════════════════════════════════════════════════════
+    let bscpeCourses = [];
+    let bseceCourses = [];
+
+    async function fetchCourses() {
+        // Fetch all courses with their prerequisites
+        const { data: courses, error } = await supabaseClient
+            .from('courses')
+            .select('*, prerequisites(*)')
+            .order('term', { ascending: true });
+
+        if (error) {
+            console.error('Error fetching courses:', error);
+            return;
+        }
+
+        // Transform to frontend format
+        bscpeCourses = [];
+        bseceCourses = [];
+
+        (courses || []).forEach(c => {
+            const prereqs = c.prerequisites || [];
+            const courseObj = {
+                dbId: c.id,
+                code: c.code,
+                title: c.title,
+                units: c.units,
+                term: c.term,
+                year: c.year_level,
+                hardPrereqs: prereqs.filter(p => p.type === 'hard').map(p => p.prerequisite_code),
+                softPrereqs: prereqs.filter(p => p.type === 'soft').map(p => p.prerequisite_code),
+                coReqs: prereqs.filter(p => p.type === 'co').map(p => p.prerequisite_code)
+            };
+
+            if (c.program_code === 'BSCpE') bscpeCourses.push(courseObj);
+            else if (c.program_code === 'BSECE') bseceCourses.push(courseObj);
+        });
+    }
+
+    await fetchCourses();
 
     // ═══════════════════════════════════════════════════════════════════════
     // VIEW MODE STATE
     // ═══════════════════════════════════════════════════════════════════════
-    let currentView = 'grid'; // 'grid' or 'table'
+    let currentView = 'grid';
     const viewGridBtn = document.getElementById('viewGrid');
     const viewTableBtn = document.getElementById('viewTable');
 
@@ -195,9 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ═══════════════════════════════════════════════════════════════════════
-    // RENDER: GRID VIEW (Term cards)
+    // RENDER: GRID VIEW
     // ═══════════════════════════════════════════════════════════════════════
-    function renderGrid(courses, gridEl) {
+    function renderGrid(courses, gridEl, programKey) {
         const filtered = filterCourses(courses);
         const terms = {};
         filtered.forEach(c => {
@@ -229,8 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <span class="course-code">${c.code}</span>
                                         <div class="d-flex gap-1">
-                                            <button class="action-btn edit" title="Edit" onclick="editCourse('${c.code}', '${courses === bscpeCourses ? 'BSCpE' : 'BSECE'}')"><i class="bi bi-pencil-square"></i></button>
-                                            <button class="action-btn delete" title="Delete" onclick="deleteCourse('${c.code}', '${courses === bscpeCourses ? 'BSCpE' : 'BSECE'}')"><i class="bi bi-trash3"></i></button>
+                                            <button class="action-btn edit" title="Edit" onclick="editCourse('${c.code}', '${programKey}')"><i class="bi bi-pencil-square"></i></button>
+                                            <button class="action-btn delete" title="Delete" onclick="deleteCourse('${c.code}', '${programKey}')"><i class="bi bi-trash3"></i></button>
                                         </div>
                                     </div>
                                     <div class="course-title">${c.title}</div>
@@ -279,15 +229,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // RENDER ALL
     // ═══════════════════════════════════════════════════════════════════════
     function renderAll() {
-        // Toggle visibility
         document.getElementById('bscpeGrid').classList.toggle('d-none', currentView !== 'grid');
         document.getElementById('bscpeTable').classList.toggle('d-none', currentView !== 'table');
         document.getElementById('bseceGrid').classList.toggle('d-none', currentView !== 'grid');
         document.getElementById('bseceTable').classList.toggle('d-none', currentView !== 'table');
 
         if (currentView === 'grid') {
-            renderGrid(bscpeCourses, document.getElementById('bscpeGrid'));
-            renderGrid(bseceCourses, document.getElementById('bseceGrid'));
+            renderGrid(bscpeCourses, document.getElementById('bscpeGrid'), 'BSCpE');
+            renderGrid(bseceCourses, document.getElementById('bseceGrid'), 'BSECE');
         } else {
             renderTable(bscpeCourses, document.getElementById('bscpeTableBody'), 'BSCpE');
             renderTable(bseceCourses, document.getElementById('bseceTableBody'), 'BSECE');
@@ -312,16 +261,15 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('editCourseCode').value = '';
         document.getElementById('editCourseProgram').value = '';
         document.getElementById('formUnits').value = 3;
-        // Default to whichever tab is active
         const activeTab = document.querySelector('#programTabs .nav-link.active');
         document.getElementById('formCourseProgram').value = activeTab.id === 'bscpe-tab' ? 'BSCpE' : 'BSECE';
         courseModal.show();
     });
 
     // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Save (Create or Update)
+    // CRUD: Save (Create or Update) — Supabase
     // ═══════════════════════════════════════════════════════════════════════
-    document.getElementById('saveCourseBtn').addEventListener('click', () => {
+    document.getElementById('saveCourseBtn').addEventListener('click', async () => {
         const editCode = document.getElementById('editCourseCode').value;
         const editProg = document.getElementById('editCourseProgram').value;
 
@@ -339,28 +287,54 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!code || !title) { alert('Please fill in Course Code and Title.'); return; }
 
-        const courseObj = { code, title, units, term, year, hardPrereqs, softPrereqs, coReqs };
-        const targetArr = program === 'BSCpE' ? bscpeCourses : bseceCourses;
-
         if (editCode) {
-            // Update
+            // ── UPDATE ──
             const srcArr = editProg === 'BSCpE' ? bscpeCourses : bseceCourses;
-            const idx = srcArr.findIndex(c => c.code === editCode);
-            if (idx !== -1) {
-                // If program changed, remove from old and add to new
-                if (editProg !== program) {
-                    srcArr.splice(idx, 1);
-                    targetArr.push(courseObj);
-                } else {
-                    srcArr[idx] = courseObj;
-                }
+            const existing = srcArr.find(c => c.code === editCode);
+            if (!existing) return;
+
+            const { error } = await supabaseClient
+                .from('courses')
+                .update({ code, title, units, term, year_level: year, program_code: program })
+                .eq('id', existing.dbId);
+
+            if (error) { alert('Error updating course: ' + error.message); return; }
+
+            // Replace prerequisites: delete old, insert new
+            await supabaseClient.from('prerequisites').delete().eq('course_id', existing.dbId);
+
+            const prereqRows = [
+                ...hardPrereqs.map(p => ({ course_id: existing.dbId, prerequisite_code: p, type: 'hard' })),
+                ...softPrereqs.map(p => ({ course_id: existing.dbId, prerequisite_code: p, type: 'soft' })),
+                ...coReqs.map(p => ({ course_id: existing.dbId, prerequisite_code: p, type: 'co' }))
+            ];
+
+            if (prereqRows.length > 0) {
+                await supabaseClient.from('prerequisites').insert(prereqRows);
             }
         } else {
-            // Create
-            if (targetArr.find(c => c.code === code)) { alert('A course with this code already exists.'); return; }
-            targetArr.push(courseObj);
+            // ── CREATE ──
+            const { data: newCourse, error } = await supabaseClient
+                .from('courses')
+                .insert({ code, title, units, term, year_level: year, program_code: program })
+                .select()
+                .single();
+
+            if (error) { alert('Error creating course: ' + error.message); return; }
+
+            // Insert prerequisites
+            const prereqRows = [
+                ...hardPrereqs.map(p => ({ course_id: newCourse.id, prerequisite_code: p, type: 'hard' })),
+                ...softPrereqs.map(p => ({ course_id: newCourse.id, prerequisite_code: p, type: 'soft' })),
+                ...coReqs.map(p => ({ course_id: newCourse.id, prerequisite_code: p, type: 'co' }))
+            ];
+
+            if (prereqRows.length > 0) {
+                await supabaseClient.from('prerequisites').insert(prereqRows);
+            }
         }
 
+        await fetchCourses();
         renderAll();
         courseModal.hide();
     });
@@ -391,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Delete
+    // CRUD: Delete — Supabase
     // ═══════════════════════════════════════════════════════════════════════
     const deleteCourseModal = new bootstrap.Modal(document.getElementById('deleteCourseModal'));
 
@@ -401,16 +375,23 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteCourseModal.show();
     };
 
-    document.getElementById('confirmDeleteCourseBtn').addEventListener('click', () => {
+    document.getElementById('confirmDeleteCourseBtn').addEventListener('click', async () => {
         const code = document.getElementById('deleteCourseCode').value;
         const program = document.getElementById('deleteCourseProgram').value;
 
-        if (program === 'BSCpE') {
-            bscpeCourses = bscpeCourses.filter(c => c.code !== code);
-        } else {
-            bseceCourses = bseceCourses.filter(c => c.code !== code);
+        const arr = program === 'BSCpE' ? bscpeCourses : bseceCourses;
+        const course = arr.find(c => c.code === code);
+
+        if (course) {
+            const { error } = await supabaseClient
+                .from('courses')
+                .delete()
+                .eq('id', course.dbId);
+
+            if (error) { alert('Error deleting course: ' + error.message); }
         }
 
+        await fetchCourses();
         renderAll();
         deleteCourseModal.hide();
     });

@@ -1,8 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
     // ═══════════════════════════════════════════════════════════════════════
-    // SHARED UI: Sidebar, Dark Mode, Clock, Profile
+    // ROUTE GUARD + SHARED UI
     // ═══════════════════════════════════════════════════════════════════════
+    const currentUser = await requireAuth(['admin']);
+    if (!currentUser) return;
+
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const overlay = document.getElementById('sidebarOverlay');
@@ -39,59 +42,69 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
     });
 
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });
+
     // ═══════════════════════════════════════════════════════════════════════
-    // MOCK DATA
+    // FETCH DATA FROM SUPABASE
     // ═══════════════════════════════════════════════════════════════════════
     const OVERLOAD_THRESHOLD = 50;
 
-    let professors = [
-        { id: 'FAC001', name: 'Dr. Jane Smith',      dept: 'DECEE', maxAdvisees: 50, initials: 'JS' },
-        { id: 'FAC002', name: 'Engr. John Doe',      dept: 'DECEE', maxAdvisees: 50, initials: 'JD' },
-        { id: 'FAC003', name: 'Dr. Alan Turing',     dept: 'DECEE', maxAdvisees: 50, initials: 'AT' },
-        { id: 'FAC004', name: 'Engr. Ada Lovelace',  dept: 'DECEE', maxAdvisees: 50, initials: 'AL' },
-        { id: 'FAC005', name: 'Dr. Grace Hopper',    dept: 'DECEE', maxAdvisees: 50, initials: 'GH' },
-        { id: 'FAC006', name: 'Engr. Nikola Tesla',  dept: 'DECEE', maxAdvisees: 50, initials: 'NT' },
-    ];
+    let professors = [];
+    let students = [];
 
-    let students = [
-        // Assigned students
-        { id: '12210001', name: 'Bianca Garcia',     program: 'BSCpE',  year: 3, adviserId: 'FAC001' },
-        { id: '12210002', name: 'Carlos Mendoza',    program: 'BSECE', year: 2, adviserId: 'FAC001' },
-        { id: '12210003', name: 'Diana Reyes',       program: 'BSCpE',  year: 4, adviserId: 'FAC001' },
-        { id: '12210004', name: 'Eduardo Santos',    program: 'BSECE', year: 1, adviserId: 'FAC002' },
-        { id: '12210005', name: 'Fatima Cruz',       program: 'BSCpE',  year: 2, adviserId: 'FAC002' },
-        { id: '12210006', name: 'Gabriel Villanueva', program: 'BSECE', year: 3, adviserId: 'FAC003' },
-        { id: '12210007', name: 'Hannah Tan',        program: 'BSCpE',  year: 1, adviserId: 'FAC003' },
-        { id: '12210008', name: 'Ivan Lim',          program: 'BSECE', year: 4, adviserId: 'FAC003' },
-        { id: '12210009', name: 'Julia Ramos',       program: 'BSCpE',  year: 3, adviserId: 'FAC004' },
-        { id: '12210010', name: 'Kevin Ong',         program: 'BSECE', year: 2, adviserId: 'FAC004' },
-        { id: '12210011', name: 'Luna Perez',        program: 'BSCpE',  year: 1, adviserId: 'FAC005' },
-        { id: '12210012', name: 'Marco de Guzman',   program: 'BSECE', year: 4, adviserId: 'FAC005' },
-        // Additional bulk assigned to FAC001 to simulate overload
-        { id: '12210020', name: 'Angela Bautista',   program: 'BSCpE',  year: 2, adviserId: 'FAC001' },
-        { id: '12210021', name: 'Ben Torres',        program: 'BSECE', year: 3, adviserId: 'FAC001' },
-        { id: '12210022', name: 'Clara Santiago',    program: 'BSCpE',  year: 1, adviserId: 'FAC001' },
-        { id: '12210023', name: 'Daniel Aquino',     program: 'BSECE', year: 4, adviserId: 'FAC001' },
-        { id: '12210024', name: 'Elena Flores',      program: 'BSCpE',  year: 2, adviserId: 'FAC001' },
-        { id: '12210025', name: 'Franco Castro',     program: 'BSECE', year: 3, adviserId: 'FAC001' },
-        { id: '12210026', name: 'Gina Morales',      program: 'BSCpE',  year: 1, adviserId: 'FAC001' },
-        { id: '12210027', name: 'Henry Pineda',      program: 'BSECE', year: 2, adviserId: 'FAC001' },
-        { id: '12210028', name: 'Iris Soriano',      program: 'BSCpE',  year: 4, adviserId: 'FAC001' },
-        { id: '12210029', name: 'Jason Navarro',     program: 'BSECE', year: 1, adviserId: 'FAC001' },
-        // more for overload (will make FAC001 have many)
-        ...Array.from({ length: 42 }, (_, i) => ({
-            id: `122100${30 + i}`, name: `Student ${30 + i}`, program: i % 2 === 0 ? 'BSCpE' : 'BSECE', year: (i % 4) + 1, adviserId: 'FAC001'
-        })),
-        // Unassigned students
-        { id: '12219001', name: 'Patricia Luna',     program: 'BSCpE',  year: 1, adviserId: null },
-        { id: '12219002', name: 'Ricardo Sison',     program: 'BSECE', year: 2, adviserId: null },
-        { id: '12219003', name: 'Samantha Yap',      program: 'BSCpE',  year: 3, adviserId: null },
-        { id: '12219004', name: 'Thomas Dela Cruz',  program: 'BSECE', year: 1, adviserId: null },
-        { id: '12219005', name: 'Ursula Fernandez',  program: 'BSCpE',  year: 4, adviserId: null },
-        { id: '12219006', name: 'Victor Manalo',     program: 'BSECE', year: 2, adviserId: null },
-        { id: '12219007', name: 'Wendy Pascual',     program: 'BSCpE',  year: 3, adviserId: null },
-        { id: '12219008', name: 'Xander Rizal',      program: 'BSECE', year: 4, adviserId: null },
-    ];
+    async function fetchProfessors() {
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('*, professors(*)')
+            .eq('role', 'professor')
+            .eq('status', 'active')
+            .order('last_name');
+
+        if (!error && data) {
+            professors = data.map(p => ({
+                id: p.school_id,
+                uuid: p.id,
+                name: `${p.first_name} ${p.last_name}`,
+                dept: p.professors?.department || 'DECEE',
+                maxAdvisees: p.professors?.max_advisees || 50,
+                initials: p.first_name[0] + p.last_name[0]
+            }));
+        }
+    }
+
+    async function fetchStudents() {
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('*, students(*)')
+            .eq('role', 'student')
+            .order('school_id');
+
+        if (!error && data) {
+            students = data.map(p => {
+                const adviserUuid = p.students?.adviser_id || null;
+                return {
+                    id: p.school_id,
+                    uuid: p.id,
+                    name: `${p.first_name} ${p.last_name}`,
+                    program: p.students?.program || 'BSCpE',
+                    year: p.students?.year_level || 1,
+                    adviserUuid: adviserUuid,
+                    adviserId: null // will be resolved after professors load
+                };
+            });
+        }
+    }
+
+    await Promise.all([fetchProfessors(), fetchStudents()]);
+
+    // Resolve adviser school_id from UUID
+    students.forEach(s => {
+        if (s.adviserUuid) {
+            const prof = professors.find(p => p.uuid === s.adviserUuid);
+            s.adviserId = prof ? prof.id : null;
+        }
+    });
 
     // ═══════════════════════════════════════════════════════════════════════
     // DERIVED HELPERS
@@ -237,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         attachCheckboxListeners();
     }
 
-    function renderAll() {
+    function renderAllStudents() {
         const all = filterStudents(students);
 
         allBody.innerHTML = all.length === 0
@@ -268,13 +281,13 @@ document.addEventListener('DOMContentLoaded', () => {
         renderStats();
         renderWorkload();
         renderUnassigned();
-        renderAll();
+        renderAllStudents();
         populateAdviserDropdowns();
     }
 
-    studentSearch.addEventListener('input', () => { renderUnassigned(); renderAll(); });
-    programFilter.addEventListener('change', () => { renderUnassigned(); renderAll(); });
-    yearFilter.addEventListener('change', () => { renderUnassigned(); renderAll(); });
+    studentSearch.addEventListener('input', () => { renderUnassigned(); renderAllStudents(); });
+    programFilter.addEventListener('change', () => { renderUnassigned(); renderAllStudents(); });
+    yearFilter.addEventListener('change', () => { renderUnassigned(); renderAllStudents(); });
 
     // ═══════════════════════════════════════════════════════════════════════
     // CHECKBOX & BULK SELECTION
@@ -313,15 +326,36 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBulkBar();
     });
 
-    // Bulk assign
-    document.getElementById('bulkAssignBtn').addEventListener('click', () => {
+    // Bulk assign — Supabase
+    document.getElementById('bulkAssignBtn').addEventListener('click', async () => {
         const advId = document.getElementById('bulkAdviserSelect').value;
         if (!advId) { alert('Please choose an adviser.'); return; }
         if (selectedStudents.size === 0) return;
 
+        const prof = professors.find(p => p.id === advId);
+        if (!prof) return;
+
+        // Update all selected students in Supabase
+        const studentUuids = [];
         selectedStudents.forEach(sId => {
             const s = students.find(x => x.id === sId);
-            if (s) s.adviserId = advId;
+            if (s) studentUuids.push(s.uuid);
+        });
+
+        for (const uuid of studentUuids) {
+            await supabaseClient
+                .from('students')
+                .update({ adviser_id: prof.uuid })
+                .eq('id', uuid);
+        }
+
+        // Update local state
+        selectedStudents.forEach(sId => {
+            const s = students.find(x => x.id === sId);
+            if (s) {
+                s.adviserId = advId;
+                s.adviserUuid = prof.uuid;
+            }
         });
 
         selectedStudents.clear();
@@ -347,7 +381,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ═══════════════════════════════════════════════════════════════════════
-    // MODAL: Assign Single
+    // MODAL: Assign Single — Supabase
     // ═══════════════════════════════════════════════════════════════════════
     const assignModal = new bootstrap.Modal(document.getElementById('assignModal'));
 
@@ -365,7 +399,6 @@ document.addEventListener('DOMContentLoaded', () => {
         assignModal.show();
     };
 
-    // Live adviser preview
     document.getElementById('assignAdviserSelect').addEventListener('change', (e) => {
         const p = professors.find(x => x.id === e.target.value);
         const preview = document.getElementById('adviserPreview');
@@ -380,20 +413,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('confirmAssignBtn').addEventListener('click', () => {
+    document.getElementById('confirmAssignBtn').addEventListener('click', async () => {
         const sId = document.getElementById('assignStudentId').value;
         const advId = document.getElementById('assignAdviserSelect').value;
         if (!advId) { alert('Please select an adviser.'); return; }
 
         const s = students.find(x => x.id === sId);
-        if (s) s.adviserId = advId;
+        const prof = professors.find(p => p.id === advId);
+        if (s && prof) {
+            await supabaseClient
+                .from('students')
+                .update({ adviser_id: prof.uuid })
+                .eq('id', s.uuid);
+
+            s.adviserId = advId;
+            s.adviserUuid = prof.uuid;
+        }
 
         assignModal.hide();
         renderEverything();
     });
 
     // ═══════════════════════════════════════════════════════════════════════
-    // MODAL: Reassign / Unassign
+    // MODAL: Reassign / Unassign — Supabase
     // ═══════════════════════════════════════════════════════════════════════
     const reassignModal = new bootstrap.Modal(document.getElementById('reassignModal'));
 
@@ -413,22 +455,39 @@ document.addEventListener('DOMContentLoaded', () => {
         reassignModal.show();
     };
 
-    document.getElementById('confirmReassignBtn').addEventListener('click', () => {
+    document.getElementById('confirmReassignBtn').addEventListener('click', async () => {
         const sId = document.getElementById('reassignStudentId').value;
         const newAdvId = document.getElementById('reassignAdviserSelect').value;
         if (!newAdvId) { alert('Please select a new adviser.'); return; }
 
         const s = students.find(x => x.id === sId);
-        if (s) s.adviserId = newAdvId;
+        const prof = professors.find(p => p.id === newAdvId);
+        if (s && prof) {
+            await supabaseClient
+                .from('students')
+                .update({ adviser_id: prof.uuid })
+                .eq('id', s.uuid);
+
+            s.adviserId = newAdvId;
+            s.adviserUuid = prof.uuid;
+        }
 
         reassignModal.hide();
         renderEverything();
     });
 
-    document.getElementById('unassignBtn').addEventListener('click', () => {
+    document.getElementById('unassignBtn').addEventListener('click', async () => {
         const sId = document.getElementById('reassignStudentId').value;
         const s = students.find(x => x.id === sId);
-        if (s) s.adviserId = null;
+        if (s) {
+            await supabaseClient
+                .from('students')
+                .update({ adviser_id: null })
+                .eq('id', s.uuid);
+
+            s.adviserId = null;
+            s.adviserUuid = null;
+        }
 
         reassignModal.hide();
         renderEverything();

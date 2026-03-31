@@ -1,8 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
     // ═══════════════════════════════════════════════════════════════════════
-    // SHARED UI: Sidebar, Dark Mode, Clock, Profile (same as admin-dashboard)
+    // ROUTE GUARD + SHARED UI
     // ═══════════════════════════════════════════════════════════════════════
+    const currentUser = await requireAuth(['admin']);
+    if (!currentUser) return;
+
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const overlay = document.getElementById('sidebarOverlay');
@@ -39,27 +42,67 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // MOCK DATA
-    // ═══════════════════════════════════════════════════════════════════════
-    let students = [
-        { id: '12210001', firstName: 'Bianca',  lastName: 'Garcia',    email: 'bianca_garcia@dlsu.edu.ph',    program: 'BSCpE', year: 3, status: 'active' },
-        { id: '12210002', firstName: 'Carlos',  lastName: 'Mendoza',   email: 'carlos_mendoza@dlsu.edu.ph',   program: 'BSECE', year: 2, status: 'active' },
-        { id: '12210003', firstName: 'Diana',   lastName: 'Reyes',     email: 'diana_reyes@dlsu.edu.ph',      program: 'BSCpE', year: 4, status: 'active' },
-        { id: '12210004', firstName: 'Eduardo', lastName: 'Santos',    email: 'eduardo_santos@dlsu.edu.ph',   program: 'BSECE', year: 1, status: 'inactive' },
-        { id: '12210005', firstName: 'Fatima',  lastName: 'Cruz',      email: 'fatima_cruz@dlsu.edu.ph',      program: 'BSCpE', year: 2, status: 'active' },
-        { id: '12210006', firstName: 'Gabriel', lastName: 'Villanueva',email: 'gabriel_villanueva@dlsu.edu.ph',program: 'BSECE', year: 3, status: 'active' },
-        { id: '12210007', firstName: 'Hannah',  lastName: 'Tan',       email: 'hannah_tan@dlsu.edu.ph',       program: 'BSCpE', year: 1, status: 'active' },
-        { id: '12210008', firstName: 'Ivan',    lastName: 'Lim',       email: 'ivan_lim@dlsu.edu.ph',         program: 'BSECE', year: 4, status: 'active' },
-    ];
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });
 
-    let professors = [
-        { id: 'FAC001', firstName: 'Jane',  lastName: 'Smith',    email: 'jane.smith@dlsu.edu.ph',    department: 'DECEE', advisees: 50, status: 'active' },
-        { id: 'FAC002', firstName: 'John',  lastName: 'Doe',      email: 'john.doe@dlsu.edu.ph',      department: 'DECEE', advisees: 60, status: 'active' },
-        { id: 'FAC003', firstName: 'Alan',  lastName: 'Turing',   email: 'alan.turing@dlsu.edu.ph',   department: 'DECEE', advisees: 50, status: 'active' },
-        { id: 'FAC004', firstName: 'Ada',   lastName: 'Lovelace', email: 'ada.lovelace@dlsu.edu.ph',  department: 'DECEE', advisees: 40, status: 'inactive' },
-        { id: 'FAC005', firstName: 'Grace', lastName: 'Hopper',   email: 'grace.hopper@dlsu.edu.ph',  department: 'DECEE', advisees: 50, status: 'active' },
-    ];
+    // ═══════════════════════════════════════════════════════════════════════
+    // FETCH DATA FROM SUPABASE
+    // ═══════════════════════════════════════════════════════════════════════
+    let students = [];
+    let professors = [];
+
+    async function fetchStudents() {
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('*, students(*)')
+            .eq('role', 'student')
+            .order('school_id', { ascending: true });
+
+        if (!error && data) {
+            students = data.map(p => ({
+                id: p.school_id,
+                uuid: p.id,
+                firstName: p.first_name,
+                lastName: p.last_name,
+                email: p.email,
+                program: p.students?.program || 'BSCpE',
+                year: p.students?.year_level || 1,
+                status: p.status
+            }));
+        }
+    }
+
+    async function fetchProfessors() {
+        const { data, error } = await supabaseClient
+            .from('profiles')
+            .select('*, professors(*)')
+            .eq('role', 'professor')
+            .order('school_id', { ascending: true });
+
+        if (!error && data) {
+            professors = data.map(p => ({
+                id: p.school_id,
+                uuid: p.id,
+                firstName: p.first_name,
+                lastName: p.last_name,
+                email: p.email,
+                department: p.professors?.department || 'DECEE',
+                advisees: 0,
+                status: p.status
+            }));
+
+            // Count advisees per professor
+            for (let prof of professors) {
+                const { count } = await supabaseClient
+                    .from('students')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('adviser_id', prof.uuid);
+                prof.advisees = count || 0;
+            }
+        }
+    }
+
+    await Promise.all([fetchStudents(), fetchProfessors()]);
 
     // ═══════════════════════════════════════════════════════════════════════
     // RENDER TABLES
@@ -146,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     programFilter.addEventListener('change', renderAll);
 
     // ═══════════════════════════════════════════════════════════════════════
-    // FORM: Role Toggle (show/hide student vs professor fields)
+    // FORM: Role Toggle
     // ═══════════════════════════════════════════════════════════════════════
     const formRole = document.getElementById('formRole');
     const studentFields = document.getElementById('studentFields');
@@ -182,9 +225,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Save (Create or Update)
+    // CRUD: Save (Create or Update) — Supabase
     // ═══════════════════════════════════════════════════════════════════════
-    document.getElementById('saveUserBtn').addEventListener('click', () => {
+    document.getElementById('saveUserBtn').addEventListener('click', async () => {
         const editId = document.getElementById('editUserId').value;
         const editType = document.getElementById('editUserType').value;
         const role = formRole.value;
@@ -199,45 +242,98 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (editId) {
-            // UPDATE
-            if (editType === 'student') {
-                const s = students.find(x => x.id === editId);
-                if (s) {
-                    s.id = userId; s.firstName = firstName; s.lastName = lastName; s.email = email;
-                    s.program = document.getElementById('formProgram').value;
-                    s.year = parseInt(document.getElementById('formYear').value);
+            // ── UPDATE existing user ──
+            const existingUser = editType === 'student'
+                ? students.find(x => x.id === editId)
+                : professors.find(x => x.id === editId);
+
+            if (existingUser) {
+                // Update profile
+                const { error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .update({
+                        school_id: userId,
+                        first_name: firstName,
+                        last_name: lastName,
+                        email: email
+                    })
+                    .eq('id', existingUser.uuid);
+
+                if (profileError) {
+                    alert('Error updating profile: ' + profileError.message);
+                    return;
                 }
-            } else {
-                const p = professors.find(x => x.id === editId);
-                if (p) {
-                    p.id = userId; p.firstName = firstName; p.lastName = lastName; p.email = email;
-                    p.department = document.getElementById('formDepartment').value;
+
+                // Update role-specific table
+                if (editType === 'student') {
+                    await supabaseClient
+                        .from('students')
+                        .update({
+                            program: document.getElementById('formProgram').value,
+                            year_level: parseInt(document.getElementById('formYear').value)
+                        })
+                        .eq('id', existingUser.uuid);
+                } else {
+                    await supabaseClient
+                        .from('professors')
+                        .update({
+                            department: document.getElementById('formDepartment').value
+                        })
+                        .eq('id', existingUser.uuid);
                 }
             }
         } else {
-            // CREATE
-            if (role === 'student') {
-                students.push({
-                    id: userId, firstName, lastName, email,
-                    program: document.getElementById('formProgram').value,
-                    year: parseInt(document.getElementById('formYear').value),
+            // ── CREATE new user ──
+            // Create auth user via Supabase Admin (or use invite)
+            // For client-side, we insert directly into profiles + role table
+            // Note: In production, use a Supabase Edge Function to create auth users
+            const newId = crypto.randomUUID();
+
+            const { error: profileError } = await supabaseClient
+                .from('profiles')
+                .insert({
+                    id: newId,
+                    role: role,
+                    school_id: userId,
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email,
                     status: 'active'
                 });
+
+            if (profileError) {
+                alert('Error creating user: ' + profileError.message);
+                return;
+            }
+
+            if (role === 'student') {
+                await supabaseClient
+                    .from('students')
+                    .insert({
+                        id: newId,
+                        program: document.getElementById('formProgram').value,
+                        year_level: parseInt(document.getElementById('formYear').value),
+                        is_cleared: false,
+                        failed_units: 0
+                    });
             } else {
-                professors.push({
-                    id: userId, firstName, lastName, email,
-                    department: document.getElementById('formDepartment').value,
-                    advisees: 0, status: 'active'
-                });
+                await supabaseClient
+                    .from('professors')
+                    .insert({
+                        id: newId,
+                        department: document.getElementById('formDepartment').value
+                    });
             }
         }
 
+        // Refresh data and re-render
+        await Promise.all([fetchStudents(), fetchProfessors()]);
         renderAll();
         userModal.hide();
     });
 
     // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Edit User (global function for onclick)
+    // CRUD: Edit User
     // ═══════════════════════════════════════════════════════════════════════
     window.editUser = function(id, type) {
         document.getElementById('userModalLabel').textContent = 'Edit User';
@@ -273,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Delete User
+    // CRUD: Delete User — Supabase
     // ═══════════════════════════════════════════════════════════════════════
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
 
@@ -283,16 +379,29 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteModal.show();
     };
 
-    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+    document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
         const id = document.getElementById('deleteUserId').value;
         const type = document.getElementById('deleteUserType').value;
 
-        if (type === 'student') {
-            students = students.filter(s => s.id !== id);
-        } else {
-            professors = professors.filter(p => p.id !== id);
+        const user = type === 'student'
+            ? students.find(s => s.id === id)
+            : professors.find(p => p.id === id);
+
+        if (user) {
+            // Delete profile (cascades to students/professors table)
+            const { error } = await supabaseClient
+                .from('profiles')
+                .delete()
+                .eq('id', user.uuid);
+
+            if (error) {
+                alert('Error deleting user: ' + error.message);
+                deleteModal.hide();
+                return;
+            }
         }
 
+        await Promise.all([fetchStudents(), fetchProfessors()]);
         renderAll();
         deleteModal.hide();
     });
@@ -314,25 +423,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Enter') performRecoverySearch();
     });
 
-    function performRecoverySearch() {
+    async function performRecoverySearch() {
         const q = document.getElementById('recoverySearchInput').value.trim().toLowerCase();
         if (!q) return;
 
-        const allUsers = [
-            ...students.map(s => ({ ...s, type: 'Student' })),
-            ...professors.map(p => ({ ...p, type: 'Professor' }))
-        ];
+        // Search in Supabase
+        const { data: results, error } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .or(`school_id.ilike.${q},email.ilike.${q}`);
 
-        const found = allUsers.find(u => u.id.toLowerCase() === q || u.email.toLowerCase() === q);
+        const found = (!error && results && results.length > 0) ? results[0] : null;
 
         if (found) {
             document.getElementById('recoveryResult').style.display = '';
             document.getElementById('recoveryNotFound').style.display = 'none';
-            document.getElementById('recoveryAvatar').textContent = found.firstName[0] + found.lastName[0];
-            document.getElementById('recoveryName').textContent = `${found.firstName} ${found.lastName}`;
-            document.getElementById('recoveryId').textContent = `${found.type} · ${found.id}`;
-            // Mock default password: "dlsu" + last 4 digits of ID
-            document.getElementById('recoveryPassword').textContent = `dlsu${found.id.slice(-4)}`;
+            document.getElementById('recoveryAvatar').textContent = found.first_name[0] + found.last_name[0];
+            document.getElementById('recoveryName').textContent = `${found.first_name} ${found.last_name}`;
+            document.getElementById('recoveryId').textContent = `${found.role.charAt(0).toUpperCase() + found.role.slice(1)} · ${found.school_id}`;
+            document.getElementById('recoveryPassword').textContent = `dlsu${found.school_id.slice(-4)}`;
         } else {
             document.getElementById('recoveryResult').style.display = 'none';
             document.getElementById('recoveryNotFound').style.display = '';

@@ -1,8 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
     // ═══════════════════════════════════════════════════════════════════════
-    // SHARED UI: Sidebar, Dark Mode, Clock, Profile
+    // ROUTE GUARD + SHARED UI
     // ═══════════════════════════════════════════════════════════════════════
+    const currentUser = await requireAuth(['admin']);
+    if (!currentUser) return;
+
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const overlay = document.getElementById('sidebarOverlay');
@@ -39,12 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
         icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
     });
 
+    const signOutBtn = document.getElementById('signOutBtn');
+    if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });
+
     // ═══════════════════════════════════════════════════════════════════════
     // TAB 1: CSV DATA UPLOAD
     // ═══════════════════════════════════════════════════════════════════════
     let selectedUploadType = 'students';
+    let parsedCsvRows = []; // store parsed CSV data for actual import
 
-    // Upload type card selection
     document.querySelectorAll('.upload-type-card').forEach(card => {
         card.addEventListener('click', () => {
             document.querySelectorAll('.upload-type-card').forEach(c => c.classList.remove('active'));
@@ -53,7 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Drag & Drop
     const dropzone = document.getElementById('csvDropzone');
     const fileInput = document.getElementById('csvFileInput');
 
@@ -72,40 +77,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleFileUpload(file) {
         const maxSize = 5 * 1024 * 1024;
-        if (file.size > maxSize) {
-            alert('File must be under 5MB.');
-            return;
-        }
+        if (file.size > maxSize) { alert('File must be under 5MB.'); return; }
         const ext = file.name.split('.').pop().toLowerCase();
-        if (!['csv', 'xlsx'].includes(ext)) {
-            alert('Only CSV and XLSX files are accepted.');
-            return;
-        }
+        if (!['csv'].includes(ext)) { alert('Only CSV files are accepted.'); return; }
 
-        // Show progress area
-        dropzone.style.display = 'none';
-        const progressArea = document.getElementById('csvProgressArea');
-        progressArea.style.display = 'block';
-        document.getElementById('csvFileName').textContent = file.name;
-        document.getElementById('csvFileSize').textContent = formatFileSize(file.size);
+        // Read and parse CSV
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const text = event.target.result;
+            const lines = text.split('\n').filter(l => l.trim());
+            if (lines.length < 2) { alert('CSV file is empty or missing data rows.'); return; }
 
-        // Simulate progress
-        const bar = document.getElementById('csvProgressBar');
-        const status = document.getElementById('csvProgressStatus');
-        let pct = 0;
-        const interval = setInterval(() => {
-            pct += Math.random() * 25 + 5;
-            if (pct >= 100) {
-                pct = 100;
-                clearInterval(interval);
-                status.textContent = 'Processing complete!';
-                status.style.color = 'var(--dlsu-green)';
-                setTimeout(() => generateCsvPreview(), 400);
-            } else {
-                status.textContent = `Uploading... ${Math.round(pct)}%`;
-            }
-            bar.style.width = pct + '%';
-        }, 200);
+            const headers = lines[0].split(',').map(h => h.trim());
+            parsedCsvRows = lines.slice(1).map(line => {
+                const values = line.split(',').map(v => v.trim());
+                const row = {};
+                headers.forEach((h, i) => { row[h] = values[i] || ''; });
+                return row;
+            });
+
+            // Show progress
+            dropzone.style.display = 'none';
+            const progressArea = document.getElementById('csvProgressArea');
+            progressArea.style.display = 'block';
+            document.getElementById('csvFileName').textContent = file.name;
+            document.getElementById('csvFileSize').textContent = formatFileSize(file.size);
+
+            const bar = document.getElementById('csvProgressBar');
+            const status = document.getElementById('csvProgressStatus');
+            bar.style.width = '100%';
+            status.textContent = 'Processing complete!';
+            status.style.color = 'var(--dlsu-green)';
+            setTimeout(() => generateCsvPreview(headers, parsedCsvRows), 400);
+        };
+        reader.readAsText(file);
     }
 
     document.getElementById('csvRemoveBtn').addEventListener('click', resetUpload);
@@ -118,45 +123,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('csvProgressStatus').textContent = 'Uploading...';
         document.getElementById('csvProgressStatus').style.color = '';
         fileInput.value = '';
+        parsedCsvRows = [];
     }
 
-    // Mock CSV preview data
-    const mockStudentRows = [
-        ['12220001', 'Juan Dela Cruz', 'juan_delacruz@dlsu.edu.ph', 'BSCpE', '1'],
-        ['12220002', 'Maria Santos', 'maria_santos@dlsu.edu.ph', 'BSECE', '2'],
-        ['12220003', 'Pedro Garcia', 'pedro_garcia@dlsu.edu.ph', 'BSCpE', '3'],
-        ['12220004', 'Anna Reyes', 'anna_reyes@dlsu.edu.ph', 'BSECE', '4'],
-        ['12220005', 'Carlo Mendoza', 'carlo_mendoza@dlsu.edu.ph', 'BSCpE', '1'],
-        ['12220006', 'Sophie Torres', 'sophie_torres@dlsu.edu.ph', 'BSECE', '2'],
-        ['12220007', 'Miguel Rivera', 'miguel_rivera@dlsu.edu.ph', 'BSCpE', '3'],
-        ['12220008', 'Isabelle Lim', 'isabelle_lim@dlsu.edu.ph', 'BSCpE', '4'],
-    ];
-    const studentHeaders = ['Student ID', 'Full Name', 'Email', 'Program', 'Year Level'];
-
-    const mockCourseRows = [
-        ['LBYCPD1', 'Computer Programming 1', '3', '1', 'None'],
-        ['LBYCPD2', 'Computer Programming 2', '3', '2', 'LBYCPD1'],
-        ['LBYCALC', 'Calculus 1', '3', '1', 'None'],
-        ['LBYPHY1', 'Physics 1', '3', '1', 'LBYCALC'],
-        ['LBYCPD3', 'Data Structures & Algorithms', '3', '3', 'LBYCPD2'],
-        ['LBYCAL2', 'Calculus 2', '3', '2', 'LBYCALC'],
-        ['LBYCIRK', 'Circuit Analysis', '3', '4', 'LBYPHY1'],
-        ['LBYCPG2', 'Computer Organization', '3', '5', 'LBYCPD2'],
-    ];
-    const courseHeaders = ['Course Code', 'Title', 'Units', 'Term', 'Prerequisites'];
-
-    function generateCsvPreview() {
-        const headers = selectedUploadType === 'students' ? studentHeaders : courseHeaders;
-        const rows = selectedUploadType === 'students' ? mockStudentRows : mockCourseRows;
-
+    function generateCsvPreview(headers, rows) {
         const thead = document.getElementById('csvPreviewHead');
         thead.innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join('')}<th class="text-center">Valid</th></tr>`;
 
         const tbody = document.getElementById('csvPreviewBody');
-        tbody.innerHTML = rows.map(row => {
-            const isValid = Math.random() > 0.15;
+        tbody.innerHTML = rows.slice(0, 20).map(row => {
+            const values = headers.map(h => row[h] || '');
+            const isValid = values.every(v => v.length > 0);
             return `<tr class="${!isValid ? 'csv-row-invalid' : ''}">
-                ${row.map(cell => `<td>${cell}</td>`).join('')}
+                ${values.map(cell => `<td>${cell}</td>`).join('')}
                 <td class="text-center">
                     ${isValid
                         ? '<i class="bi bi-check-circle-fill" style="color: var(--dlsu-green);"></i>'
@@ -169,12 +148,102 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('csvPreviewArea').style.display = 'block';
     }
 
-    document.getElementById('csvImportBtn').addEventListener('click', () => {
-        alert('Import complete! In the production version, this data would be saved to Supabase.');
+    // ACTUAL CSV IMPORT TO SUPABASE
+    document.getElementById('csvImportBtn').addEventListener('click', async () => {
+        if (parsedCsvRows.length === 0) { alert('No data to import.'); return; }
+
+        const btn = document.getElementById('csvImportBtn');
+        btn.disabled = true;
+        btn.textContent = 'Importing...';
+
+        let successCount = 0;
+        let errorCount = 0;
+
+        if (selectedUploadType === 'students') {
+            for (const row of parsedCsvRows) {
+                const newId = crypto.randomUUID();
+                const schoolId = row['Student ID'] || row['student_id'] || '';
+                const fullName = row['Full Name'] || row['full_name'] || '';
+                const email = row['Email'] || row['email'] || '';
+                const program = row['Program'] || row['program'] || 'BSCpE';
+                const yearLevel = parseInt(row['Year Level'] || row['year_level'] || '1');
+
+                const [firstName, ...lastParts] = fullName.split(' ');
+                const lastName = lastParts.join(' ') || firstName;
+
+                const { error: profileError } = await supabaseClient
+                    .from('profiles')
+                    .insert({
+                        id: newId,
+                        role: 'student',
+                        school_id: schoolId,
+                        first_name: firstName,
+                        last_name: lastName,
+                        email: email,
+                        status: 'active'
+                    });
+
+                if (!profileError) {
+                    await supabaseClient.from('students').insert({
+                        id: newId,
+                        program: program,
+                        year_level: yearLevel,
+                        is_cleared: false,
+                        failed_units: 0
+                    });
+                    successCount++;
+                } else {
+                    errorCount++;
+                    console.warn('Import error:', profileError.message, row);
+                }
+            }
+        } else {
+            // Course import
+            for (const row of parsedCsvRows) {
+                const code = (row['Course Code'] || row['code'] || '').toUpperCase();
+                const title = row['Title'] || row['title'] || '';
+                const units = parseInt(row['Units'] || row['units'] || '3');
+                const term = parseInt(row['Term'] || row['term'] || '1');
+                const prereqs = row['Prerequisites'] || row['prerequisites'] || '';
+                const program = row['Program'] || row['program'] || 'BSCpE';
+                const yearLevel = Math.ceil(term / 3);
+
+                const { data: newCourse, error } = await supabaseClient
+                    .from('courses')
+                    .insert({ code, title, units, term, year_level: yearLevel, program_code: program })
+                    .select()
+                    .single();
+
+                if (!error && newCourse) {
+                    // Parse prerequisites
+                    if (prereqs && prereqs.toLowerCase() !== 'none') {
+                        const prereqCodes = prereqs.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+                        const prereqRows = prereqCodes.map(p => ({
+                            course_id: newCourse.id,
+                            prerequisite_code: p,
+                            type: 'hard'
+                        }));
+                        if (prereqRows.length > 0) {
+                            await supabaseClient.from('prerequisites').insert(prereqRows);
+                        }
+                    }
+                    successCount++;
+                } else {
+                    errorCount++;
+                    console.warn('Course import error:', error?.message, row);
+                }
+            }
+        }
+
+        alert(`Import complete!\n✅ ${successCount} records imported successfully.\n${errorCount > 0 ? `❌ ${errorCount} records failed.` : ''}`);
+        btn.disabled = false;
+        btn.textContent = 'Import Data';
         resetUpload();
     });
 
     document.getElementById('csvDownloadTemplate').addEventListener('click', () => {
+        const studentHeaders = ['Student ID', 'Full Name', 'Email', 'Program', 'Year Level'];
+        const courseHeaders = ['Course Code', 'Title', 'Units', 'Term', 'Program', 'Prerequisites'];
         const headers = selectedUploadType === 'students' ? studentHeaders : courseHeaders;
         const csvContent = headers.join(',') + '\n';
         const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -193,22 +262,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ═══════════════════════════════════════════════════════════════════════
-    // TAB 2: MASS CLEARANCE
+    // TAB 2: MASS CLEARANCE — Supabase
     // ═══════════════════════════════════════════════════════════════════════
-    const clearanceStudents = [];
-    // Generate mock students
-    const programs = ['BSCpE', 'BSECE'];
-    const firstNames = ['Juan', 'Maria', 'Pedro', 'Anna', 'Carlo', 'Sophie', 'Miguel', 'Isabelle', 'Jose', 'Teresa', 'Leo', 'Grace', 'Nathan', 'Ella', 'Rico', 'Linda', 'David', 'Carmen', 'Roberto', 'Jessica'];
-    const lastNames = ['Dela Cruz', 'Santos', 'Garcia', 'Reyes', 'Mendoza', 'Torres', 'Rivera', 'Lim', 'Cruz', 'Diaz', 'Castillo', 'Bautista', 'Flores', 'Pineda', 'Santiago', 'Aquino', 'Villanueva', 'Fernandez', 'Sison', 'Yap'];
+    let clearanceStudents = [];
 
-    for (let i = 0; i < 312; i++) {
-        clearanceStudents.push({
-            id: `1221${String(i).padStart(4, '0')}`,
-            name: `${firstNames[i % firstNames.length]} ${lastNames[i % lastNames.length]}`,
-            program: programs[i % 2],
-            year: (i % 4) + 1,
-            cleared: false,
-        });
+    async function fetchClearanceStudents() {
+        const { data, error } = await supabaseClient
+            .from('students')
+            .select('*, profiles!inner(school_id, first_name, last_name, status)')
+            .eq('profiles.status', 'active');
+
+        if (!error && data) {
+            clearanceStudents = data.map(s => ({
+                uuid: s.id,
+                id: s.profiles.school_id,
+                name: `${s.profiles.first_name} ${s.profiles.last_name}`,
+                program: s.program,
+                year: s.year_level,
+                cleared: s.is_cleared || false
+            }));
+        }
+    }
+
+    await fetchClearanceStudents();
+
+    function updateClearanceStats() {
+        const cleared = clearanceStudents.filter(s => s.cleared).length;
+        const notCleared = clearanceStudents.filter(s => !s.cleared).length;
+        document.getElementById('clearCleared').textContent = cleared.toLocaleString();
+        document.getElementById('clearNotCleared').textContent = notCleared.toLocaleString();
     }
 
     function updateClearanceCount() {
@@ -225,52 +307,91 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('clearMatchCount').textContent = matched.length;
     }
 
+    updateClearanceStats();
+    updateClearanceCount();
+
     document.getElementById('clearProgram').addEventListener('change', updateClearanceCount);
     document.getElementById('clearYear').addEventListener('change', updateClearanceCount);
     document.getElementById('clearStatus').addEventListener('change', updateClearanceCount);
 
-    // Show confirmation modal
     document.getElementById('clearApplyBtn').addEventListener('click', () => {
         const count = document.getElementById('clearMatchCount').textContent;
         document.getElementById('clearanceModalText').textContent = `This will clear ${count} students for enrollment. This action cannot be undone.`;
         new bootstrap.Modal(document.getElementById('clearanceModal')).show();
     });
 
-    // Confirm clearance
-    document.getElementById('confirmClearBtn').addEventListener('click', () => {
+    document.getElementById('confirmClearBtn').addEventListener('click', async () => {
         const prog = document.getElementById('clearProgram').value;
         const yr = document.getElementById('clearYear').value;
         const status = document.getElementById('clearStatus').value;
-        let count = 0;
 
-        clearanceStudents.forEach(s => {
+        const toClear = clearanceStudents.filter(s => {
             const matchProg = prog === 'all' || s.program === prog;
             const matchYr = yr === 'all' || s.year === parseInt(yr);
             const matchStatus = status === 'all' || (status === 'not-cleared' && !s.cleared);
-            if (matchProg && matchYr && matchStatus && !s.cleared) {
-                s.cleared = true;
-                count++;
-            }
+            return matchProg && matchYr && matchStatus && !s.cleared;
         });
 
-        // Update stats
-        const cleared = clearanceStudents.filter(s => s.cleared).length;
-        const notCleared = clearanceStudents.length - cleared;
-        document.getElementById('clearCleared').textContent = (938 + cleared).toLocaleString();
-        document.getElementById('clearNotCleared').textContent = notCleared.toLocaleString();
+        // Batch update in Supabase
+        const uuids = toClear.map(s => s.uuid);
+        if (uuids.length > 0) {
+            for (const uuid of uuids) {
+                await supabaseClient
+                    .from('students')
+                    .update({
+                        is_cleared: true,
+                        cleared_at: new Date().toISOString(),
+                        cleared_by: currentUser.id
+                    })
+                    .eq('id', uuid);
+            }
+        }
 
-        // Add to log
-        addClearanceLog(count, prog, yr);
+        // Log the clearance action
+        await supabaseClient.from('clearance_log').insert({
+            admin_id: currentUser.id,
+            program_filter: prog === 'all' ? null : prog,
+            year_filter: yr === 'all' ? null : parseInt(yr),
+            students_cleared: uuids.length
+        });
 
+        // Update local state
+        toClear.forEach(s => { s.cleared = true; });
+
+        addClearanceLog(uuids.length, prog, yr);
         bootstrap.Modal.getInstance(document.getElementById('clearanceModal')).hide();
+        updateClearanceStats();
         updateClearanceCount();
     });
 
-    const clearanceLogs = [
-        { date: 'Mar 28, 2026 · 14:32', action: 'Cleared 85 BSCpE 4th Year students', admin: 'System Admin' },
-        { date: 'Mar 25, 2026 · 09:15', action: 'Cleared 120 BSECE All Year students', admin: 'System Admin' },
-        { date: 'Mar 20, 2026 · 11:45', action: 'Cleared 200 All Programs 1st Year students', admin: 'System Admin' },
-    ];
+    // Clearance logs from Supabase
+    let clearanceLogs = [];
+
+    async function fetchClearanceLogs() {
+        const { data, error } = await supabaseClient
+            .from('clearance_log')
+            .select('*, profiles!clearance_log_admin_id_fkey(first_name, last_name)')
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+        if (!error && data) {
+            clearanceLogs = data.map(log => {
+                const adminName = log.profiles ? `${log.profiles.first_name} ${log.profiles.last_name}` : 'System Admin';
+                const date = new Date(log.created_at);
+                const options = { month: 'short', day: 'numeric', year: 'numeric' };
+                const time = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                const progLabel = log.program_filter || 'All Programs';
+                const yrLabel = log.year_filter ? `${log.year_filter}${log.year_filter === 1 ? 'st' : log.year_filter === 2 ? 'nd' : log.year_filter === 3 ? 'rd' : 'th'} Year` : 'All Year';
+                return {
+                    date: `${date.toLocaleDateString('en-US', options)} · ${time}`,
+                    action: `Cleared ${log.students_cleared} ${progLabel} ${yrLabel} students`,
+                    admin: adminName
+                };
+            });
+        }
+    }
+
+    await fetchClearanceLogs();
 
     function addClearanceLog(count, prog, yr) {
         const now = new Date();
@@ -279,12 +400,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const date = `${now.toLocaleDateString('en-US', options)} · ${time}`;
         const progLabel = prog === 'all' ? 'All Programs' : prog;
         const yrLabel = yr === 'all' ? 'All Year' : `${yr}${yr === '1' ? 'st' : yr === '2' ? 'nd' : yr === '3' ? 'rd' : 'th'} Year`;
-        clearanceLogs.unshift({ date, action: `Cleared ${count} ${progLabel} ${yrLabel} students`, admin: 'System Admin' });
+        clearanceLogs.unshift({ date, action: `Cleared ${count} ${progLabel} ${yrLabel} students`, admin: `${currentUser.first_name} ${currentUser.last_name}` });
         renderClearanceLogs();
     }
 
     function renderClearanceLogs() {
         const container = document.getElementById('clearanceLog');
+        if (clearanceLogs.length === 0) {
+            container.innerHTML = `<div class="text-center py-3" style="color:var(--dlsu-gray-400); font-size:0.82rem;">No clearance actions yet.</div>`;
+            return;
+        }
         container.innerHTML = clearanceLogs.slice(0, 5).map(log => `
             <div class="clearance-log-item">
                 <div class="clearance-log-dot"></div>
@@ -303,21 +428,30 @@ document.addEventListener('DOMContentLoaded', () => {
     renderClearanceLogs();
 
     // ═══════════════════════════════════════════════════════════════════════
-    // TAB 3: TARGETED MASS EMAIL
+    // TAB 3: TARGETED MASS EMAIL — Supabase
     // ═══════════════════════════════════════════════════════════════════════
-    const recipientCounts = {
-        'all-professors': 6,
-        'all-students': 1250,
-        'bscpe-students': 650,
-        'bsece-students': 600,
-        'at-risk': 70,
-        'not-cleared': 312,
-        'unassigned': 8,
-        'year-1': 380,
-        'year-2': 330,
-        'year-3': 300,
-        'year-4': 240,
-    };
+    // Fetch dynamic recipient counts
+    let recipientCounts = {};
+    try {
+        const { data: stats } = await supabaseClient.from('dashboard_stats').select('*').single();
+        if (stats) {
+            recipientCounts = {
+                'all-professors': await supabaseClient.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'professor').then(r => r.count || 0),
+                'all-students': stats.total_students || 0,
+                'bscpe-students': stats.bscpe_count || 0,
+                'bsece-students': stats.bsece_count || 0,
+                'at-risk': stats.at_risk || 0,
+                'not-cleared': stats.not_cleared || 0,
+                'unassigned': await supabaseClient.from('students').select('*', { count: 'exact', head: true }).is('adviser_id', null).then(r => r.count || 0),
+            };
+        }
+    } catch (e) {
+        console.warn('Recipient counts fetch failed:', e);
+        recipientCounts = {
+            'all-professors': 0, 'all-students': 0, 'bscpe-students': 0,
+            'bsece-students': 0, 'at-risk': 0, 'not-cleared': 0, 'unassigned': 0,
+        };
+    }
 
     const emailTemplates = {
         'advising-deadline': {
@@ -359,28 +493,35 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('emailPreviewBtn').addEventListener('click', () => {
         const subject = document.getElementById('emailSubject').value;
         const body = document.getElementById('emailBody').value;
-        if (!subject || !body) {
-            alert('Please fill in the subject and message body before previewing.');
-            return;
-        }
+        if (!subject || !body) { alert('Please fill in the subject and message body before previewing.'); return; }
         const recipient = document.getElementById('emailRecipient');
         const group = recipient.options[recipient.selectedIndex]?.text || 'No group';
         alert(`── Email Preview ──\n\nTo: ${group}\nSubject: ${subject}\n\n${body}`);
     });
 
-    document.getElementById('emailSendBtn').addEventListener('click', () => {
+    document.getElementById('emailSendBtn').addEventListener('click', async () => {
         const recipient = document.getElementById('emailRecipient').value;
         const subject = document.getElementById('emailSubject').value;
         const body = document.getElementById('emailBody').value;
-        if (!recipient || !subject || !body) {
-            alert('Please select a recipient group and fill in all fields.');
-            return;
-        }
+        if (!recipient || !subject || !body) { alert('Please select a recipient group and fill in all fields.'); return; }
+
         const count = recipientCounts[recipient] || 0;
+
+        // Log email to Supabase
+        await supabaseClient.from('email_log').insert({
+            sender_id: currentUser.id,
+            recipient_group: recipient,
+            recipient_count: count,
+            subject: subject,
+            body: body,
+            status: 'delivered'
+        });
+
         document.getElementById('emailSentText').textContent = `Your email has been sent to ${count} recipient${count !== 1 ? 's' : ''}.`;
         new bootstrap.Modal(document.getElementById('emailSentModal')).show();
+
         addEmailLog(recipient, subject, count);
-        // Reset
+
         document.getElementById('emailSubject').value = '';
         document.getElementById('emailBody').value = '';
         document.getElementById('emailRecipient').selectedIndex = 0;
@@ -388,18 +529,47 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.email-template-chip').forEach(c => c.classList.remove('active'));
     });
 
-    const emailLogs = [
-        { date: 'Mar 30, 2026 · 10:22', subject: 'Advising Deadline Reminder – Term 3', group: 'All Students', count: 1250, status: 'delivered' },
-        { date: 'Mar 28, 2026 · 15:45', subject: 'Study Plan Review Reminder', group: 'All Professors', count: 6, status: 'delivered' },
-        { date: 'Mar 25, 2026 · 09:30', subject: 'Academic Standing Warning', group: 'At-Risk Students', count: 70, status: 'delivered' },
-        { date: 'Mar 22, 2026 · 11:10', subject: 'Enrollment Clearance Notice', group: 'Not Cleared Students', count: 312, status: 'delivered' },
-    ];
+    // Email logs from Supabase
+    let emailLogs = [];
+
+    async function fetchEmailLogs() {
+        const { data, error } = await supabaseClient
+            .from('email_log')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+        if (!error && data) {
+            const groupMap = {
+                'all-professors': 'All Professors',
+                'all-students': 'All Students',
+                'bscpe-students': 'BSCpE Students',
+                'bsece-students': 'BSECE Students',
+                'at-risk': 'At-Risk Students',
+                'not-cleared': 'Not Cleared Students',
+                'unassigned': 'Unassigned Students',
+            };
+            emailLogs = data.map(log => {
+                const date = new Date(log.created_at);
+                const options = { month: 'short', day: 'numeric', year: 'numeric' };
+                const time = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+                return {
+                    date: `${date.toLocaleDateString('en-US', options)} · ${time}`,
+                    subject: log.subject,
+                    group: groupMap[log.recipient_group] || log.recipient_group,
+                    count: log.recipient_count,
+                    status: log.status
+                };
+            });
+        }
+    }
+
+    await fetchEmailLogs();
 
     function addEmailLog(recipientKey, subject, count) {
         const now = new Date();
         const options = { month: 'short', day: 'numeric', year: 'numeric' };
         const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        const date = `${now.toLocaleDateString('en-US', options)} · ${time}`;
         const groupMap = {
             'all-professors': 'All Professors',
             'all-students': 'All Students',
@@ -408,17 +578,17 @@ document.addEventListener('DOMContentLoaded', () => {
             'at-risk': 'At-Risk Students',
             'not-cleared': 'Not Cleared Students',
             'unassigned': 'Unassigned Students',
-            'year-1': '1st Year Students',
-            'year-2': '2nd Year Students',
-            'year-3': '3rd Year Students',
-            'year-4': '4th Year Students',
         };
-        emailLogs.unshift({ date, subject, group: groupMap[recipientKey] || recipientKey, count, status: 'delivered' });
+        emailLogs.unshift({ date: `${now.toLocaleDateString('en-US', options)} · ${time}`, subject, group: groupMap[recipientKey] || recipientKey, count, status: 'delivered' });
         renderEmailLogs();
     }
 
     function renderEmailLogs() {
         const container = document.getElementById('emailHistory');
+        if (emailLogs.length === 0) {
+            container.innerHTML = `<div class="text-center py-3" style="color:var(--dlsu-gray-400); font-size:0.82rem;">No emails sent yet.</div>`;
+            return;
+        }
         container.innerHTML = emailLogs.slice(0, 5).map(log => `
             <div class="email-log-item">
                 <div class="d-flex justify-content-between align-items-start mb-1">
