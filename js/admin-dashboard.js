@@ -68,6 +68,18 @@ document.addEventListener('DOMContentLoaded', () => {
     updateClock();
     setInterval(updateClock, 1000);
 
+    // ── Dark Mode Toggle ──
+    const darkModeBtn = document.getElementById('darkModeBtn');
+    darkModeBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const icon = darkModeBtn.querySelector('i');
+        if (document.body.classList.contains('dark-mode')) {
+            icon.className = 'bi bi-sun-fill';
+        } else {
+            icon.className = 'bi bi-moon-fill';
+        }
+    });
+
     // =========================================================================
     // MOCK DATA — Replace with Supabase fetches later
     // =========================================================================

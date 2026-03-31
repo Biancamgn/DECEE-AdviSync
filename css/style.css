@@ -701,3 +701,119 @@ body {
         padding: 1rem 0.75rem;
     }
 }
+
+/* ============================================================
+   Dark Mode
+   ============================================================ */
+body.dark-mode {
+    background-color: #1a1d23;
+    color: #d1d5db;
+}
+
+body.dark-mode .main-content {
+    background-color: #1a1d23;
+}
+
+body.dark-mode .topbar {
+    background: #22262e;
+    border-bottom-color: #2d323c;
+}
+
+body.dark-mode .topbar-left h1 {
+    color: #e5e7eb;
+}
+
+body.dark-mode .topbar-left p {
+    color: #6b7280;
+}
+
+body.dark-mode .topbar-btn {
+    background: #2d323c;
+    border-color: #3b4049;
+    color: #9ca3af;
+}
+
+body.dark-mode .topbar-btn:hover {
+    background: #3b4049;
+    color: var(--dlsu-green-muted);
+}
+
+body.dark-mode .stat-card {
+    background: #22262e;
+    border-color: #2d323c;
+}
+
+body.dark-mode .stat-card .stat-label {
+    color: #6b7280;
+}
+
+body.dark-mode .stat-card .stat-value {
+    color: #e5e7eb;
+}
+
+body.dark-mode .stat-card .stat-sub {
+    color: #6b7280;
+}
+
+body.dark-mode .content-card {
+    background: #22262e;
+    border-color: #2d323c;
+}
+
+body.dark-mode .section-header {
+    color: #e5e7eb;
+}
+
+body.dark-mode .admin-table thead th {
+    background: #1a1d23;
+    color: #6b7280;
+    border-bottom-color: #2d323c;
+}
+
+body.dark-mode .admin-table tbody td {
+    border-bottom-color: #2d323c;
+    color: #d1d5db;
+}
+
+body.dark-mode .admin-table tbody tr:hover {
+    background: #2d323c;
+}
+
+body.dark-mode .admin-table .prof-name {
+    color: #e5e7eb;
+}
+
+body.dark-mode .admin-table .badge-program {
+    background: #2d323c;
+    color: #9ca3af;
+}
+
+body.dark-mode .progress-track {
+    background: #2d323c;
+}
+
+body.dark-mode .profile-toggle:hover {
+    background: #2d323c;
+}
+
+body.dark-mode .profile-toggle .profile-name {
+    color: #e5e7eb;
+}
+
+body.dark-mode .profile-toggle .profile-role {
+    color: #6b7280;
+}
+
+body.dark-mode .profile-dropdown {
+    background: #22262e;
+    border-color: #3b4049;
+}
+
+body.dark-mode .profile-dropdown a {
+    color: #9ca3af;
+}
+
+body.dark-mode .profile-dropdown a:hover {
+    background: #2d323c;
+    color: var(--dlsu-green-muted);
+}
