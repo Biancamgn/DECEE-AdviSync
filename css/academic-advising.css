@@ -1,0 +1,182 @@
+.page-body { 
+    padding: 1.75rem 2rem; }
+
+.page-title { 
+    font-size: 1.4rem; 
+    font-weight: 800; 
+    color: var(--dlsu-green); 
+    margin-bottom: 0.3rem; 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5rem; }
+
+.page-subtitle { 
+    font-size: 0.82rem; 
+    color: var(--dlsu-gray-400); 
+    margin-bottom: 1.75rem; }
+
+.section-card { 
+    background: white; 
+    border-radius: 14px; 
+    border: 1px solid var(--dlsu-gray-200); 
+    padding: 1.5rem; 
+    margin-bottom: 1.5rem; }
+
+.section-title { 
+    font-size: 0.95rem; 
+    font-weight: 700; 
+    margin-bottom: 0.25rem; 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5rem; }
+
+.section-title i { 
+    color: var(--dlsu-green); }
+
+.section-desc { 
+    font-size: 0.78rem; 
+    color: var(--dlsu-gray-400); 
+    margin-bottom: 1.15rem; }
+
+.form-group { 
+    margin-bottom: 1rem; }
+
+.form-label-custom { 
+    font-size: 0.78rem; 
+    font-weight: 600; 
+    color: var(--dlsu-gray-800); 
+    margin-bottom: 0.35rem; 
+    display: block; }
+
+.form-control-custom { 
+    padding: 0.55rem 0.85rem; 
+    order: 1px solid var(--dlsu-gray-200); 
+    border-radius: 8px; 
+    font-size: 0.82rem; 
+    font-family: inherit; 
+    color: var(--dlsu-gray-800); 
+    outline: none; 
+    transition: border-color 0.2s, box-shadow 0.2s; }
+
+.form-control-custom:
+focus {
+    border-color: var(--dlsu-green); 
+    box-shadow: 0 0 0 3px var(--dlsu-green-light); }
+
+.btn-save { 
+    padding: 0.55rem 1.5rem; 
+    background: var(--dlsu-green); 
+    color: white; 
+    border: none; 
+    border-radius: 10px; 
+    font-size: 0.82rem; 
+    font-weight: 600; 
+    font-family: inherit; 
+    cursor: pointer; 
+    display: inline-flex; 
+    align-items: center; gap: 0.4rem; }
+
+.btn-save:
+hover { 
+    background: var(--dlsu-green-dark); }
+
+.deadline-display { 
+    background: var(--dlsu-green-light); 
+    border-radius: 10px; 
+    padding: 1rem 1.25rem; 
+    display: flex; 
+    align-items: center; 
+    gap: 1rem; 
+    margin-bottom: 1.25rem; }
+
+.deadline-display .dd-icon { 
+    width: 44px; height: 44px; 
+    border-radius: 10px; 
+    background: var(--dlsu-green); 
+    color: white; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 1.15rem; 
+    flex-shrink: 0; }
+
+.deadline-display .dd-label { 
+    font-size: 0.72rem; 
+    color: var(--dlsu-green); 
+    font-weight: 600; 
+    text-transform: uppercase; 
+    letter-spacing: 0.04em; }
+
+.deadline-display .dd-value { 
+    font-size: 1rem; 
+    font-weight: 700; }
+
+.tracker-table { 
+    width: 100%; 
+    font-size: 0.82rem; 
+    background: white; 
+    border-radius: 12px; 
+    border: 1px solid var(--dlsu-gray-200); 
+    overflow: hidden; }
+
+.tracker-table thead th { 
+    font-size: 0.68rem; 
+    text-transform: uppercase; 
+    letter-spacing: 0.04em; 
+    color: var(--dlsu-gray-400); 
+    font-weight: 600; 
+    padding: 0.75rem 1.25rem; 
+    border-bottom: 1px solid var(--dlsu-gray-200); 
+    background: var(--dlsu-gray-50); }
+
+.tracker-table tbody td { 
+    padding: 0.65rem 1.25rem; 
+    border-bottom: 1px solid var(--dlsu-gray-100); 
+    vertical-align: middle; }
+
+.sub-status-badge { 
+    font-size: 0.65rem; 
+    font-weight: 700; 
+    padding: 0.2rem 0.6rem; 
+    border-radius: 20px; }
+
+.sub-status-badge.submitted { 
+    background: var(--dlsu-green-light); 
+    color: var(--dlsu-green); }
+
+.sub-status-badge.not-submitted { 
+    background: #fce8e6; 
+    color: var(--dlsu-danger); }
+
+.sub-status-badge.reviewed { 
+    background: #e4edfb; 
+    color: #1a56a8; }
+
+.progress-strip { 
+    display: flex; 
+    align-items: center; 
+    gap: 1rem; 
+    margin-bottom: 1.25rem; }
+
+.progress-bar-custom { 
+    flex: 1; 
+    height: 10px; 
+    background: var(--dlsu-gray-100); 
+    border-radius: 5px; 
+    overflow: hidden; }
+
+.progress-fill { 
+    height: 100%; 
+    background: var(--dlsu-green); 
+    border-radius: 5px; 
+    transition: width 0.5s ease; }
+
+.progress-label { 
+    font-size: 0.82rem; 
+    font-weight: 700; 
+    color: var(--dlsu-gray-800); 
+    white-space: nowrap; }
+
+@media (max-width: 991.98px) { 
+    .page-body { 
+        padding: 1.25rem 1rem; } }
