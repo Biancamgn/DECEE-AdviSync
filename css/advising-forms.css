@@ -1,0 +1,40 @@
+/* ══ Advising Forms — Page Styles ══ */
+.page-body { padding: 1.75rem 2rem; }
+.page-title { font-size: 1.4rem; font-weight: 800; color: var(--dlsu-green); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem; }
+.page-subtitle { font-size: 0.82rem; color: var(--dlsu-gray-400); margin-bottom: 1.5rem; }
+.tab-bar { display: flex; gap: 0; border-bottom: 2px solid var(--dlsu-gray-200); margin-bottom: 1.5rem; }
+.tab-item { padding: 0.65rem 1.25rem; font-size: 0.82rem; font-weight: 600; color: var(--dlsu-gray-400); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.4rem; }
+.tab-item:hover { color: var(--dlsu-gray-800); }
+.tab-item.active { color: var(--dlsu-green); border-bottom-color: var(--dlsu-green); }
+.tab-count { font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 10px; background: var(--dlsu-gray-100); color: var(--dlsu-gray-600); }
+.tab-item.active .tab-count { background: var(--dlsu-green-light); color: var(--dlsu-green); }
+.submission-card { background: white; border: 1px solid var(--dlsu-gray-200); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; transition: box-shadow 0.2s ease; }
+.submission-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+.sub-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.85rem; gap: 1rem; flex-wrap: wrap; }
+.sub-student { display: flex; align-items: center; gap: 0.75rem; }
+.sub-avatar { width: 40px; height: 40px; border-radius: 10px; background: var(--dlsu-green-light); color: var(--dlsu-green); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
+.sub-name { font-size: 0.88rem; font-weight: 700; }
+.sub-meta { font-size: 0.72rem; color: var(--dlsu-gray-400); display: flex; gap: 0.5rem; }
+.sub-date { font-size: 0.72rem; color: var(--dlsu-gray-400); white-space: nowrap; }
+.courses-mini { font-size: 0.78rem; margin-bottom: 1rem; }
+.courses-mini table { width: 100%; }
+.courses-mini th { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dlsu-gray-400); font-weight: 600; padding: 0.4rem 0.65rem; border-bottom: 1px solid var(--dlsu-gray-200); }
+.courses-mini td { padding: 0.4rem 0.65rem; border-bottom: 1px solid var(--dlsu-gray-100); }
+.courses-mini .code { font-weight: 700; color: var(--dlsu-green); }
+.prereq-ok { font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 600; background: var(--dlsu-green-light); color: var(--dlsu-green); }
+.prereq-fail { font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 4px; font-weight: 600; background: #fce8e6; color: var(--dlsu-danger); }
+.sub-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.btn-approve { padding: 0.4rem 1rem; border: none; border-radius: 8px; background: var(--dlsu-green); color: white; font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 0.3rem; }
+.btn-approve:hover { background: var(--dlsu-green-dark); }
+.btn-reject { padding: 0.4rem 1rem; border: 1px solid var(--dlsu-danger); border-radius: 8px; background: white; color: var(--dlsu-danger); font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.3rem; }
+.btn-reject:hover { background: #fce8e6; }
+.btn-revision { padding: 0.4rem 1rem; border: 1px solid var(--dlsu-warning); border-radius: 8px; background: white; color: #8a6914; font-size: 0.78rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.3rem; }
+.btn-revision:hover { background: #fef3dc; }
+.feedback-area { margin-top: 0.85rem; display: none; }
+.feedback-area.open { display: block; }
+.feedback-area textarea { width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--dlsu-gray-200); border-radius: 8px; font-size: 0.82rem; font-family: inherit; resize: vertical; min-height: 70px; outline: none; }
+.feedback-area textarea:focus { border-color: var(--dlsu-green); box-shadow: 0 0 0 3px var(--dlsu-green-light); }
+.sub-status { font-size: 0.68rem; font-weight: 700; padding: 0.25rem 0.7rem; border-radius: 20px; }
+.sub-status.approved { background: var(--dlsu-green-light); color: var(--dlsu-green); }
+.sub-status.rejected { background: #fce8e6; color: var(--dlsu-danger); }
+@media (max-width: 991.98px) { .page-body { padding: 1.25rem 1rem; } }
