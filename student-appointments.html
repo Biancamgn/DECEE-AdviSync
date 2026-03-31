@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdviSync – Appointments</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Common Styles -->
+    <link href="css/common.css" rel="stylesheet">
+    <!-- Page-Specific Styles -->
+    <link href="css/student-appointments.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><div class="brand-text"><h6>DECEE Advising</h6><small>De La Salle University</small></div></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a href="student-dashboard.html" class="nav-link">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span class="link-text">Dashboard</span>
+            </a>
+            <a href="student-academic-history.html" class="nav-link">
+                <i class="bi bi-journal-text"></i>
+                <span class="link-text">Academic History</span>
+            </a>
+            <a href="student-academic-booklet.html" class="nav-link">
+                <i class="bi bi-file-earmark-check"></i>
+                <span class="link-text">Academic Booklet</span>
+            </a>
+            <a href="student-program-checklist.html" class="nav-link">
+                <i class="bi bi-list-check"></i>
+                <span class="link-text">Program Checklist</span>
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Advising</div>
+            <a href="student-appointments.html" class="nav-link active">
+                <i class="bi bi-calendar-event"></i>
+                <span class="link-text">Appointments</span>
+            </a>
+            <a href="student-concerns.html" class="nav-link">
+                <i class="bi bi-chat-left-text"></i>
+                <span class="link-text">Concerns</span>
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Account</div>
+            <a href="student-profile.html" class="nav-link">
+                <i class="bi bi-person"></i>
+                <span class="link-text">Profile</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-gear"></i>
+                <span class="link-text">Settings</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer"><div class="user-card"><div class="avatar">BM</div><div class="user-info"><div class="user-name">Bianca M.</div><div class="user-id">12012345 · BS-CpE</div></div></div></div>
+    </aside>
+
+    <div class="main-content" id="mainContent">
+        <header class="topbar">
+            <div class="d-flex align-items-center">
+                <button class="hamburger-btn" id="hamburgerBtn"><i class="bi bi-list"></i></button>
+                <div class="topbar-left"><h1>Appointments</h1><p>Book & manage advising meetings</p></div>
+            </div>
+                        <div class="topbar-right">
+                <span class="topbar-clock" id="topbarClock">00:00:00</span>
+                <button class="topbar-circle-btn" title="Toggle Dark Mode" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
+                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
+                <div class="profile-wrapper" id="profileWrapper">
+                    <div class="d-flex align-items-center gap-1" style="cursor: pointer;" id="profileToggle">
+                        <div class="profile-btn" title="Profile">BM</div>
+                        <i class="bi bi-chevron-down profile-chevron"></i>
+                    </div>
+                    <div class="profile-dropdown">
+                        <div class="dropdown-header">
+                            <div class="dropdown-avatar">BM</div>
+                            <div>
+                                <div class="dropdown-name">Bianca Magsino</div>
+                                <div class="dropdown-role">Student</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-info">
+                            <div class="dropdown-info-row">
+                                <span class="dropdown-info-label">ID Number</span>
+                                <span class="dropdown-info-value">12012345</span>
+                            </div>
+                            <div class="dropdown-info-row">
+                                <span class="dropdown-info-label">Program</span>
+                                <span class="dropdown-info-value">BS-CpE</span>
+                            </div>
+                            <div class="dropdown-info-row">
+                                <span class="dropdown-info-label">Term</span>
+                                <span class="dropdown-info-value">8 of 12</span>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="student-profile.html" class="dropdown-action">
+                            <i class="bi bi-person"></i>
+                            View Profile
+                        </a>
+                        <a href="#" class="dropdown-action">
+                            <i class="bi bi-gear"></i>
+                            Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-action logout">
+                            <i class="bi bi-box-arrow-left"></i>
+                            Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-body">
+            <h2 class="page-title"><i class="bi bi-calendar-event-fill"></i> Advising Appointments</h2>
+            <p class="page-subtitle">View your adviser's available slots and book a meeting.</p>
+
+            <!-- Adviser Banner -->
+            <div class="adviser-banner">
+                <div class="adv-avatar">RC</div>
+                <div>
+                    <div class="adv-name">Dr. Roberto Cruz</div>
+                    <div class="adv-dept">DECEE · CpE Program · Academic Adviser</div>
+                </div>
+            </div>
+
+            <!-- Book Appointment -->
+            <div class="section-card">
+                <div class="section-title"><i class="bi bi-clock"></i> Available Time Slots</div>
+                <div class="section-desc">Select a date, then pick an available time slot to book your appointment.</div>
+
+                <!-- Date Chips -->
+                <div class="date-picker-bar" id="dateBar">
+                    <div class="date-chip selected" data-date="2026-03-30" onclick="selectDate(this)">
+                        <span class="day-name">Mon</span><span class="day-num">30</span><span class="day-month">Mar</span>
+                    </div>
+                    <div class="date-chip" data-date="2026-03-31" onclick="selectDate(this)">
+                        <span class="day-name">Tue</span><span class="day-num">31</span><span class="day-month">Mar</span>
+                    </div>
+                    <div class="date-chip" data-date="2026-04-01" onclick="selectDate(this)">
+                        <span class="day-name">Wed</span><span class="day-num">1</span><span class="day-month">Apr</span>
+                    </div>
+                    <div class="date-chip" data-date="2026-04-02" onclick="selectDate(this)">
+                        <span class="day-name">Thu</span><span class="day-num">2</span><span class="day-month">Apr</span>
+                    </div>
+                    <div class="date-chip" data-date="2026-04-03" onclick="selectDate(this)">
+                        <span class="day-name">Fri</span><span class="day-num">3</span><span class="day-month">Apr</span>
+                    </div>
+                </div>
+
+                <!-- Time Slots -->
+                <div class="slots-grid" id="slotsGrid">
+                    <div class="time-slot" onclick="selectSlot(this)"><div class="slot-time">9:00 AM</div><div class="slot-status">Available</div></div>
+                    <div class="time-slot" onclick="selectSlot(this)"><div class="slot-time">9:30 AM</div><div class="slot-status">Available</div></div>
+                    <div class="time-slot booked"><div class="slot-time">10:00 AM</div><div class="slot-status">Booked</div></div>
+                    <div class="time-slot" onclick="selectSlot(this)"><div class="slot-time">10:30 AM</div><div class="slot-status">Available</div></div>
+                    <div class="time-slot booked"><div class="slot-time">11:00 AM</div><div class="slot-status">Booked</div></div>
+                    <div class="time-slot" onclick="selectSlot(this)"><div class="slot-time">1:00 PM</div><div class="slot-status">Available</div></div>
+                    <div class="time-slot" onclick="selectSlot(this)"><div class="slot-time">1:30 PM</div><div class="slot-status">Available</div></div>
+                    <div class="time-slot" onclick="selectSlot(this)"><div class="slot-time">2:00 PM</div><div class="slot-status">Available</div></div>
+                    <div class="time-slot booked"><div class="slot-time">2:30 PM</div><div class="slot-status">Booked</div></div>
+                    <div class="time-slot" onclick="selectSlot(this)"><div class="slot-time">3:00 PM</div><div class="slot-status">Available</div></div>
+                </div>
+
+                <button class="btn-book" id="bookBtn" disabled onclick="bookAppointment()"><i class="bi bi-check-circle"></i> Book This Slot</button>
+            </div>
+
+            <!-- My Bookings -->
+            <div class="section-card">
+                <div class="section-title"><i class="bi bi-journal-check"></i> My Bookings</div>
+                <div class="section-desc">Your upcoming and past advising appointments.</div>
+
+                <div class="booking-item">
+                    <div class="booking-left">
+                        <div class="booking-date-box"><span class="bdb-month">Apr</span><span class="bdb-day">1</span></div>
+                        <div class="booking-info">
+                            <div class="bi-title">Advising Meeting — Dr. Roberto Cruz</div>
+                            <div class="bi-detail"><i class="bi bi-clock"></i> 10:00 AM · <i class="bi bi-camera-video"></i> Zoom</div>
+                        </div>
+                    </div>
+                    <div class="booking-actions">
+                        <span class="booking-status confirmed">Confirmed</span>
+                        <button class="btn-cancel" onclick="cancelBooking(this)">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="booking-item">
+                    <div class="booking-left">
+                        <div class="booking-date-box"><span class="bdb-month">Mar</span><span class="bdb-day">15</span></div>
+                        <div class="booking-info">
+                            <div class="bi-title">Advising Meeting — Dr. Roberto Cruz</div>
+                            <div class="bi-detail"><i class="bi bi-clock"></i> 2:30 PM · <i class="bi bi-building"></i> In Person · Gokongwei G304</div>
+                        </div>
+                    </div>
+                    <div class="booking-actions">
+                        <span class="booking-status confirmed">Completed</span>
+                    </div>
+                </div>
+
+                <div class="booking-item" style="opacity: 0.55;">
+                    <div class="booking-left">
+                        <div class="booking-date-box" style="background: var(--dlsu-gray-100);"><span class="bdb-month" style="color: var(--dlsu-gray-400);">Feb</span><span class="bdb-day" style="color: var(--dlsu-gray-400);">20</span></div>
+                        <div class="booking-info">
+                            <div class="bi-title" style="text-decoration: line-through;">Advising Meeting — Dr. Roberto Cruz</div>
+                            <div class="bi-detail"><i class="bi bi-clock"></i> 11:00 AM · <i class="bi bi-camera-video"></i> Zoom</div>
+                        </div>
+                    </div>
+                    <div class="booking-actions">
+                        <span class="booking-status cancelled">Cancelled</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Common JS -->
+    <script src="js/common.js"></script>
+    <!-- Page-Specific JS -->
+    <script src="js/student-appointments.js"></script>
+</body>
+</html>

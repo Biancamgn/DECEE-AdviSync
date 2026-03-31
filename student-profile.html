@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdviSync – Profile</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Common Styles -->
+    <link href="css/common.css" rel="stylesheet">
+    <!-- Page-Specific Styles -->
+    <link href="css/student-profile.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><div class="brand-text"><h6>DECEE Advising</h6><small>De La Salle University</small></div></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a href="student-dashboard.html" class="nav-link">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span class="link-text">Dashboard</span>
+            </a>
+            <a href="student-academic-history.html" class="nav-link">
+                <i class="bi bi-journal-text"></i>
+                <span class="link-text">Academic History</span>
+            </a>
+            <a href="student-academic-booklet.html" class="nav-link">
+                <i class="bi bi-file-earmark-check"></i>
+                <span class="link-text">Academic Booklet</span>
+            </a>
+            <a href="student-program-checklist.html" class="nav-link">
+                <i class="bi bi-list-check"></i>
+                <span class="link-text">Program Checklist</span>
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Advising</div>
+            <a href="student-appointments.html" class="nav-link">
+                <i class="bi bi-calendar-event"></i>
+                <span class="link-text">Appointments</span>
+            </a>
+            <a href="student-concerns.html" class="nav-link">
+                <i class="bi bi-chat-left-text"></i>
+                <span class="link-text">Concerns</span>
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Account</div>
+            <a href="student-profile.html" class="nav-link active">
+                <i class="bi bi-person"></i>
+                <span class="link-text">Profile</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-gear"></i>
+                <span class="link-text">Settings</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer"><div class="user-card"><div class="avatar">BM</div><div class="user-info"><div class="user-name">Bianca M.</div><div class="user-id">12012345 · BS-CpE</div></div></div></div>
+    </aside>
+
+    <div class="main-content" id="mainContent">
+        <header class="topbar">
+            <div class="d-flex align-items-center">
+                <button class="hamburger-btn" id="hamburgerBtn"><i class="bi bi-list"></i></button>
+                <div class="topbar-left"><h1>My Profile</h1><p>View your personal & academic information</p></div>
+            </div>
+                        <div class="topbar-right">
+                <span class="topbar-clock" id="topbarClock">00:00:00</span>
+                <button class="topbar-circle-btn" title="Toggle Dark Mode" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
+                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
+                <div class="profile-wrapper" id="profileWrapper">
+                    <div class="d-flex align-items-center gap-1" style="cursor: pointer;" id="profileToggle">
+                        <div class="profile-btn" title="Profile">BM</div>
+                        <i class="bi bi-chevron-down profile-chevron"></i>
+                    </div>
+                    <div class="profile-dropdown">
+                        <div class="dropdown-header">
+                            <div class="dropdown-avatar">BM</div>
+                            <div>
+                                <div class="dropdown-name">Bianca Magsino</div>
+                                <div class="dropdown-role">Student</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-info">
+                            <div class="dropdown-info-row">
+                                <span class="dropdown-info-label">ID Number</span>
+                                <span class="dropdown-info-value">12012345</span>
+                            </div>
+                            <div class="dropdown-info-row">
+                                <span class="dropdown-info-label">Program</span>
+                                <span class="dropdown-info-value">BS-CpE</span>
+                            </div>
+                            <div class="dropdown-info-row">
+                                <span class="dropdown-info-label">Term</span>
+                                <span class="dropdown-info-value">8 of 12</span>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="student-profile.html" class="dropdown-action">
+                            <i class="bi bi-person"></i>
+                            View Profile
+                        </a>
+                        <a href="#" class="dropdown-action">
+                            <i class="bi bi-gear"></i>
+                            Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-action logout">
+                            <i class="bi bi-box-arrow-left"></i>
+                            Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-body">
+
+            <!-- Profile Hero -->
+            <div class="profile-hero">
+                <div class="hero-avatar">BM</div>
+                <div class="hero-info">
+                    <h2>Bianca Magsino</h2>
+                    <div class="hero-meta">
+                        <span>ID: 12012345</span>
+                        <span class="sep">·</span>
+                        <span>BS Computer Engineering</span>
+                        <span class="sep">·</span>
+                        <span>Term 8 of 12</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Banner -->
+            <div class="status-banner cleared">
+                <i class="bi bi-check-circle-fill"></i>
+                <span>Cleared — You are cleared for enrollment this term.</span>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="info-section">
+                <div class="info-section-title"><i class="bi bi-person-vcard"></i> Personal Information</div>
+                <div class="info-grid cols-4">
+                    <div class="info-cell">
+                        <div class="cell-label">Full Name</div>
+                        <div class="cell-value">Bianca Magsino</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Student ID</div>
+                        <div class="cell-value">12012345</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Email Address</div>
+                        <div class="cell-value email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fd9f949c939e9cd3909c9a8e949392bd99918e88d3989988d38d95">[email&#160;protected]</a></div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Phone Number</div>
+                        <div class="cell-value phone">+63 917 234 5678</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Information -->
+            <div class="info-section">
+                <div class="info-section-title"><i class="bi bi-mortarboard"></i> Academic Information</div>
+                <div class="info-grid cols-3" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="info-cell">
+                        <div class="cell-label">College</div>
+                        <div class="cell-value">Gokongwei College of Engineering</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Department</div>
+                        <div class="cell-value">GCOE-DECEE</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Program</div>
+                        <div class="cell-value">BS Computer Engineering</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Specialization</div>
+                        <div class="cell-value" style="color: var(--dlsu-gray-400);">N/A</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Accumulated Failed Units</div>
+                        <div class="cell-value">6 / 30</div>
+                        <div class="mini-meter">
+                            <div class="mini-meter-bar"><div class="mini-meter-fill safe" style="width: 20%;"></div></div>
+                        </div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Advising Status</div>
+                        <div class="cell-value"><span class="status-pill cleared"><i class="bi bi-check-circle-fill"></i> Cleared</span></div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Current Term</div>
+                        <div class="cell-value">8 of 12</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Cumulative GPA</div>
+                        <div class="cell-value">2.85</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Units Completed</div>
+                        <div class="cell-value">138 / 200</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guardian Information -->
+            <div class="info-section">
+                <div class="info-section-title"><i class="bi bi-people"></i> Guardian Information</div>
+                <div class="info-grid cols-3" style="grid-template-columns: repeat(3, 1fr);">
+                    <div class="info-cell">
+                        <div class="cell-label">Guardian Name</div>
+                        <div class="cell-value">Roberto Magsino</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Relationship</div>
+                        <div class="cell-value">Father</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Guardian Contact</div>
+                        <div class="cell-value phone">+63 918 876 5432</div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Guardian Email</div>
+                        <div class="cell-value email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3a4814575b5d495354557a5d575b535614595557">[email&#160;protected]</a></div>
+                    </div>
+                    <div class="info-cell">
+                        <div class="cell-label">Guardian Address</div>
+                        <div class="cell-value">Quezon City, Metro Manila</div>
+                    </div>
+                    <div class="info-cell" style="border-right: none;">
+                        <div class="cell-label">Emergency Contact</div>
+                        <div class="cell-value phone">+63 918 876 5432</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assigned Adviser -->
+            <div class="info-section">
+                <div class="info-section-title"><i class="bi bi-person-check"></i> Assigned Academic Adviser</div>
+                <div class="adviser-section">
+                    <div class="adv-avatar">RC</div>
+                    <div>
+                        <div class="adv-name">Dr. Roberto Cruz</div>
+                        <div class="adv-detail"><i class="bi bi-building"></i> DECEE · CpE Program</div>
+                        <div class="adv-detail"><i class="bi bi-envelope"></i> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2a5845484f585e450449585f506a4e46595f044f4e5f045a42">[email&#160;protected]</a></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Common JS -->
+    <script src="js/common.js"></script>
+    <!-- Page-Specific JS -->
+    <script src="js/student-profile.js"></script>
+</body>
+</html>

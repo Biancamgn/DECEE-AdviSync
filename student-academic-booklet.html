@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdviSync – Academic Booklet</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Common Styles -->
+    <link href="css/common.css" rel="stylesheet">
+    <!-- Page-Specific Styles -->
+    <link href="css/student-academic-booklet.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><div class="brand-text"><h6>DECEE Advising</h6><small>De La Salle University</small></div></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a href="student-dashboard.html" class="nav-link">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span class="link-text">Dashboard</span>
+            </a>
+            <a href="student-academic-history.html" class="nav-link">
+                <i class="bi bi-journal-text"></i>
+                <span class="link-text">Academic History</span>
+            </a>
+            <a href="student-academic-booklet.html" class="nav-link active">
+                <i class="bi bi-file-earmark-check"></i>
+                <span class="link-text">Academic Booklet</span>
+            </a>
+            <a href="student-program-checklist.html" class="nav-link">
+                <i class="bi bi-list-check"></i>
+                <span class="link-text">Program Checklist</span>
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Advising</div>
+            <a href="student-appointments.html" class="nav-link">
+                <i class="bi bi-calendar-event"></i>
+                <span class="link-text">Appointments</span>
+            </a>
+            <a href="student-concerns.html" class="nav-link">
+                <i class="bi bi-chat-left-text"></i>
+                <span class="link-text">Concerns</span>
+            </a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Account</div>
+            <a href="student-profile.html" class="nav-link">
+                <i class="bi bi-person"></i>
+                <span class="link-text">Profile</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-gear"></i>
+                <span class="link-text">Settings</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer"><div class="user-card"><div class="avatar">BM</div><div class="user-info"><div class="user-name">Bianca M.</div><div class="user-id">12012345 · BS-CpE</div></div></div></div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <header class="topbar">
+            <div class="d-flex align-items-center">
+                <button class="hamburger-btn" id="hamburgerBtn"><i class="bi bi-list"></i></button>
+                <div class="topbar-left"><h1>Study Plan Submission</h1><p>Term 9 · Academic Year 2025–2026</p></div>
+            </div>
+                        <div class="topbar-right">
+                <span class="topbar-clock" id="topbarClock">00:00:00</span>
+                <button class="topbar-circle-btn" title="Toggle Dark Mode" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
+                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
+                <div class="profile-wrapper" id="profileWrapper">
+                    <div class="d-flex align-items-center gap-1" style="cursor: pointer;" id="profileToggle">
+                        <div class="profile-btn" title="Profile">BM</div>
+                        <i class="bi bi-chevron-down profile-chevron"></i>
+                    </div>
+                    <div class="profile-dropdown">
+                        <div class="dropdown-header">
+                            <div class="dropdown-avatar">BM</div>
+                            <div>
+                                <div class="dropdown-name">Bianca Magsino</div>
+                                <div class="dropdown-role">Student</div>
+                            </div>
+                        </div>
+                        <div class="dropdown-info">
+                            <div class="dropdown-info-row">
+                                <span class="dropdown-info-label">ID Number</span>
+                                <span class="dropdown-info-value">12012345</span>
+                            </div>
+                            <div class="dropdown-info-row">
+                                <span class="dropdown-info-label">Program</span>
+                                <span class="dropdown-info-value">BS-CpE</span>
+                            </div>
+                            <div class="dropdown-info-row">
+                                <span class="dropdown-info-label">Term</span>
+                                <span class="dropdown-info-value">8 of 12</span>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="student-profile.html" class="dropdown-action">
+                            <i class="bi bi-person"></i>
+                            View Profile
+                        </a>
+                        <a href="#" class="dropdown-action">
+                            <i class="bi bi-gear"></i>
+                            Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-action logout">
+                            <i class="bi bi-box-arrow-left"></i>
+                            Log Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-body">
+            <h2 class="page-title"><i class="bi bi-file-earmark-plus-fill"></i> Submit Study Plan</h2>
+            <p class="page-subtitle">Complete all sections below to submit your academic advising study plan for the upcoming term.</p>
+
+            <!-- Stepper -->
+            <div class="form-stepper">
+                <div class="step active" data-step="1"><div class="step-num">1</div><span class="step-label">Failed Courses</span></div>
+                <div class="step-line"></div>
+                <div class="step" data-step="2"><div class="step-num">2</div><span class="step-label">Current Subjects</span></div>
+                <div class="step-line"></div>
+                <div class="step" data-step="3"><div class="step-num">3</div><span class="step-label">Planned Courses</span></div>
+                <div class="step-line"></div>
+                <div class="step" data-step="4"><div class="step-num">4</div><span class="step-label">Uploads & Meeting</span></div>
+                <div class="step-line"></div>
+                <div class="step" data-step="5"><div class="step-num">5</div><span class="step-label">Review</span></div>
+            </div>
+
+            <!-- ══ STEP 1: Failed Courses ══ -->
+            <div class="form-section active" id="step1">
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-exclamation-circle"></i> Previously Failed Courses</div>
+                    <div class="section-card-desc">List any courses you failed in the previous term. Leave empty if none.</div>
+
+                    <!-- Column Headers -->
+                    <div class="course-row course-header" style="margin-bottom: 0.35rem;">
+                        <div class="form-label-custom">Course Code</div>
+                        <div class="form-label-custom">Course Name</div>
+                        <div class="form-label-custom">Units</div>
+                        <div></div>
+                    </div>
+
+                    <div id="failedCoursesContainer">
+                        <div class="course-row">
+                            <div><input type="text" class="form-control-custom" placeholder="e.g. CSMCPRO"></div>
+                            <div><input type="text" class="form-control-custom" placeholder="e.g. Microprocessors"></div>
+                            <div><input type="number" class="form-control-custom" placeholder="3"></div>
+                            <div><button class="remove-row"><i class="bi bi-x-lg"></i></button></div>
+                        </div>
+                    </div>
+                    <button class="add-row-btn" id="addFailedRow"><i class="bi bi-plus-circle"></i> Add Course</button>
+                </div>
+
+                <div class="form-nav">
+                    <div></div>
+                    <button class="btn-nav next" onclick="goStep(2)">Next <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ══ STEP 2: Current Enrolled Subjects ══ -->
+            <div class="form-section" id="step2">
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-book"></i> Current Enrolled Subjects</div>
+                    <div class="section-card-desc">List all subjects you are currently enrolled in this term, along with their prerequisites.</div>
+
+                    <!-- Column Headers -->
+                    <div class="course-row course-header" style="grid-template-columns: 1fr 2fr 80px 1fr 40px; margin-bottom: 0.35rem;">
+                        <div class="form-label-custom">Course Code</div>
+                        <div class="form-label-custom">Course Name</div>
+                        <div class="form-label-custom">Units</div>
+                        <div class="form-label-custom">Prerequisite</div>
+                        <div></div>
+                    </div>
+
+                    <div id="currentSubjectsContainer">
+                        <div class="course-row" style="grid-template-columns: 1fr 2fr 80px 1fr 40px;">
+                            <div><input type="text" class="form-control-custom" value="OPESSYS"></div>
+                            <div><input type="text" class="form-control-custom" value="Operating Systems"></div>
+                            <div><input type="number" class="form-control-custom" value="3"></div>
+                            <div><input type="text" class="form-control-custom" value="CCDATRCL"></div>
+                            <div><button class="remove-row"><i class="bi bi-x-lg"></i></button></div>
+                        </div>
+                        <div class="course-row" style="grid-template-columns: 1fr 2fr 80px 1fr 40px;">
+                            <div><input type="text" class="form-control-custom" value="NSSECU1"></div>
+                            <div><input type="text" class="form-control-custom" value="Network Security 1"></div>
+                            <div><input type="number" class="form-control-custom" value="3"></div>
+                            <div><input type="text" class="form-control-custom" value="CCNETCM"></div>
+                            <div><button class="remove-row"><i class="bi bi-x-lg"></i></button></div>
+                        </div>
+                    </div>
+                    <button class="add-row-btn" id="addCurrentRow"><i class="bi bi-plus-circle"></i> Add Subject</button>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn-nav prev" onclick="goStep(1)"><i class="bi bi-arrow-left"></i> Previous</button>
+                    <button class="btn-nav next" onclick="goStep(3)">Next <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ══ STEP 3: Planned Courses ══ -->
+            <div class="form-section" id="step3">
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-calendar-plus"></i> Planned Courses for Next Term</div>
+                    <div class="section-card-desc">List the courses you plan to enroll in for the upcoming term. Prerequisites will be validated automatically.</div>
+
+                    <!-- Column Headers -->
+                    <div class="course-row course-header" style="grid-template-columns: 1fr 2fr 80px 1fr 40px; margin-bottom: 0.35rem;">
+                        <div class="form-label-custom">Course Code</div>
+                        <div class="form-label-custom">Course Name</div>
+                        <div class="form-label-custom">Units</div>
+                        <div class="form-label-custom">Prerequisite</div>
+                        <div></div>
+                    </div>
+
+                    <div id="plannedCoursesContainer">
+                        <div class="course-row" style="grid-template-columns: 1fr 2fr 80px 1fr 40px;">
+                            <div><input type="text" class="form-control-custom" placeholder="e.g. EMBDSYS"></div>
+                            <div><input type="text" class="form-control-custom" placeholder="Course name"></div>
+                            <div><input type="number" class="form-control-custom" placeholder="3"></div>
+                            <div><input type="text" class="form-control-custom" placeholder="e.g. MICPROS"></div>
+                            <div><button class="remove-row"><i class="bi bi-x-lg"></i></button></div>
+                        </div>
+                    </div>
+                    <button class="add-row-btn" id="addPlannedRow"><i class="bi bi-plus-circle"></i> Add Course</button>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-chat-square-text"></i> Concerns (Optional)</div>
+                    <div class="section-card-desc">Share any academic concerns or questions for your adviser.</div>
+                    <textarea class="form-control-custom" placeholder="Type your concerns here..."></textarea>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn-nav prev" onclick="goStep(2)"><i class="bi bi-arrow-left"></i> Previous</button>
+                    <button class="btn-nav next" onclick="goStep(4)">Next <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ══ STEP 4: Uploads & Meeting ══ -->
+            <div class="form-section" id="step4">
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-cloud-arrow-up"></i> Upload Documents</div>
+                    <div class="section-card-desc">Upload the required screenshots and documents for your adviser's review.</div>
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Grade Report Screenshot <span class="required">*</span></label>
+                        <div class="upload-area" onclick="this.querySelector('input').click()">
+                            <input type="file" accept="image/*,.pdf" style="display:none;">
+                            <i class="bi bi-image"></i>
+                            <div class="upload-text">Click to upload or drag and drop</div>
+                            <div class="upload-hint">PNG, JPG, or PDF · Max 10MB</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Updated Academic Advising Booklet <span class="required">*</span></label>
+                        <div class="upload-area" onclick="this.querySelector('input').click()">
+                            <input type="file" accept=".pdf,.docx,.doc" style="display:none;">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <div class="upload-text">Click to upload or drag and drop</div>
+                            <div class="upload-hint">PDF or DOCX · Max 10MB</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-people"></i> Advising Appointment</div>
+                    <div class="section-card-desc">Would you like to schedule a meeting with your academic adviser?</div>
+
+                    <div class="radio-card-group">
+                        <div class="radio-card" onclick="selectRadio(this, 'waive')">
+                            <div class="rc-title"><i class="bi bi-check-circle"></i> Waive Appointment</div>
+                            <div class="rc-desc">I don't need to meet with my adviser this term.</div>
+                        </div>
+                        <div class="radio-card" onclick="selectRadio(this, 'schedule')">
+                            <div class="rc-title"><i class="bi bi-camera-video"></i> Schedule a Meeting</div>
+                            <div class="rc-desc">I'd like to book a Zoom or in-person meeting.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn-nav prev" onclick="goStep(3)"><i class="bi bi-arrow-left"></i> Previous</button>
+                    <button class="btn-nav next" onclick="goStep(5)">Review & Submit <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ══ STEP 5: Review & Submit ══ -->
+            <div class="form-section" id="step5">
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-clipboard-check"></i> Review Your Submission</div>
+                    <div class="section-card-desc">Please review all information before submitting. Your adviser will review your study plan and provide feedback.</div>
+
+                    <h6 style="font-size: 0.82rem; font-weight: 700; margin: 1rem 0 0.5rem; color: var(--dlsu-gray-800);">Planned Courses for Next Term</h6>
+                    <table class="review-table">
+                        <thead><tr><th>Course Code</th><th>Course Name</th><th>Units</th><th>Prerequisite</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr><td class="code">EMBDSYS</td><td>Embedded Systems Lecture</td><td>3</td><td>MICPROS</td><td><span class="prereq-badge ok">✓ Passed</span></td></tr>
+                            <tr><td class="code">LBYCPM3</td><td>Embedded Systems Lab</td><td>1</td><td>EMBDSYS</td><td><span class="prereq-badge ok">✓ Co-req</span></td></tr>
+                            <tr><td class="code">CSYSARC</td><td>Computer Architecture</td><td>3</td><td>MICPROS</td><td><span class="prereq-badge ok">✓ Passed</span></td></tr>
+                            <tr><td class="code">REMETHS</td><td>Methods of Research</td><td>3</td><td>ENGDATA</td><td><span class="prereq-badge ok">✓ Passed</span></td></tr>
+                        </tbody>
+                    </table>
+
+                    <h6 style="font-size: 0.82rem; font-weight: 700; margin: 1.25rem 0 0.5rem; color: var(--dlsu-gray-800);">Summary</h6>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; font-size: 0.82rem;">
+                        <div style="padding: 0.6rem 0.85rem; background: var(--dlsu-gray-50); border-radius: 8px;"><span style="color: var(--dlsu-gray-400); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Total Planned Units</span><div style="font-weight: 700; font-size: 1.1rem;">10</div></div>
+                        <div style="padding: 0.6rem 0.85rem; background: var(--dlsu-gray-50); border-radius: 8px;"><span style="color: var(--dlsu-gray-400); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Prerequisite Violations</span><div style="font-weight: 700; font-size: 1.1rem; color: var(--dlsu-green);">0</div></div>
+                        <div style="padding: 0.6rem 0.85rem; background: var(--dlsu-gray-50); border-radius: 8px;"><span style="color: var(--dlsu-gray-400); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Failed Units (Accumulated)</span><div style="font-weight: 700; font-size: 1.1rem;">6</div></div>
+                        <div style="padding: 0.6rem 0.85rem; background: var(--dlsu-gray-50); border-radius: 8px;"><span style="color: var(--dlsu-gray-400); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Advising Meeting</span><div style="font-weight: 700; font-size: 1.1rem;">Waived</div></div>
+                    </div>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn-nav prev" onclick="goStep(4)"><i class="bi bi-arrow-left"></i> Previous</button>
+                    <button class="btn-nav submit" onclick="alert('Study plan submitted! Your adviser will review it shortly.')"><i class="bi bi-send-fill"></i> Submit Study Plan</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Common JS -->
+    <script src="js/common.js"></script>
+    <!-- Page-Specific JS -->
+    <script src="js/student-academic-booklet.js"></script>
+</body>
+</html>
