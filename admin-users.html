@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdviSync — User Management</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+            <div class="brand-text">
+                <h6>AdviSync</h6>
+                <small>Admin Panel</small>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <div class="nav-divider"></div>
+            <a href="admin-dashboard.html" class="nav-link">
+                <i class="bi bi-speedometer2"></i>
+                <span class="link-text">Dashboard</span>
+            </a>
+            <a href="admin-users.html" class="nav-link active">
+                <i class="bi bi-people"></i>
+                <span class="link-text">User Management</span>
+            </a>
+
+            <div class="nav-section-label">Data</div>
+            <div class="nav-divider"></div>
+            <a href="#" class="nav-link">
+                <i class="bi bi-bar-chart-line"></i>
+                <span class="link-text">Reports</span>
+            </a>
+            <a href="#" class="nav-link">
+                <i class="bi bi-person-lines-fill"></i>
+                <span class="link-text">Student Records</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="avatar">AD</div>
+                <div class="user-info">
+                    <div class="user-name">System Admin</div>
+                    <div class="user-id">DECEE Department</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="d-flex align-items-center">
+                <button class="hamburger-btn" id="hamburgerBtn"><i class="bi bi-list"></i></button>
+                <div class="topbar-left">
+                    <h1>User Management</h1>
+                    <p id="topbarClock"></p>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" id="darkModeBtn" title="Toggle Dark Mode">
+                    <i class="bi bi-moon-fill"></i>
+                </button>
+                <button class="topbar-btn" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                    <span class="notif-dot"></span>
+                </button>
+                <div class="profile-wrapper" id="profileWrapper">
+                    <div class="profile-toggle" id="profileToggle">
+                        <div class="avatar-sm">AD</div>
+                        <div class="d-none d-sm-block">
+                            <div class="profile-name">Admin</div>
+                            <div class="profile-role">DECEE Dept</div>
+                        </div>
+                    </div>
+                    <div class="profile-dropdown">
+                        <a href="#">Settings</a>
+                        <a href="#">Profile</a>
+                        <a href="index.html" class="danger">Sign out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Body -->
+        <div class="page-body">
+
+            <!-- Page Header with Add Button -->
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+                <div>
+                    <div class="section-header mb-0"><span>User Accounts</span></div>
+                    <p style="font-size: 0.82rem; color: var(--dlsu-gray-400); margin: 0;">Manage student and professor credentials, profiles, and account recovery.</p>
+                </div>
+                <button class="btn btn-sm px-3 py-2" id="addUserBtn" style="background: var(--dlsu-green); color: white; font-weight: 600; border-radius: 8px; font-size: 0.82rem; white-space: nowrap;">
+                    <i class="bi bi-plus-lg me-1"></i> Add User
+                </button>
+            </div>
+
+            <!-- Role-Based Tabs -->
+            <div class="content-card mb-4">
+                <div class="card-body-inner p-0">
+                    <ul class="nav user-tabs" id="userTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#studentsPanel" type="button" role="tab" aria-selected="true">
+                                <i class="bi bi-mortarboard me-2"></i>Students
+                                <span class="tab-count" id="studentCount">0</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="professors-tab" data-bs-toggle="tab" data-bs-target="#professorsPanel" type="button" role="tab" aria-selected="false">
+                                <i class="bi bi-person-workspace me-2"></i>Professors
+                                <span class="tab-count" id="professorCount">0</span>
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Search & Filter Bar -->
+                    <div class="d-flex flex-column flex-sm-row align-items-sm-center gap-2 px-4 py-3" style="border-bottom: 1px solid var(--dlsu-gray-200);">
+                        <div class="input-group" style="max-width: 340px;">
+                            <span class="input-group-text" style="background: var(--dlsu-gray-50); border-color: var(--dlsu-gray-200); color: var(--dlsu-gray-400);"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search by name, ID, or email..." style="border-color: var(--dlsu-gray-200); font-size: 0.82rem;">
+                        </div>
+                        <select class="form-select form-select-sm" id="programFilter" style="max-width: 160px; border-color: var(--dlsu-gray-200); font-size: 0.82rem;">
+                            <option value="all">All Programs</option>
+                            <option value="BSCpE">BSCpE</option>
+                            <option value="BSECE">BSECE</option>
+                        </select>
+                        <button class="btn btn-sm ms-sm-auto" id="resetPasswordBtn" style="background: #fef7e0; color: var(--dlsu-warning); font-weight: 600; border-radius: 8px; font-size: 0.78rem; white-space: nowrap;">
+                            <i class="bi bi-key me-1"></i> Account Recovery
+                        </button>
+                    </div>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content">
+                        <!-- Students Panel -->
+                        <div class="tab-pane fade show active" id="studentsPanel" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="admin-table" id="studentsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Student ID</th>
+                                            <th>Full Name</th>
+                                            <th>Email</th>
+                                            <th>Program</th>
+                                            <th>Year Level</th>
+                                            <th>Status</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentsBody">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Professors Panel -->
+                        <div class="tab-pane fade" id="professorsPanel" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="admin-table" id="professorsTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Faculty ID</th>
+                                            <th>Full Name</th>
+                                            <th>Email</th>
+                                            <th>Department</th>
+                                            <th>Advisees</th>
+                                            <th>Status</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="professorsBody">
+                                        <!-- Populated by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- MODAL: Add / Edit User                                             -->
+    <!-- ================================================================== -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 14px;">
+                <div class="modal-header" style="border-bottom: 1px solid var(--dlsu-gray-200); padding: 1.25rem 1.5rem;">
+                    <h5 class="modal-title fw-bold" id="userModalLabel" style="font-size: 1rem;">Add New User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <form id="userForm">
+                        <input type="hidden" id="editUserId">
+                        <input type="hidden" id="editUserType">
+
+                        <!-- Role Selector -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 0.82rem;">Role</label>
+                            <select class="form-select form-select-sm" id="formRole" style="border-color: var(--dlsu-gray-200);">
+                                <option value="student">Student</option>
+                                <option value="professor">Professor</option>
+                            </select>
+                        </div>
+
+                        <!-- User ID -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 0.82rem;" id="formIdLabel">Student ID</label>
+                            <input type="text" class="form-control form-control-sm" id="formUserId" placeholder="e.g. 12345678" style="border-color: var(--dlsu-gray-200);">
+                        </div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-6">
+                                <label class="form-label fw-semibold" style="font-size: 0.82rem;">First Name</label>
+                                <input type="text" class="form-control form-control-sm" id="formFirstName" style="border-color: var(--dlsu-gray-200);">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-semibold" style="font-size: 0.82rem;">Last Name</label>
+                                <input type="text" class="form-control form-control-sm" id="formLastName" style="border-color: var(--dlsu-gray-200);">
+                            </div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold" style="font-size: 0.82rem;">Email</label>
+                            <input type="email" class="form-control form-control-sm" id="formEmail" placeholder="name@dlsu.edu.ph" style="border-color: var(--dlsu-gray-200);">
+                        </div>
+
+                        <!-- Student-specific fields -->
+                        <div id="studentFields">
+                            <div class="row g-3 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label fw-semibold" style="font-size: 0.82rem;">Program</label>
+                                    <select class="form-select form-select-sm" id="formProgram" style="border-color: var(--dlsu-gray-200);">
+                                        <option value="BSCpE">BSCpE</option>
+                                        <option value="BSECE">BSECE</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-semibold" style="font-size: 0.82rem;">Year Level</label>
+                                    <select class="form-select form-select-sm" id="formYear" style="border-color: var(--dlsu-gray-200);">
+                                        <option value="1">1st Year</option>
+                                        <option value="2">2nd Year</option>
+                                        <option value="3">3rd Year</option>
+                                        <option value="4">4th Year</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Professor-specific fields -->
+                        <div id="professorFields" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="font-size: 0.82rem;">Department</label>
+                                <input type="text" class="form-control form-control-sm" id="formDepartment" value="DECEE" style="border-color: var(--dlsu-gray-200);">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid var(--dlsu-gray-200); padding: 1rem 1.5rem;">
+                    <button type="button" class="btn btn-sm px-3" data-bs-dismiss="modal" style="background: var(--dlsu-gray-100); color: var(--dlsu-gray-600); font-weight: 600; border-radius: 8px;">Cancel</button>
+                    <button type="button" class="btn btn-sm px-4" id="saveUserBtn" style="background: var(--dlsu-green); color: white; font-weight: 600; border-radius: 8px;">Save User</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- MODAL: Delete Confirmation                                         -->
+    <!-- ================================================================== -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content" style="border: none; border-radius: 14px;">
+                <div class="modal-body text-center" style="padding: 2rem 1.5rem;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: #fdeaea; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="bi bi-trash3 fs-4" style="color: var(--dlsu-danger);"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">Delete User?</h6>
+                    <p style="font-size: 0.82rem; color: var(--dlsu-gray-400);">This action cannot be undone. The user's account and all related data will be permanently removed.</p>
+                    <input type="hidden" id="deleteUserId">
+                    <input type="hidden" id="deleteUserType">
+                </div>
+                <div class="modal-footer justify-content-center" style="border-top: 1px solid var(--dlsu-gray-200); padding: 1rem;">
+                    <button type="button" class="btn btn-sm px-3" data-bs-dismiss="modal" style="background: var(--dlsu-gray-100); color: var(--dlsu-gray-600); font-weight: 600; border-radius: 8px;">Cancel</button>
+                    <button type="button" class="btn btn-sm px-4" id="confirmDeleteBtn" style="background: var(--dlsu-danger); color: white; font-weight: 600; border-radius: 8px;">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- MODAL: Account Recovery                                            -->
+    <!-- ================================================================== -->
+    <div class="modal fade" id="recoveryModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border: none; border-radius: 14px;">
+                <div class="modal-header" style="border-bottom: 1px solid var(--dlsu-gray-200); padding: 1.25rem 1.5rem;">
+                    <h5 class="modal-title fw-bold" style="font-size: 1rem;"><i class="bi bi-key me-2" style="color: var(--dlsu-warning);"></i>Account Recovery</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <p style="font-size: 0.82rem; color: var(--dlsu-gray-600); margin-bottom: 1rem;">Search for a user to fetch or reset their default password.</p>
+                    <div class="input-group mb-3">
+                        <span class="input-group-text" style="background: var(--dlsu-gray-50); border-color: var(--dlsu-gray-200); color: var(--dlsu-gray-400);"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control form-control-sm" id="recoverySearchInput" placeholder="Enter ID number or email..." style="border-color: var(--dlsu-gray-200); font-size: 0.82rem;">
+                        <button class="btn btn-sm px-3" id="recoverySearchBtn" type="button" style="background: var(--dlsu-green); color: white; font-weight: 600; font-size: 0.82rem;">Search</button>
+                    </div>
+                    <!-- Recovery Result -->
+                    <div id="recoveryResult" style="display: none;">
+                        <div class="p-3" style="background: var(--dlsu-gray-50); border-radius: 10px; border: 1px solid var(--dlsu-gray-200);">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div style="width: 42px; height: 42px; border-radius: 10px; background: var(--dlsu-green-light); color: var(--dlsu-green); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem;" id="recoveryAvatar"></div>
+                                <div>
+                                    <div class="fw-bold" style="font-size: 0.88rem;" id="recoveryName"></div>
+                                    <div style="font-size: 0.75rem; color: var(--dlsu-gray-400);" id="recoveryId"></div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between p-2 mb-2" style="background: white; border-radius: 8px; border: 1px dashed var(--dlsu-gray-200);">
+                                <div>
+                                    <div style="font-size: 0.68rem; color: var(--dlsu-gray-400); text-transform: uppercase; font-weight: 600; letter-spacing: 0.05em;">Default Password</div>
+                                    <div class="fw-bold" style="font-size: 0.95rem; font-family: monospace; letter-spacing: 1px;" id="recoveryPassword"></div>
+                                </div>
+                                <button class="btn btn-sm" id="copyPasswordBtn" style="background: var(--dlsu-green-light); color: var(--dlsu-green); font-weight: 600; font-size: 0.75rem; border-radius: 6px;">
+                                    <i class="bi bi-clipboard me-1"></i>Copy
+                                </button>
+                            </div>
+                            <button class="btn btn-sm w-100" id="resetToDefaultBtn" style="background: #fef7e0; color: var(--dlsu-warning); font-weight: 600; border-radius: 8px; font-size: 0.78rem;">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Reset to Default Password
+                            </button>
+                        </div>
+                    </div>
+                    <div id="recoveryNotFound" style="display: none;">
+                        <div class="text-center py-3">
+                            <i class="bi bi-person-x fs-2" style="color: var(--dlsu-gray-400);"></i>
+                            <p style="font-size: 0.82rem; color: var(--dlsu-gray-400); margin-top: 0.5rem;">No user found matching that ID or email.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/admin-users.js"></script>
+</body>
+</html>
