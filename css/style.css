@@ -747,6 +747,125 @@ body {
     border-color: #fdeaea;
 }
 
+/* ── Curriculum: Term Blocks ── */
+.term-block {
+    margin-bottom: 1.5rem;
+}
+
+.term-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--dlsu-gray-200);
+}
+
+.term-label {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: var(--dlsu-green);
+}
+
+.term-year {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--dlsu-gray-400);
+    background: var(--dlsu-gray-100);
+    padding: 0.15rem 0.55rem;
+    border-radius: 5px;
+}
+
+.term-units {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--dlsu-gray-400);
+    margin-left: auto;
+}
+
+/* ── Curriculum: Course Cards ── */
+.course-card {
+    background: white;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 10px;
+    padding: 0.85rem;
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+    height: 100%;
+}
+
+.course-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 112, 60, 0.08);
+    transform: translateY(-1px);
+}
+
+.course-code {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--dlsu-green);
+    letter-spacing: 0.02em;
+}
+
+.course-title {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--dlsu-gray-800);
+    line-height: 1.35;
+    margin-bottom: 0.25rem;
+}
+
+.course-units {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--dlsu-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.course-prereqs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+/* ── Curriculum: Prerequisite Badges ── */
+.prereq-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.62rem;
+    font-weight: 700;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+}
+
+.prereq-badge.hard {
+    background: #fdeaea;
+    color: var(--dlsu-danger);
+}
+
+.prereq-badge.soft {
+    background: #fef7e0;
+    color: var(--dlsu-warning);
+}
+
+.prereq-badge.co {
+    background: #e8f0fe;
+    color: var(--dlsu-info);
+}
+
+/* Prerequisite type indicator dots (used in form) */
+.prereq-type-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.prereq-type-dot.hard { background: var(--dlsu-danger); }
+.prereq-type-dot.soft { background: var(--dlsu-warning); }
+.prereq-type-dot.co   { background: var(--dlsu-info); }
+
 /* ── Mobile Overlay ── */
 .sidebar-overlay {
     display: none;
@@ -995,4 +1114,39 @@ body.dark-mode .modal-content {
 body.dark-mode .modal-header,
 body.dark-mode .modal-footer {
     border-color: #2d323c;
+}
+
+/* Dark Mode: Curriculum */
+body.dark-mode .term-header {
+    border-bottom-color: #2d323c;
+}
+
+body.dark-mode .term-year {
+    background: #2d323c;
+    color: #6b7280;
+}
+
+body.dark-mode .course-card {
+    background: #22262e;
+    border-color: #2d323c;
+}
+
+body.dark-mode .course-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .course-title {
+    color: #d1d5db;
+}
+
+body.dark-mode .prereq-badge.hard {
+    background: rgba(192, 57, 43, 0.15);
+}
+
+body.dark-mode .prereq-badge.soft {
+    background: rgba(230, 168, 23, 0.15);
+}
+
+body.dark-mode .prereq-badge.co {
+    background: rgba(41, 128, 185, 0.15);
 }
