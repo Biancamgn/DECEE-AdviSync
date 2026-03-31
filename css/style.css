@@ -934,6 +934,161 @@ body {
     bottom: 0;
 }
 
+/* ── Reports: Metric Cards ── */
+.report-metric-card {
+    background: white;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 12px;
+    padding: 1.15rem;
+    height: 100%;
+}
+
+.report-metric-value {
+    font-size: 1.65rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--dlsu-gray-800);
+    margin-bottom: 0.2rem;
+}
+
+.report-metric-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--dlsu-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.report-metric-sublabel {
+    font-size: 0.68rem;
+    color: var(--dlsu-gray-400);
+    margin-top: 0.15rem;
+}
+
+.report-metric-change {
+    font-size: 0.68rem;
+    font-weight: 700;
+    margin-top: 0.35rem;
+}
+
+.report-metric-change.positive {
+    color: var(--dlsu-green);
+}
+
+.report-metric-change.negative {
+    color: var(--dlsu-danger);
+}
+
+.border-warning-card {
+    border-left: 3px solid var(--dlsu-warning);
+}
+
+.border-critical-card {
+    border-left: 3px solid var(--dlsu-danger);
+}
+
+/* ── Reports: Chart Cards ── */
+.report-chart-card {
+    background: white;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 12px;
+    padding: 1.25rem;
+    height: 100%;
+}
+
+.report-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--dlsu-gray-800);
+}
+
+/* ── Reports: Risk Status Badges ── */
+.risk-status-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.risk-status-badge.warning {
+    background: #fef7e0;
+    color: var(--dlsu-warning);
+}
+
+.risk-status-badge.critical {
+    background: #fdeaea;
+    color: var(--dlsu-danger);
+}
+
+/* ── Reports: Bottleneck Cards ── */
+.bottleneck-card {
+    background: white;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 10px;
+    padding: 1rem;
+    border-left: 3px solid var(--dlsu-danger);
+    transition: box-shadow 0.2s ease;
+}
+
+.bottleneck-card:hover {
+    box-shadow: 0 4px 15px rgba(192, 57, 43, 0.08);
+}
+
+.bottleneck-rate {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--dlsu-danger);
+    background: #fdeaea;
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+}
+
+/* ── Reports: Progress Track ── */
+.progress-track {
+    background: var(--dlsu-gray-100);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.4s ease;
+}
+
+/* ── Reports: Workload Report Badge ── */
+.workload-report-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.workload-report-badge.complete {
+    background: var(--dlsu-green-light);
+    color: var(--dlsu-green);
+}
+
+.workload-report-badge.on-track {
+    background: #fef7e0;
+    color: var(--dlsu-warning);
+}
+
+.workload-report-badge.behind {
+    background: #fdeaea;
+    color: var(--dlsu-danger);
+}
+
 /* ── Mobile Overlay ── */
 .sidebar-overlay {
     display: none;
@@ -1245,4 +1400,57 @@ body.dark-mode .bulk-assign-bar {
     background: #22262e;
     border-top-color: #2d323c;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Dark Mode: Reports */
+body.dark-mode .report-metric-card {
+    background: #22262e;
+    border-color: #2d323c;
+}
+
+body.dark-mode .report-metric-value {
+    color: #d1d5db;
+}
+
+body.dark-mode .report-chart-card {
+    background: #22262e;
+    border-color: #2d323c;
+}
+
+body.dark-mode .report-chart-header {
+    color: #d1d5db;
+}
+
+body.dark-mode .risk-status-badge.warning {
+    background: rgba(230, 168, 23, 0.15);
+}
+
+body.dark-mode .risk-status-badge.critical {
+    background: rgba(192, 57, 43, 0.15);
+}
+
+body.dark-mode .bottleneck-card {
+    background: #22262e;
+    border-color: #2d323c;
+    border-left-color: var(--dlsu-danger);
+}
+
+body.dark-mode .bottleneck-rate {
+    background: rgba(192, 57, 43, 0.15);
+}
+
+body.dark-mode .progress-track {
+    background: #2d323c;
+}
+
+body.dark-mode .workload-report-badge.complete {
+    background: rgba(0, 112, 60, 0.15);
+}
+
+body.dark-mode .workload-report-badge.on-track {
+    background: rgba(230, 168, 23, 0.15);
+}
+
+body.dark-mode .workload-report-badge.behind {
+    background: rgba(192, 57, 43, 0.15);
 }
