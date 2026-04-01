@@ -306,8 +306,8 @@
             <a href="student-concerns.html" class="nav-link"><i class="bi bi-chat-left-text"></i><span class="link-text">Concerns</span></a>
             <div class="nav-divider"></div>
             <div class="nav-section-label">Account</div>
-            <a href="#" class="nav-link"><i class="bi bi-person"></i><span class="link-text">Profile</span></a>
-            <a href="#" class="nav-link"><i class="bi bi-gear"></i><span class="link-text">Settings</span></a>
+            <a href="student-profile.html" class="nav-link"><i class="bi bi-person"></i><span class="link-text">Profile</span></a>
+            <a href="student-settings.html" class="nav-link"><i class="bi bi-gear"></i><span class="link-text">Settings</span></a>
         </nav>
         <div class="sidebar-footer"><div class="user-card"><div class="avatar">BM</div><div class="user-info"><div class="user-name">Bianca M.</div><div class="user-id">12012345 · BS-CpE</div></div></div></div>
     </aside>
@@ -319,11 +319,12 @@
                 <div class="topbar-left"><h1>Appointments</h1><p id="topbarClock"></p></div>
             </div>
             <div class="topbar-right">
-                <button class="topbar-circle-btn"><i class="bi bi-moon-fill"></i></button>
+                <button class="topbar-circle-btn" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
                 <button class="topbar-circle-btn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
                 <div class="profile-btn">BM</div>
             </div>
         </header>
+        <div class="toast-notification" id="toast" style="position:fixed;bottom:2rem;right:2rem;background:#00703C;color:white;padding:0.85rem 1.5rem;border-radius:12px;font-size:0.85rem;font-weight:600;display:none;align-items:center;gap:0.5rem;z-index:9999;box-shadow:0 8px 30px rgba(0,112,60,0.3);"><i class="bi bi-check-circle-fill"></i> <span id="toastMsg"></span></div>
 
         <div class="page-body">
             <h2 class="page-title"><i class="bi bi-calendar-event-fill"></i> Advising Appointments</h2>
@@ -463,12 +464,41 @@
             const date = document.querySelector('.date-chip.selected');
             const slot = document.querySelector('.time-slot.selected');
             if (date && slot) {
-                alert(`Appointment booked!\n${date.querySelector('.day-name').textContent}, ${date.querySelector('.day-month').textContent} ${date.querySelector('.day-num').textContent} at ${slot.querySelector('.slot-time').textContent}`);
+                const dayName = date.querySelector('.day-name').textContent;
+                const dayMonth = date.querySelector('.day-month').textContent;
+                const dayNum = date.querySelector('.day-num').textContent;
+                const slotTime = slot.querySelector('.slot-time').textContent;
+
                 slot.classList.remove('selected');
                 slot.classList.add('booked');
                 slot.querySelector('.slot-status').textContent = 'Booked';
                 slot.onclick = null;
                 document.getElementById('bookBtn').disabled = true;
+
+                // Add to My Bookings dynamically
+                const bookingsContainer = document.querySelector('.section-card:last-of-type');
+                const newBooking = document.createElement('div');
+                newBooking.className = 'booking-item';
+                newBooking.innerHTML = `
+                    <div class="booking-left">
+                        <div class="booking-date-box"><span class="bdb-month">${dayMonth}</span><span class="bdb-day">${dayNum}</span></div>
+                        <div class="booking-info">
+                            <div class="bi-title">Advising Meeting — Dr. Roberto Cruz</div>
+                            <div class="bi-detail"><i class="bi bi-clock"></i> ${slotTime} · <i class="bi bi-camera-video"></i> Zoom</div>
+                        </div>
+                    </div>
+                    <div class="booking-actions">
+                        <span class="booking-status pending">Pending</span>
+                        <button class="btn-cancel" onclick="cancelBooking(this)">Cancel</button>
+                    </div>
+                `;
+                bookingsContainer.insertBefore(newBooking, bookingsContainer.querySelector('.booking-item'));
+
+                // Show toast
+                const t = document.getElementById('toast');
+                document.getElementById('toastMsg').textContent = `Appointment booked for ${dayName}, ${dayMonth} ${dayNum} at ${slotTime}!`;
+                t.style.display = 'flex';
+                setTimeout(() => t.style.display = 'none', 4000);
             }
         }
 

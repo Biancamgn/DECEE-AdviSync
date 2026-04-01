@@ -296,8 +296,8 @@
             <a href="student-concerns.html" class="nav-link active"><i class="bi bi-chat-left-text"></i><span class="link-text">Concerns</span></a>
             <div class="nav-divider"></div>
             <div class="nav-section-label">Account</div>
-            <a href="#" class="nav-link"><i class="bi bi-person"></i><span class="link-text">Profile</span></a>
-            <a href="#" class="nav-link"><i class="bi bi-gear"></i><span class="link-text">Settings</span></a>
+            <a href="student-profile.html" class="nav-link"><i class="bi bi-person"></i><span class="link-text">Profile</span></a>
+            <a href="student-settings.html" class="nav-link"><i class="bi bi-gear"></i><span class="link-text">Settings</span></a>
         </nav>
         <div class="sidebar-footer"><div class="user-card"><div class="avatar">BM</div><div class="user-info"><div class="user-name">Bianca M.</div><div class="user-id">12012345 · BS-CpE</div></div></div></div>
     </aside>
@@ -309,11 +309,12 @@
                 <div class="topbar-left"><h1>Concerns</h1><p id="topbarClock"></p></div>
             </div>
             <div class="topbar-right">
-                <button class="topbar-circle-btn"><i class="bi bi-moon-fill"></i></button>
+                <button class="topbar-circle-btn" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
                 <button class="topbar-circle-btn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
                 <div class="profile-btn">BM</div>
             </div>
         </header>
+        <div class="toast-notification" id="toast" style="position:fixed;bottom:2rem;right:2rem;background:#00703C;color:white;padding:0.85rem 1.5rem;border-radius:12px;font-size:0.85rem;font-weight:600;display:none;align-items:center;gap:0.5rem;z-index:9999;box-shadow:0 8px 30px rgba(0,112,60,0.3);"><i class="bi bi-check-circle-fill"></i> <span id="toastMsg"></span></div>
 
         <div class="page-body">
             <h2 class="page-title"><i class="bi bi-chat-left-text-fill"></i> Academic Concerns</h2>
@@ -432,10 +433,47 @@
         // Submit
         function submitConcern() {
             const text = document.getElementById('concernText').value.trim();
+            const termSelect = document.querySelector('select.form-control-custom');
+            const subjectInput = document.querySelector('input.form-control-custom');
             if (!text) { alert('Please enter your concern before submitting.'); return; }
-            alert('Your concern has been submitted. Your adviser will be notified.');
+
+            const termText = termSelect.options[termSelect.selectedIndex].text.replace(' (Current)', '');
+            const subjectText = subjectInput ? subjectInput.value.trim() : '';
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+            // Add to history dynamically
+            const firstConcern = document.querySelector('.concern-item');
+            const newConcern = document.createElement('div');
+            newConcern.className = 'concern-item';
+            newConcern.setAttribute('data-status', 'unread');
+            newConcern.innerHTML = `
+                <div class="concern-top">
+                    <div class="concern-meta">
+                        <span class="concern-term">${termText}</span>
+                        <span class="concern-date">Submitted ${dateStr}</span>
+                    </div>
+                    <span class="concern-status unread">Pending</span>
+                </div>
+                <p class="concern-message">${text.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>
+            `;
+            firstConcern.parentNode.insertBefore(newConcern, firstConcern);
+
+            // Update count
+            const countBadge = document.querySelector('.count-badge');
+            const currentCount = parseInt(countBadge.textContent) + 1;
+            countBadge.textContent = currentCount + ' total';
+
+            // Clear form
             document.getElementById('concernText').value = '';
+            if (subjectInput) subjectInput.value = '';
             updateCharCount();
+
+            // Show toast
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = 'Concern submitted successfully! Your adviser will be notified.';
+            t.style.display = 'flex';
+            setTimeout(() => t.style.display = 'none', 4000);
         }
 
         // Filter
