@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function fetchCourses() {
         const { data: curriculum_courses, error } = await supabaseClient
-            .from('curriculum_curriculum_courses')
+            .from('curriculum_courses') // ✅ FIXED
             .select('*, prerequisites(*)')
             .order('term', { ascending: true });
 
