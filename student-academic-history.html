@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic History — DECEE Academic Advising</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dlsu-green: #00703C;
+            --dlsu-green-dark: #005a30;
+            --dlsu-green-light: #e8f5ee;
+            --dlsu-green-muted: #4a9e6f;
+            --dlsu-white: #ffffff;
+            --dlsu-gray-50: #f8faf9;
+            --dlsu-gray-100: #f0f4f2;
+            --dlsu-gray-200: #e2e8e5;
+            --dlsu-gray-400: #94a89c;
+            --dlsu-gray-600: #5a6b60;
+            --dlsu-gray-800: #2d3a32;
+            --dlsu-warning: #e6a817;
+            --dlsu-danger: #c0392b;
+            --dlsu-info: #2980b9;
+            --sidebar-collapsed: 70px;
+            --sidebar-expanded: 250px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--dlsu-gray-50);
+            color: var(--dlsu-gray-800);
+            min-height: 100vh;
+        }
+
+        /* ══ SIDEBAR (same as dashboard) ══ */
+        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-collapsed); height: 100vh; background: var(--dlsu-green); color: white; display: flex; flex-direction: column; z-index: 1000; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; border-radius: 0 18px 18px 0; }
+        .sidebar.expanded { width: var(--sidebar-expanded); }
+        .sidebar-brand { display: flex; align-items: center; justify-content: center; padding: 1.2rem 0; border-bottom: 1px solid rgba(255,255,255,0.12); min-height: 68px; overflow: hidden; }
+        .sidebar-brand .brand-icon { width: 38px; height: 38px; min-width: 38px; background: rgba(255,255,255,0.18); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .sidebar-brand .brand-text { opacity: 0; white-space: nowrap; margin-left: 0.75rem; transition: opacity 0.15s ease; width: 0; overflow: hidden; }
+        .sidebar.expanded .sidebar-brand { justify-content: flex-start; padding-left: 1rem; }
+        .sidebar.expanded .brand-text { opacity: 1; width: auto; }
+        .sidebar-brand h6 { font-size: 0.88rem; font-weight: 700; margin: 0; }
+        .sidebar-brand small { font-size: 0.63rem; opacity: 0.6; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+        .sidebar-nav { flex: 1; padding: 0.6rem 0; overflow-y: auto; overflow-x: hidden; }
+        .nav-section-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; white-space: nowrap; color: rgba(255,255,255,0.4); max-height: 0; opacity: 0; overflow: hidden; padding: 0 1.1rem; transition: max-height 0.3s ease, opacity 0.2s ease, padding 0.3s ease; }
+        .sidebar.expanded .nav-section-label { max-height: 30px; opacity: 1; padding: 0.7rem 1.1rem 0.3rem; }
+        .nav-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 0.4rem 1.1rem; transition: opacity 0.2s ease; }
+        .sidebar.expanded .nav-divider { opacity: 0; margin: 0; height: 0; }
+        .sidebar-nav .nav-link { color: rgba(255,255,255,0.65); display: flex; align-items: center; justify-content: center; padding: 0.65rem 0; margin: 2px 0.5rem; border-radius: 10px; font-size: 0.82rem; font-weight: 500; white-space: nowrap; position: relative; transition: all 0.2s ease; text-decoration: none; }
+        .sidebar-nav .nav-link i { font-size: 1.2rem; width: 22px; min-width: 22px; text-align: center; transition: margin 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-nav .nav-link .link-text { opacity: 0; width: 0; overflow: hidden; margin-left: 0; transition: opacity 0.15s ease, width 0.3s ease, margin 0.3s ease; }
+        .sidebar.expanded .nav-link { justify-content: flex-start; padding: 0.55rem 0.75rem; }
+        .sidebar.expanded .nav-link i { margin-left: 0.35rem; }
+        .sidebar.expanded .nav-link .link-text { opacity: 1; width: auto; margin-left: 0.75rem; }
+        .sidebar-nav .nav-link:hover { color: white; background: rgba(255,255,255,0.12); }
+        .sidebar-nav .nav-link.active { color: white; background: rgba(255,255,255,0.18); font-weight: 600; }
+        .sidebar-nav .nav-link.active::before { content: ''; position: absolute; left: -0.5rem; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: white; border-radius: 0 3px 3px 0; }
+        .sidebar-footer { padding: 0.85rem 0; border-top: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: center; }
+        .sidebar.expanded .sidebar-footer { justify-content: flex-start; padding-left: 1rem; }
+        .sidebar-footer .user-card { display: flex; align-items: center; gap: 0.65rem; }
+        .sidebar-footer .avatar { width: 34px; height: 34px; min-width: 34px; border-radius: 8px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; }
+        .sidebar-footer .user-info { opacity: 0; white-space: nowrap; width: 0; overflow: hidden; transition: opacity 0.15s ease; }
+        .sidebar.expanded .sidebar-footer .user-info { opacity: 1; width: auto; }
+        .sidebar-footer .user-name { font-size: 0.78rem; font-weight: 600; }
+        .sidebar-footer .user-id { font-size: 0.65rem; opacity: 0.6; }
+
+        /* ══ MAIN CONTENT ══ */
+        .main-content { margin-left: var(--sidebar-collapsed); min-height: 100vh; transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .main-content.shifted { margin-left: var(--sidebar-expanded); }
+
+        /* ══ TOPBAR ══ */
+        .topbar { background: white; padding: 0.75rem 2rem; border-bottom: 1px solid var(--dlsu-gray-200); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .topbar-left h1 { font-size: 1.15rem; font-weight: 700; margin: 0; color: var(--dlsu-gray-800); }
+        .topbar-left p { font-size: 0.78rem; color: var(--dlsu-gray-400); margin: 0; }
+        .topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+        .topbar-circle-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--dlsu-gray-200); background: white; display: flex; align-items: center; justify-content: center; color: var(--dlsu-gray-600); cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .topbar-circle-btn:hover { background: var(--dlsu-gray-100); color: var(--dlsu-green); border-color: var(--dlsu-gray-400); }
+        .topbar-circle-btn i { font-size: 1.1rem; }
+        .topbar-circle-btn .notif-badge { position: absolute; top: -2px; right: -2px; width: 20px; height: 20px; background: var(--dlsu-danger); color: white; border-radius: 50%; font-size: 0.6rem; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+        .topbar-clock { font-size: 0.82rem; font-weight: 600; color: var(--dlsu-gray-600); font-variant-numeric: tabular-nums; padding: 0.35rem 0.75rem; background: var(--dlsu-gray-100); border-radius: 20px; white-space: nowrap; }
+        .profile-wrapper { position: relative; }
+        .profile-btn { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--dlsu-gray-200); background: var(--dlsu-green); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; font-weight: 700; transition: all 0.2s ease; }
+        .profile-btn:hover { border-color: var(--dlsu-green); box-shadow: 0 0 0 3px var(--dlsu-green-light); }
+        .profile-chevron { color: var(--dlsu-gray-400); font-size: 0.75rem; cursor: pointer; transition: transform 0.2s ease; }
+        .profile-wrapper.open .profile-chevron { transform: rotate(180deg); }
+        .profile-dropdown { position: absolute; top: calc(100% + 10px); right: 0; width: 260px; background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--dlsu-gray-200); opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all 0.2s ease; z-index: 200; overflow: hidden; }
+        .profile-wrapper.open .profile-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown-header { padding: 1rem 1.15rem; background: var(--dlsu-gray-50); border-bottom: 1px solid var(--dlsu-gray-200); display: flex; align-items: center; gap: 0.75rem; }
+        .dropdown-header .dropdown-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--dlsu-green); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; flex-shrink: 0; }
+        .dropdown-header .dropdown-name { font-size: 0.85rem; font-weight: 700; }
+        .dropdown-header .dropdown-role { font-size: 0.7rem; color: var(--dlsu-green); font-weight: 600; }
+        .dropdown-info { padding: 0.75rem 1.15rem; }
+        .dropdown-info-row { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; }
+        .dropdown-info-row:not(:last-child) { border-bottom: 1px solid var(--dlsu-gray-100); }
+        .dropdown-info-label { font-size: 0.7rem; color: var(--dlsu-gray-400); font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; }
+        .dropdown-info-value { font-size: 0.78rem; color: var(--dlsu-gray-800); font-weight: 600; }
+        .dropdown-divider { height: 1px; background: var(--dlsu-gray-200); }
+        .dropdown-action { display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.15rem; font-size: 0.8rem; font-weight: 500; color: var(--dlsu-gray-600); cursor: pointer; transition: all 0.15s ease; text-decoration: none; border: none; background: none; width: 100%; text-align: left; }
+        .dropdown-action:hover { background: var(--dlsu-gray-50); color: var(--dlsu-gray-800); }
+        .dropdown-action.logout { color: var(--dlsu-danger); }
+        .dropdown-action.logout:hover { background: #fdeaea; }
+        .dropdown-action i { font-size: 1rem; width: 18px; text-align: center; }
+        .hamburger-btn { display: none; background: none; border: none; font-size: 1.3rem; color: var(--dlsu-gray-800); cursor: pointer; margin-right: 0.75rem; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; }
+
+        /* ══ PAGE BODY ══ */
+        .page-body { padding: 1.75rem 2rem; }
+
+        /* ══ PAGE HEADER ══ */
+        .page-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-header-bar h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--dlsu-green);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .page-header-bar h2 i {
+            font-size: 1.2rem;
+        }
+
+        /* ══ FILTER BAR ══ */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--dlsu-gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .filter-select {
+            padding: 0.4rem 0.75rem;
+            border: 1px solid var(--dlsu-gray-200);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-family: inherit;
+            font-weight: 500;
+            color: var(--dlsu-gray-800);
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+            outline: none;
+        }
+
+        .filter-select:focus {
+            border-color: var(--dlsu-green);
+            box-shadow: 0 0 0 3px var(--dlsu-green-light);
+        }
+
+        .btn-reset-filters {
+            padding: 0.4rem 0.85rem;
+            background: var(--dlsu-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .btn-reset-filters:hover {
+            background: var(--dlsu-green-dark);
+        }
+
+        /* ══ SUMMARY CARDS ══ */
+        .summary-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.85rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .summary-chip {
+            background: white;
+            border: 1px solid var(--dlsu-gray-200);
+            border-radius: 12px;
+            padding: 1rem 1.15rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .summary-chip .chip-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+        }
+
+        .chip-icon.green { background: var(--dlsu-green-light); color: var(--dlsu-green); }
+        .chip-icon.blue { background: #e4edfb; color: #1a56a8; }
+        .chip-icon.amber { background: #fef3dc; color: #b8860b; }
+        .chip-icon.pink { background: #fce8e6; color: #c0392b; }
+
+        .summary-chip .chip-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--dlsu-gray-400);
+            font-weight: 600;
+        }
+
+        .summary-chip .chip-value {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--dlsu-gray-800);
+            line-height: 1.1;
+        }
+
+        /* ══ TERM CARD (BOOKLET) ══ */
+        .term-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--dlsu-gray-200);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .term-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 112, 60, 0.06);
+        }
+
+        .term-card-header {
+            background: var(--dlsu-green);
+            color: white;
+            padding: 0.85rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .term-card-header .term-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+
+        .term-card-header .term-ay {
+            font-size: 0.72rem;
+            opacity: 0.75;
+            font-weight: 500;
+        }
+
+        .term-card-header .term-status {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .term-status.approved {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .term-status.current {
+            background: var(--dlsu-warning);
+            color: #3d2e00;
+        }
+
+        /* Course Table */
+        .term-table {
+            width: 100%;
+            font-size: 0.82rem;
+        }
+
+        .term-table thead th {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--dlsu-gray-400);
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid var(--dlsu-gray-200);
+            background: var(--dlsu-gray-50);
+        }
+
+        .term-table tbody td {
+            padding: 0.65rem 1.5rem;
+            border-bottom: 1px solid var(--dlsu-gray-100);
+            vertical-align: middle;
+        }
+
+        .term-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .term-table .course-code {
+            font-weight: 700;
+            color: var(--dlsu-green);
+        }
+
+        .grade-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 42px;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+
+        .grade-badge.pass { background: var(--dlsu-green-light); color: var(--dlsu-green); }
+        .grade-badge.fail { background: #fdeaea; color: var(--dlsu-danger); }
+        .grade-badge.pending { background: var(--dlsu-gray-100); color: var(--dlsu-gray-400); }
+
+        /* Term Footer / Stats */
+        .term-footer {
+            padding: 1rem 1.5rem;
+            background: var(--dlsu-gray-50);
+            border-top: 1px solid var(--dlsu-gray-200);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .term-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .term-stat .ts-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--dlsu-gray-400);
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+
+        .term-stat .ts-value {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--dlsu-gray-800);
+        }
+
+        .term-stat .ts-value.warn { color: var(--dlsu-warning); }
+        .term-stat .ts-value.danger { color: var(--dlsu-danger); }
+        .term-stat .ts-value.good { color: var(--dlsu-green); }
+
+        /* Adviser Note */
+        .adviser-note {
+            padding: 0.85rem 1.5rem;
+            border-top: 1px solid var(--dlsu-gray-200);
+            background: white;
+        }
+
+        .adviser-note .note-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--dlsu-gray-400);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .adviser-note .note-text {
+            font-size: 0.8rem;
+            color: var(--dlsu-gray-600);
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* ══ RESPONSIVE ══ */
+        @media (max-width: 991.98px) {
+            .sidebar { width: 0; border-radius: 0; }
+            .sidebar.expanded { width: var(--sidebar-expanded); }
+            .sidebar-overlay.active { display: block; }
+            .main-content, .main-content.shifted { margin-left: 0; }
+            .hamburger-btn { display: block; }
+            .page-body { padding: 1.25rem 1rem; }
+            .topbar { padding: 0.85rem 1rem; }
+            .page-header-bar { flex-direction: column; align-items: flex-start; }
+        }
+
+        @media (max-width: 575.98px) {
+            .term-table thead th,
+            .term-table tbody td {
+                padding: 0.55rem 0.85rem;
+            }
+            .term-footer {
+                grid-template-columns: 1fr 1fr;
+                padding: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+            <div class="brand-text"><h6>DECEE Advising</h6><small>De La Salle University</small></div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a href="student-dashboard.html" class="nav-link"><i class="bi bi-grid-1x2-fill"></i><span class="link-text">Dashboard</span></a>
+            <a href="#" class="nav-link active"><i class="bi bi-journal-text"></i><span class="link-text">Academic History</span></a>
+            <a href="#" class="nav-link"><i class="bi bi-file-earmark-check"></i><span class="link-text">Study Plan</span></a>
+            <a href="#" class="nav-link"><i class="bi bi-list-check"></i><span class="link-text">Program Checklist</span></a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Advising</div>
+            <a href="#" class="nav-link"><i class="bi bi-calendar-event"></i><span class="link-text">Appointments</span></a>
+            <a href="#" class="nav-link"><i class="bi bi-chat-left-text"></i><span class="link-text">Concerns</span></a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Account</div>
+            <a href="#" class="nav-link"><i class="bi bi-person"></i><span class="link-text">Profile</span></a>
+            <a href="#" class="nav-link"><i class="bi bi-gear"></i><span class="link-text">Settings</span></a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="avatar">BM</div>
+                <div class="user-info"><div class="user-name">Bianca M.</div><div class="user-id">12012345 · BS-CpE</div></div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ══ MAIN CONTENT ══ -->
+    <div class="main-content" id="mainContent">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="d-flex align-items-center">
+                <button class="hamburger-btn" id="hamburgerBtn"><i class="bi bi-list"></i></button>
+                <div class="topbar-left">
+                    <h1>Academic History</h1>
+                    <p>My Academic Advising Booklet</p>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <span class="topbar-clock" id="topbarClock">00:00:00</span>
+                <button class="topbar-circle-btn" title="Toggle Dark Mode" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
+                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
+                <div class="profile-wrapper" id="profileWrapper">
+                    <div class="d-flex align-items-center gap-1" style="cursor:pointer;" id="profileToggle">
+                        <div class="profile-btn">BM</div>
+                        <i class="bi bi-chevron-down profile-chevron"></i>
+                    </div>
+                    <div class="profile-dropdown">
+                        <div class="dropdown-header">
+                            <div class="dropdown-avatar">BM</div>
+                            <div><div class="dropdown-name">Bianca Magsino</div><div class="dropdown-role">Student</div></div>
+                        </div>
+                        <div class="dropdown-info">
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">ID Number</span><span class="dropdown-info-value">12012345</span></div>
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">Program</span><span class="dropdown-info-value">BS-CpE</span></div>
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">Term</span><span class="dropdown-info-value">8 of 12</span></div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-action"><i class="bi bi-person"></i>View Profile</a>
+                        <a href="#" class="dropdown-action"><i class="bi bi-gear"></i>Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-action logout"><i class="bi bi-box-arrow-left"></i>Log Out</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ══ PAGE BODY ══ -->
+        <div class="page-body">
+            <!-- Page Header + Filters -->
+            <div class="page-header-bar">
+                <h2><i class="bi bi-journal-bookmark-fill"></i> My Academic Booklet</h2>
+                <div class="filter-bar">
+                    <label>Filter:</label>
+                    <select class="filter-select" id="filterYear">
+                        <option value="all">All Academic Years</option>
+                        <option value="2025-2026">2025–2026</option>
+                        <option value="2024-2025">2024–2025</option>
+                        <option value="2023-2024">2023–2024</option>
+                    </select>
+                    <select class="filter-select" id="filterTerm">
+                        <option value="all">All Terms</option>
+                        <option value="1">First Term</option>
+                        <option value="2">Second Term</option>
+                        <option value="3">Third Term</option>
+                    </select>
+                    <button class="btn-reset-filters" id="resetFilters">Reset Filters</button>
+                </div>
+            </div>
+
+            <!-- Summary Strip -->
+            <div class="summary-strip">
+                <div class="summary-chip">
+                    <div class="chip-icon green"><i class="bi bi-check-circle-fill"></i></div>
+                    <div><div class="chip-label">Units Completed</div><div class="chip-value">138 / 200</div></div>
+                </div>
+                <div class="summary-chip">
+                    <div class="chip-icon blue"><i class="bi bi-graph-up"></i></div>
+                    <div><div class="chip-label">Cumulative GPA</div><div class="chip-value">2.85</div></div>
+                </div>
+                <div class="summary-chip">
+                    <div class="chip-icon amber"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                    <div><div class="chip-label">Accumulated Failures</div><div class="chip-value">6 units</div></div>
+                </div>
+                <div class="summary-chip">
+                    <div class="chip-icon pink"><i class="bi bi-calendar-check"></i></div>
+                    <div><div class="chip-label">Terms Completed</div><div class="chip-value">7 of 12</div></div>
+                </div>
+            </div>
+
+            <!-- ══ TERM CARDS ══ -->
+
+            <!-- Term 7 (most recent completed) -->
+            <div class="term-card" data-year="2025-2026" data-term="1">
+                <div class="term-card-header">
+                    <div>
+                        <div class="term-title">First Term</div>
+                        <div class="term-ay">Academic Year 2025–2026 · Term 1</div>
+                    </div>
+                    <span class="term-status approved">Approved</span>
+                </div>
+                <table class="term-table">
+                    <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Units</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="course-code">LBYCPG2</td><td>Online Technologies Lab 2</td><td>1</td><td><span class="grade-badge pass">2.5</span></td></tr>
+                        <tr><td class="course-code">CCNETCM</td><td>Network Computing</td><td>3</td><td><span class="grade-badge pass">2.0</span></td></tr>
+                        <tr><td class="course-code">CCDATRCL</td><td>Data Structures & Algorithms</td><td>3</td><td><span class="grade-badge pass">3.0</span></td></tr>
+                        <tr><td class="course-code">CALENG0</td><td>Pre-Calculus</td><td>3</td><td><span class="grade-badge pass">2.5</span></td></tr>
+                        <tr><td class="course-code">ENGMANA</td><td>Engineering Management</td><td>3</td><td><span class="grade-badge pass">3.5</span></td></tr>
+                        <tr><td class="course-code">GEETHIC</td><td>Ethics</td><td>3</td><td><span class="grade-badge pass">3.0</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="term-footer">
+                    <div class="term-stat"><span class="ts-label">Term GPA</span><span class="ts-value">2.75</span></div>
+                    <div class="term-stat"><span class="ts-label">Cumulative GPA</span><span class="ts-value">2.85</span></div>
+                    <div class="term-stat"><span class="ts-label">Accumulated Failures</span><span class="ts-value good">6 units</span></div>
+                    <div class="term-stat"><span class="ts-label">Trimestral Honors</span><span class="ts-value">None</span></div>
+                </div>
+                <div class="adviser-note">
+                    <div class="note-label">Adviser's Note</div>
+                    <div class="note-text">Good progress this term. Continue focusing on your technical courses. Consider retaking CSMCPRO to clear the failed units.</div>
+                </div>
+            </div>
+
+            <!-- Term 6 -->
+            <div class="term-card" data-year="2024-2025" data-term="3">
+                <div class="term-card-header">
+                    <div>
+                        <div class="term-title">Third Term</div>
+                        <div class="term-ay">Academic Year 2024–2025 · Term 3</div>
+                    </div>
+                    <span class="term-status approved">Approved</span>
+                </div>
+                <table class="term-table">
+                    <thead>
+                        <tr><th>Course Code</th><th>Course Name</th><th>Units</th><th>Grade</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="course-code">CSARCH2</td><td>Computer Architecture 2</td><td>3</td><td><span class="grade-badge pass">2.0</span></td></tr>
+                        <tr><td class="course-code">CSALGCM</td><td>Design & Analysis of Algorithms</td><td>3</td><td><span class="grade-badge pass">2.5</span></td></tr>
+                        <tr><td class="course-code">CSELEC1</td><td>CpE Elective 1</td><td>3</td><td><span class="grade-badge pass">3.0</span></td></tr>
+                        <tr><td class="course-code">GELITER</td><td>Literature</td><td>3</td><td><span class="grade-badge pass">3.5</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="term-footer">
+                    <div class="term-stat"><span class="ts-label">Term GPA</span><span class="ts-value">2.75</span></div>
+                    <div class="term-stat"><span class="ts-label">Cumulative GPA</span><span class="ts-value">2.80</span></div>
+                    <div class="term-stat"><span class="ts-label">Accumulated Failures</span><span class="ts-value good">6 units</span></div>
+                    <div class="term-stat"><span class="ts-label">Trimestral Honors</span><span class="ts-value">None</span></div>
+                </div>
+                <div class="adviser-note">
+                    <div class="note-label">Adviser's Note</div>
+                    <div class="note-text">Steady improvement. Algorithm design performance is solid — keep building on this momentum.</div>
+                </div>
+            </div>
+
+            <!-- Term 5 -->
+            <div class="term-card" data-year="2024-2025" data-term="2">
+                <div class="term-card-header">
+                    <div>
+                        <div class="term-title">Second Term</div>
+                        <div class="term-ay">Academic Year 2024–2025 · Term 2</div>
+                    </div>
+                    <span class="term-status approved">Approved</span>
+                </div>
+                <table class="term-table">
+                    <thead>
+                        <tr><th>Course Code</th><th>Course Name</th><th>Units</th><th>Grade</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="course-code">CSNETWK</td><td>Computer Networks</td><td>3</td><td><span class="grade-badge pass">2.5</span></td></tr>
+                        <tr><td class="course-code">CSARCH1</td><td>Computer Architecture 1</td><td>3</td><td><span class="grade-badge pass">2.0</span></td></tr>
+                        <tr><td class="course-code">CCDSTRU</td><td>Discrete Structures</td><td>3</td><td><span class="grade-badge pass">2.5</span></td></tr>
+                        <tr><td class="course-code">GEPHIL2</td><td>Philosophy of the Human Person</td><td>3</td><td><span class="grade-badge pass">3.5</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="term-footer">
+                    <div class="term-stat"><span class="ts-label">Term GPA</span><span class="ts-value">2.63</span></div>
+                    <div class="term-stat"><span class="ts-label">Cumulative GPA</span><span class="ts-value">2.70</span></div>
+                    <div class="term-stat"><span class="ts-label">Accumulated Failures</span><span class="ts-value good">6 units</span></div>
+                    <div class="term-stat"><span class="ts-label">Trimestral Honors</span><span class="ts-value">None</span></div>
+                </div>
+                <div class="adviser-note">
+                    <div class="note-label">Adviser's Note</div>
+                    <div class="note-text">On track. Be mindful of prerequisite chains for upper-division courses next AY.</div>
+                </div>
+            </div>
+
+            <!-- Term 4 (with a failed course) -->
+            <div class="term-card" data-year="2024-2025" data-term="1">
+                <div class="term-card-header">
+                    <div>
+                        <div class="term-title">First Term</div>
+                        <div class="term-ay">Academic Year 2024–2025 · Term 1</div>
+                    </div>
+                    <span class="term-status approved">Approved</span>
+                </div>
+                <table class="term-table">
+                    <thead>
+                        <tr><th>Course Code</th><th>Course Name</th><th>Units</th><th>Grade</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="course-code">CSMCPRO</td><td>Microprocessors</td><td>3</td><td><span class="grade-badge fail">0.0</span></td></tr>
+                        <tr><td class="course-code">CSMCPRO</td><td>Microprocessors</td><td>3</td><td><span class="grade-badge fail">0.0</span></td></tr>
+                        <tr><td class="course-code">CCPROG3</td><td>Object-Oriented Programming</td><td>3</td><td><span class="grade-badge pass">2.5</span></td></tr>
+                        <tr><td class="course-code">LBYCPG1</td><td>CpE Laboratory 1</td><td>1</td><td><span class="grade-badge pass">3.0</span></td></tr>
+                        <tr><td class="course-code">GEFILI2</td><td>Filipino 2</td><td>3</td><td><span class="grade-badge pass">3.5</span></td></tr>
+                    </tbody>
+                </table>
+                <div class="term-footer">
+                    <div class="term-stat"><span class="ts-label">Term GPA</span><span class="ts-value warn">1.33</span></div>
+                    <div class="term-stat"><span class="ts-label">Cumulative GPA</span><span class="ts-value">2.50</span></div>
+                    <div class="term-stat"><span class="ts-label">Accumulated Failures</span><span class="ts-value warn">6 units</span></div>
+                    <div class="term-stat"><span class="ts-label">Trimestral Honors</span><span class="ts-value">None</span></div>
+                </div>
+                <div class="adviser-note">
+                    <div class="note-label">Adviser's Note</div>
+                    <div class="note-text">Two failed attempts in CSMCPRO (Microprocessors). Please schedule a meeting to discuss a retake plan and review study strategies. Accumulated failures now at 6 units — monitor carefully.</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ── Sidebar ──
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const overlay = document.getElementById('sidebarOverlay');
+        const hamburger = document.getElementById('hamburgerBtn');
+        const isMobile = () => window.innerWidth < 992;
+
+        sidebar.addEventListener('mouseenter', () => { if (!isMobile()) { sidebar.classList.add('expanded'); mainContent.classList.add('shifted'); } });
+        sidebar.addEventListener('mouseleave', () => { if (!isMobile()) { sidebar.classList.remove('expanded'); mainContent.classList.remove('shifted'); } });
+        hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
+        overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
+
+        // ── Profile Dropdown ──
+        const profileWrapper = document.getElementById('profileWrapper');
+        const profileToggle = document.getElementById('profileToggle');
+        profileToggle.addEventListener('click', (e) => { e.stopPropagation(); profileWrapper.classList.toggle('open'); });
+        document.addEventListener('click', (e) => { if (!profileWrapper.contains(e.target)) profileWrapper.classList.remove('open'); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileWrapper.classList.remove('open'); });
+
+        // ── Clock ──
+        const clockEl = document.getElementById('topbarClock');
+        function updateClock() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+            clockEl.textContent = `${dateStr} · ${h}:${m}:${s}`;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // ── Term Card Filters ──
+        const filterYear = document.getElementById('filterYear');
+        const filterTerm = document.getElementById('filterTerm');
+        const resetBtn = document.getElementById('resetFilters');
+        const termCards = document.querySelectorAll('.term-card');
+
+        function applyFilters() {
+            const year = filterYear.value;
+            const term = filterTerm.value;
+            termCards.forEach(card => {
+                const cardYear = card.dataset.year;
+                const cardTerm = card.dataset.term;
+                const matchYear = year === 'all' || cardYear === year;
+                const matchTerm = term === 'all' || cardTerm === term;
+                card.style.display = (matchYear && matchTerm) ? '' : 'none';
+            });
+        }
+
+        filterYear.addEventListener('change', applyFilters);
+        filterTerm.addEventListener('change', applyFilters);
+        resetBtn.addEventListener('click', () => {
+            filterYear.value = 'all';
+            filterTerm.value = 'all';
+            applyFilters();
+        });
+    </script>
+</body>
+</html>
