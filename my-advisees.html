@@ -18,10 +18,10 @@
             <h2 class="page-title"><i class="bi bi-people-fill"></i> My Advisees</h2>
             <p class="page-subtitle">View and manage all students assigned to you for academic advising.</p>
             <div class="summary-row">
-                <div class="summary-chip"><span class="chip-count" id="countTotal">-</span> Total Advisees</div>
-                <div class="summary-chip"><span class="chip-count" id="countCleared">-</span> Cleared</div>
-                <div class="summary-chip warn"><span class="chip-count" id="countPending">-</span> Pending</div>
-                <div class="summary-chip danger"><span class="chip-count" id="countAtRisk">-</span> At-Risk</div>
+                <div class="summary-chip"><span class="chip-count chip-total">0</span> Total Advisees</div>
+                <div class="summary-chip"><span class="chip-count chip-cleared">0</span> Cleared</div>
+                <div class="summary-chip warn"><span class="chip-count chip-pending">0</span> Pending</div>
+                <div class="summary-chip danger"><span class="chip-count chip-risk">0</span> At-Risk</div>
             </div>
             <div class="filter-bar">
                 <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search by name, ID, or email..." id="searchInput" oninput="filterTable()"></div>
@@ -30,8 +30,8 @@
             </div>
             <table class="advisee-table" id="adviseeTable">
                 <thead><tr><th>Student</th><th>ID</th><th>Program</th><th>Term</th><th>Failed Units</th><th>Status</th><th>Action</th></tr></thead>
-                <tbody id="adviseeTbody">
-                    <tr><td colspan="7" class="text-center">Loading advisees...</td></tr>
+                <tbody>
+                    <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--dlsu-gray-400);">Loading advisees...</td></tr>
                 </tbody>
             </table>
         </div>
