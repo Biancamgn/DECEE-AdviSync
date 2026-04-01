@@ -1,4 +1,3 @@
-        // Sidebar
         const sidebar = document.getElementById('sidebar'), mainContent = document.getElementById('mainContent'), overlay = document.getElementById('sidebarOverlay'), hamburger = document.getElementById('hamburgerBtn');
         const isMobile = () => window.innerWidth < 992;
         sidebar.addEventListener('mouseenter', () => { if (!isMobile()) { sidebar.classList.add('expanded'); mainContent.classList.add('shifted'); } });
@@ -6,19 +5,10 @@
         hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
         overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
 
-        // Profile Dropdown
-        const profileWrapper = document.getElementById('profileWrapper');
-        const profileToggle = document.getElementById('profileToggle');
-        profileToggle.addEventListener('click', (e) => { e.stopPropagation(); profileWrapper.classList.toggle('open'); });
-        document.addEventListener('click', (e) => { if (!profileWrapper.contains(e.target)) profileWrapper.classList.remove('open'); });
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileWrapper.classList.remove('open'); });
-
-        // Clock
         const clockEl = document.getElementById('topbarClock');
         function updateClock() { const n = new Date(); clockEl.textContent = n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) + ' · ' + String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0'); }
         updateClock(); setInterval(updateClock, 1000);
 
-        // Date selection
         function selectDate(el) {
             document.querySelectorAll('.date-chip').forEach(c => c.classList.remove('selected'));
             el.classList.add('selected');
@@ -26,7 +16,6 @@
             document.getElementById('bookBtn').disabled = true;
         }
 
-        // Slot selection
         function selectSlot(el) {
             if (el.classList.contains('booked')) return;
             document.querySelectorAll('.time-slot.selected').forEach(s => s.classList.remove('selected'));
@@ -34,7 +23,6 @@
             document.getElementById('bookBtn').disabled = false;
         }
 
-        // Book
         function bookAppointment() {
             const date = document.querySelector('.date-chip.selected');
             const slot = document.querySelector('.time-slot.selected');
@@ -69,7 +57,6 @@
                 `;
                 bookingsContainer.insertBefore(newBooking, bookingsContainer.querySelector('.booking-item'));
 
-                // Show toast
                 const t = document.getElementById('toast');
                 document.getElementById('toastMsg').textContent = `Appointment booked for ${dayName}, ${dayMonth} ${dayNum} at ${slotTime}!`;
                 t.style.display = 'flex';
@@ -77,7 +64,6 @@
             }
         }
 
-        // Cancel
         function cancelBooking(btn) {
             if (confirm('Are you sure you want to cancel this appointment?')) {
                 const item = btn.closest('.booking-item');
@@ -88,14 +74,4 @@
                 item.querySelector('.booking-date-box').style.background = 'var(--dlsu-gray-100)';
                 btn.remove();
             }
-        }
-
-        // ── Dark Mode Toggle ──
-        const darkModeBtn = document.getElementById('darkModeBtn');
-        if (darkModeBtn) {
-            darkModeBtn.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                const icon = darkModeBtn.querySelector('i');
-                icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-            });
         }

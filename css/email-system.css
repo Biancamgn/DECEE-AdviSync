@@ -105,7 +105,9 @@
     font-size: 0.82rem;
     font-family: inherit;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
 }
 
 .form-control-custom:focus {
@@ -217,7 +219,6 @@ select.form-control-custom {
     display: block;
 }
 
-/* Responsive */
 @media (max-width: 991.98px) {
     .page-body {
         padding: 1.25rem 1rem;

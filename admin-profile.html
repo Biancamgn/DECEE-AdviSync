@@ -9,31 +9,236 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .page-body { max-width: 900px; margin: 0 auto; }
-        .profile-hero { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; }
-        .profile-avatar-lg { width: 90px; height: 90px; border-radius: 50%; background: var(--dlsu-green); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; flex-shrink: 0; border: 4px solid var(--dlsu-green-light); }
-        .profile-hero-info h2 { font-size: 1.4rem; font-weight: 800; color: var(--dlsu-gray-800); margin-bottom: 0.15rem; }
-        .profile-hero-info .role-badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 20px; background: var(--dlsu-green-light); color: var(--dlsu-green); text-transform: uppercase; letter-spacing: 0.03em; }
-        .profile-hero-info .id-text { font-size: 0.82rem; color: var(--dlsu-gray-400); margin-top: 0.25rem; }
-        .section-card { background: white; border-radius: 14px; border: 1px solid var(--dlsu-gray-200); padding: 1.5rem; margin-bottom: 1.25rem; }
-        .section-card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .section-card-title i { color: var(--dlsu-green); font-size: 1rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.85rem; }
-        .form-group { display: flex; flex-direction: column; }
-        .form-label-custom { font-size: 0.75rem; font-weight: 600; color: var(--dlsu-gray-600); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.03em; }
-        .form-control-custom { width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--dlsu-gray-200); border-radius: 8px; font-size: 0.82rem; font-family: inherit; color: var(--dlsu-gray-800); background: white; transition: border-color 0.2s ease, box-shadow 0.2s ease; outline: none; }
-        .form-control-custom:focus { border-color: var(--dlsu-green); box-shadow: 0 0 0 3px var(--dlsu-green-light); }
-        .form-control-custom:disabled { background: var(--dlsu-gray-50); color: var(--dlsu-gray-400); cursor: not-allowed; }
-        .btn-save { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.5rem; background: var(--dlsu-green); color: white; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s ease; }
-        .btn-save:hover { background: var(--dlsu-green-dark); }
-        .btn-secondary { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; background: white; color: var(--dlsu-gray-600); border: 1px solid var(--dlsu-gray-200); border-radius: 10px; font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; }
-        .btn-group-right { display: flex; gap: 0.65rem; justify-content: flex-end; margin-top: 1.25rem; }
-        .toast-notification { position: fixed; bottom: 2rem; right: 2rem; background: var(--dlsu-green); color: white; padding: 0.85rem 1.5rem; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: none; align-items: center; gap: 0.5rem; z-index: 9999; box-shadow: 0 8px 30px rgba(0,112,60,0.3); animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @media (max-width: 575.98px) { .form-row { grid-template-columns: 1fr; } .profile-hero { flex-direction: column; text-align: center; } }
+        .page-body {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .profile-hero {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .profile-avatar-lg {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--dlsu-green);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            flex-shrink: 0;
+            border: 4px solid var(--dlsu-green-light);
+        }
+        .profile-hero-info h2 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--dlsu-gray-800);
+            margin-bottom: 0.15rem;
+        }
+        .profile-hero-info .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.25rem 0.65rem;
+            border-radius: 20px;
+            background: var(--dlsu-green-light);
+            color: var(--dlsu-green);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .profile-hero-info .id-text {
+            font-size: 0.82rem;
+            color: var(--dlsu-gray-400);
+            margin-top: 0.25rem;
+        }
+        .section-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--dlsu-gray-200);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+        .section-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-card-title i {
+            color: var(--dlsu-green);
+            font-size: 1rem;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 0.85rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-label-custom {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--dlsu-gray-600);
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .form-control-custom {
+            width: 100%;
+            padding: 0.55rem 0.85rem;
+            border: 1px solid var(--dlsu-gray-200);
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-family: inherit;
+            color: var(--dlsu-gray-800);
+            background: white;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+            outline: none;
+        }
+        .form-control-custom:focus {
+            border-color: var(--dlsu-green);
+            box-shadow: 0 0 0 3px var(--dlsu-green-light);
+        }
+        .form-control-custom:disabled {
+            background: var(--dlsu-gray-50);
+            color: var(--dlsu-gray-400);
+            cursor: not-allowed;
+        }
+        .btn-save {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.5rem;
+            background: var(--dlsu-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .btn-save:hover {
+            background: var(--dlsu-green-dark);
+        }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.25rem;
+            background: white;
+            color: var(--dlsu-gray-600);
+            border: 1px solid var(--dlsu-gray-200);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+        }
+        .btn-group-right {
+            display: flex;
+            gap: 0.65rem;
+            justify-content: flex-end;
+            margin-top: 1.25rem;
+        }
+        .toast-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--dlsu-green);
+            color: white;
+            padding: 0.85rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 9999;
+            box-shadow: 0 8px 30px rgba(0, 112, 60, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @media (max-width: 575.98px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .profile-hero {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        /* Dark Mode */
+        body.dark-mode .section-card {
+            background: #1a1a1a;
+            border-color: #2a2a2a;
+        }
+        body.dark-mode .section-card-title {
+            color: #e8e8e8;
+        }
+        body.dark-mode .form-label-custom {
+            color: #6b6b6b;
+        }
+        body.dark-mode .form-control-custom {
+            background: #1e1e1e;
+            border-color: #333;
+            color: #e8e8e8;
+        }
+        body.dark-mode .form-control-custom:disabled {
+            background: #121212;
+            color: #6b6b6b;
+        }
+        body.dark-mode .form-control-custom:focus {
+            box-shadow: 0 0 0 3px rgba(0, 112, 60, 0.2);
+        }
+        body.dark-mode .profile-hero-info h2 {
+            color: #e8e8e8;
+        }
+        body.dark-mode .profile-hero-info .id-text {
+            color: #6b6b6b;
+        }
+        body.dark-mode .profile-hero-info .role-badge {
+            background: #1a3a28;
+        }
+        body.dark-mode .profile-avatar-lg {
+            border-color: #0d3d1f;
+        }
+        body.dark-mode .btn-secondary {
+            background: #1e1e1e;
+            border-color: #333;
+            color: #a0a0a0;
+        }
+        body.dark-mode .btn-secondary:hover {
+            border-color: #444;
+            color: #e8e8e8;
+        }
     </style>
 </head>
 <body>
+<script>if(localStorage.getItem("darkMode")==="true")document.body.classList.add("dark-mode")</script>
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
@@ -62,8 +267,13 @@
                 <div class="topbar-left"><h1>Admin Profile</h1><p id="topbarClock"></p></div>
             </div>
             <div class="topbar-right">
-                <button class="topbar-circle-btn" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
-                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i><span class="notif-badge">3</span></button>
+                <button class="topbar-circle-btn" id="darkModeBtn" title="Toggle Dark Mode">
+                    <i class="bi bi-moon-fill"></i>
+                </button>
+                <button class="topbar-circle-btn" title="Notifications" id="notifBtn">
+                    <i class="bi bi-bell-fill"></i>
+                    <span class="notif-badge">0</span>
+                </button>
                 <div class="profile-wrapper" id="profileWrapper">
                     <div class="d-flex align-items-center gap-1" style="cursor:pointer;" id="profileToggle">
                         <div class="profile-btn">AD</div>

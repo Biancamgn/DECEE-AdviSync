@@ -103,6 +103,7 @@ function initShared() {
     const profileToggle = document.getElementById('profileToggle');
 
     if (profileWrapper && profileToggle) {
+        profileWrapper._toggleBound = true;
         profileToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             profileWrapper.classList.toggle('open');
@@ -121,11 +122,18 @@ function initShared() {
 
     const darkModeBtn = document.getElementById('darkModeBtn');
     if (darkModeBtn) {
+        // Sync icon with current dark mode state (may have been set from localStorage)
+        if (document.body.classList.contains('dark-mode')) {
+            const icon = darkModeBtn.querySelector('i');
+            if (icon) icon.className = 'bi bi-sun-fill';
+        }
+        darkModeBtn._dmBound = true;
         darkModeBtn.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
             const icon = darkModeBtn.querySelector('i');
             icon.className = document.body.classList.contains('dark-mode')
                 ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         });
     }
 

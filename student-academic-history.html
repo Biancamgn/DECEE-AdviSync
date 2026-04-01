@@ -11,6 +11,7 @@
     <link href="css/student-academic-history.css" rel="stylesheet">
 </head>
 <body>
+<script>if(localStorage.getItem("darkMode")==="true")document.body.classList.add("dark-mode")</script>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- ══ SIDEBAR ══ -->
@@ -44,7 +45,6 @@
 
     <!-- ══ MAIN CONTENT ══ -->
     <div class="main-content" id="mainContent">
-        <!-- Topbar -->
         <header class="topbar">
             <div class="d-flex align-items-center">
                 <button class="hamburger-btn" id="hamburgerBtn"><i class="bi bi-list"></i></button>
@@ -81,7 +81,6 @@
 
         <!-- ══ PAGE BODY ══ -->
         <div class="page-body">
-            <!-- Page Header + Filters -->
             <div class="page-header-bar">
                 <h2><i class="bi bi-journal-bookmark-fill"></i> My Academic Booklet</h2>
                 <div class="filter-bar">
@@ -102,7 +101,6 @@
                 </div>
             </div>
 
-            <!-- Summary Strip -->
             <div class="summary-strip">
                 <div class="summary-chip">
                     <div class="chip-icon green"><i class="bi bi-check-circle-fill"></i></div>

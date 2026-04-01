@@ -1,9 +1,5 @@
-/* ═══════════════════════════════════════════════════════════════════════
-   Login Page Styles — DECEE AdviSync
-   ═══════════════════════════════════════════════════════════════════════ */
-
 :root {
-    --dlsu-green: #00703C;
+    --dlsu-green: #00703c;
     --dlsu-green-dark: #005a30;
     --dlsu-green-light: #e8f5ee;
     --dlsu-green-muted: #4a9e6f;
@@ -20,21 +16,21 @@
 }
 
 body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 body.dlsu-bg {
-    background-image: url('../assets/images/login-page-background.jpg');
-    background-size: cover;         
-    background-position: center;    
-    background-repeat: no-repeat;   
-    background-attachment: fixed;   
+    background-image: url("../assets/images/login-page-background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     background-color: var(--dlsu-gray-200);
 }
 
 .login-card {
-    background-color: rgba(255, 255, 255, 0.92) !important; 
-    border: 1px solid var(--dlsu-gray-200) !important; 
+    background-color: rgba(255, 255, 255, 0.92) !important;
+    border: 1px solid var(--dlsu-gray-200) !important;
     backdrop-filter: blur(8px);
     border-radius: 15px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -48,7 +44,7 @@ body.dlsu-bg {
 }
 
 .text-success {
-    color: var(--dlsu-green) !important; 
+    color: var(--dlsu-green) !important;
 }
 
 .btn-success {
@@ -57,7 +53,7 @@ body.dlsu-bg {
 }
 
 .btn-success:hover {
-    background-color: var(--dlsu-green-dark) !important; 
+    background-color: var(--dlsu-green-dark) !important;
     border-color: var(--dlsu-green-dark) !important;
 }
 

@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const pageTitle = document.body.dataset.pageTitle;
     const pageSubtitle = document.body.dataset.pageSubtitle;
-    
+
     if (pageTitle) {
         const titleEl = document.getElementById('pageTitle');
         if (titleEl) titleEl.textContent = pageTitle;
@@ -36,7 +36,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     initShared();
-    
+
     await new Promise(resolve => setTimeout(resolve, 50));
+    if (typeof window._bindNotifBtn === 'function') window._bindNotifBtn();
     await loadUserProfile();
 });

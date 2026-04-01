@@ -9,44 +9,297 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .page-body { max-width: 900px; margin: 0 auto; }
-        .section-card { background: white; border-radius: 14px; border: 1px solid var(--dlsu-gray-200); padding: 1.5rem; margin-bottom: 1.25rem; }
-        .section-card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.5rem; }
-        .section-card-title i { color: var(--dlsu-green); font-size: 1rem; }
-        .section-card-desc { font-size: 0.78rem; color: var(--dlsu-gray-400); margin-bottom: 1.15rem; }
-        .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 0; border-bottom: 1px solid var(--dlsu-gray-100); }
-        .setting-row:last-child { border-bottom: none; }
-        .setting-info { flex: 1; }
-        .setting-label { font-size: 0.85rem; font-weight: 600; color: var(--dlsu-gray-800); }
-        .setting-desc { font-size: 0.73rem; color: var(--dlsu-gray-400); margin-top: 0.15rem; }
-        .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-slider { position: absolute; cursor: pointer; inset: 0; background: var(--dlsu-gray-200); border-radius: 24px; transition: 0.3s ease; }
-        .toggle-slider::before { content: ''; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.3s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-        .toggle-switch input:checked + .toggle-slider { background: var(--dlsu-green); }
-        .toggle-switch input:checked + .toggle-slider::before { transform: translateX(20px); }
-        .theme-options { display: flex; gap: 0.65rem; flex-wrap: wrap; }
-        .theme-card { padding: 0.75rem 1.15rem; border: 2px solid var(--dlsu-gray-200); border-radius: 10px; cursor: pointer; transition: all 0.2s ease; text-align: center; min-width: 100px; }
-        .theme-card:hover { border-color: var(--dlsu-gray-400); }
-        .theme-card.selected { border-color: var(--dlsu-green); background: var(--dlsu-green-light); }
-        .theme-card i { font-size: 1.5rem; display: block; margin-bottom: 0.3rem; color: var(--dlsu-gray-600); }
-        .theme-card.selected i { color: var(--dlsu-green); }
-        .theme-card span { font-size: 0.75rem; font-weight: 600; }
-        .form-group { margin-bottom: 0.85rem; }
-        .form-label-custom { font-size: 0.75rem; font-weight: 600; color: var(--dlsu-gray-600); margin-bottom: 0.3rem; display: block; text-transform: uppercase; letter-spacing: 0.03em; }
-        .form-control-custom { width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--dlsu-gray-200); border-radius: 8px; font-size: 0.82rem; font-family: inherit; color: var(--dlsu-gray-800); background: white; transition: border-color 0.2s ease, box-shadow 0.2s ease; outline: none; }
-        .form-control-custom:focus { border-color: var(--dlsu-green); box-shadow: 0 0 0 3px var(--dlsu-green-light); }
-        .password-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        .btn-save { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.5rem; background: var(--dlsu-green); color: white; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s ease; }
-        .btn-save:hover { background: var(--dlsu-green-dark); }
-        .btn-danger-outline { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; background: white; color: var(--dlsu-danger); border: 1px solid var(--dlsu-danger); border-radius: 10px; font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s ease; }
-        .btn-danger-outline:hover { background: #fdeaea; }
-        .toast-notification { position: fixed; bottom: 2rem; right: 2rem; background: var(--dlsu-green); color: white; padding: 0.85rem 1.5rem; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: none; align-items: center; gap: 0.5rem; z-index: 9999; box-shadow: 0 8px 30px rgba(0,112,60,0.3); animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @media (max-width: 575.98px) { .password-row { grid-template-columns: 1fr; } }
+        .page-body {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .section-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--dlsu-gray-200);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+        .section-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-card-title i {
+            color: var(--dlsu-green);
+            font-size: 1rem;
+        }
+        .section-card-desc {
+            font-size: 0.78rem;
+            color: var(--dlsu-gray-400);
+            margin-bottom: 1.15rem;
+        }
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.85rem 0;
+            border-bottom: 1px solid var(--dlsu-gray-100);
+        }
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+        .setting-info {
+            flex: 1;
+        }
+        .setting-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--dlsu-gray-800);
+        }
+        .setting-desc {
+            font-size: 0.73rem;
+            color: var(--dlsu-gray-400);
+            margin-top: 0.15rem;
+        }
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--dlsu-gray-200);
+            border-radius: 24px;
+            transition: 0.3s ease;
+        }
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+        }
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--dlsu-green);
+        }
+        .toggle-switch input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+        .theme-options {
+            display: flex;
+            gap: 0.65rem;
+            flex-wrap: wrap;
+        }
+        .theme-card {
+            padding: 0.75rem 1.15rem;
+            border: 2px solid var(--dlsu-gray-200);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            min-width: 100px;
+        }
+        .theme-card:hover {
+            border-color: var(--dlsu-gray-400);
+        }
+        .theme-card.selected {
+            border-color: var(--dlsu-green);
+            background: var(--dlsu-green-light);
+        }
+        .theme-card i {
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 0.3rem;
+            color: var(--dlsu-gray-600);
+        }
+        .theme-card.selected i {
+            color: var(--dlsu-green);
+        }
+        .theme-card span {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .form-group {
+            margin-bottom: 0.85rem;
+        }
+        .form-label-custom {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--dlsu-gray-600);
+            margin-bottom: 0.3rem;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .form-control-custom {
+            width: 100%;
+            padding: 0.55rem 0.85rem;
+            border: 1px solid var(--dlsu-gray-200);
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-family: inherit;
+            color: var(--dlsu-gray-800);
+            background: white;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+            outline: none;
+        }
+        .form-control-custom:focus {
+            border-color: var(--dlsu-green);
+            box-shadow: 0 0 0 3px var(--dlsu-green-light);
+        }
+        .password-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .btn-save {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.5rem;
+            background: var(--dlsu-green);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .btn-save:hover {
+            background: var(--dlsu-green-dark);
+        }
+        .btn-danger-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.55rem 1.25rem;
+            background: white;
+            color: var(--dlsu-danger);
+            border: 1px solid var(--dlsu-danger);
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-danger-outline:hover {
+            background: #fdeaea;
+        }
+        .toast-notification {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--dlsu-green);
+            color: white;
+            padding: 0.85rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 9999;
+            box-shadow: 0 8px 30px rgba(0, 112, 60, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @media (max-width: 575.98px) {
+            .password-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        /* Dark Mode */
+        body.dark-mode .section-card {
+            background: #1a1a1a;
+            border-color: #2a2a2a;
+        }
+        body.dark-mode .section-card-title {
+            color: #e8e8e8;
+        }
+        body.dark-mode .section-card-desc {
+            color: #6b6b6b;
+        }
+        body.dark-mode .setting-row {
+            border-bottom-color: #2a2a2a;
+        }
+        body.dark-mode .setting-label {
+            color: #e8e8e8;
+        }
+        body.dark-mode .setting-desc {
+            color: #6b6b6b;
+        }
+        body.dark-mode .toggle-slider {
+            background: #333;
+        }
+        body.dark-mode .toggle-switch input:checked + .toggle-slider {
+            background: var(--dlsu-green);
+        }
+        body.dark-mode .theme-card {
+            background: #1a1a1a;
+            border-color: #2a2a2a;
+            color: #e8e8e8;
+        }
+        body.dark-mode .theme-card:hover {
+            border-color: #444;
+        }
+        body.dark-mode .theme-card.selected {
+            border-color: var(--dlsu-green);
+            background: #1a3a28;
+        }
+        body.dark-mode .theme-card i {
+            color: #a0a0a0;
+        }
+        body.dark-mode .theme-card.selected i {
+            color: var(--dlsu-green);
+        }
+        body.dark-mode .form-label-custom {
+            color: #6b6b6b;
+        }
+        body.dark-mode .form-control-custom {
+            background: #1e1e1e;
+            border-color: #333;
+            color: #e8e8e8;
+        }
+        body.dark-mode .form-control-custom:focus {
+            box-shadow: 0 0 0 3px rgba(0, 112, 60, 0.2);
+        }
+        body.dark-mode .btn-danger-outline {
+            background: #1a1a1a;
+            border-color: #c0392b;
+        }
+        body.dark-mode .btn-danger-outline:hover {
+            background: #2a1515;
+        }
     </style>
 </head>
 <body>
+<script>if(localStorage.getItem("darkMode")==="true")document.body.classList.add("dark-mode")</script>
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
@@ -75,8 +328,13 @@
                 <div class="topbar-left"><h1>Settings</h1><p id="topbarClock"></p></div>
             </div>
             <div class="topbar-right">
-                <button class="topbar-circle-btn" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
-                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i><span class="notif-badge">3</span></button>
+                <button class="topbar-circle-btn" id="darkModeBtn" title="Toggle Dark Mode">
+                    <i class="bi bi-moon-fill"></i>
+                </button>
+                <button class="topbar-circle-btn" title="Notifications" id="notifBtn">
+                    <i class="bi bi-bell-fill"></i>
+                    <span class="notif-badge">0</span>
+                </button>
                 <div class="profile-wrapper" id="profileWrapper">
                     <div class="d-flex align-items-center gap-1" style="cursor:pointer;" id="profileToggle">
                         <div class="profile-btn">AD</div>
@@ -137,14 +395,50 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/script.js"></script>
     <script>
-        function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = msg; t.style.display = 'flex'; setTimeout(() => t.style.display = 'none', 3000); }
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            t.style.display = 'flex';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
         function setTheme(el, theme) {
             document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
             el.classList.add('selected');
-            if (theme === 'dark') document.body.classList.add('dark-mode');
-            else if (theme === 'light') document.body.classList.remove('dark-mode');
+            const dmBtn = document.getElementById('darkModeBtn');
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (dmBtn) dmBtn.querySelector('i').className = 'bi bi-sun-fill';
+            } else if (theme === 'light') {
+                document.body.classList.remove('dark-mode');
+                if (dmBtn) dmBtn.querySelector('i').className = 'bi bi-moon-fill';
+            }
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
             showToast('Theme updated!');
         }
+
+        function syncThemeCards() {
+            const isDark = document.body.classList.contains('dark-mode');
+            document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.theme-card').forEach(c => {
+                if (c.textContent.trim() === (isDark ? 'Dark' : 'Light')) c.classList.add('selected');
+            });
+        }
+
+        (function() {
+            const dmBtn = document.getElementById('darkModeBtn');
+            if (dmBtn) {
+                dmBtn._dmBound = true;
+                dmBtn.addEventListener('click', function() {
+                    document.body.classList.toggle('dark-mode');
+                    const isDark = document.body.classList.contains('dark-mode');
+                    this.querySelector('i').className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+                    localStorage.setItem('darkMode', isDark);
+                    syncThemeCards();
+                });
+            }
+            syncThemeCards();
+        })();
     </script>
     <script src="js/notifications.js"></script>
 </body>

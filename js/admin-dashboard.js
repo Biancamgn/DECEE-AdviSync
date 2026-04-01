@@ -1,17 +1,14 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // ── Route Guard: Admin only ──
     const currentUser = await requireAuth(['admin']);
     if (!currentUser) return;
 
-    // ── Elements ──
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     const overlay = document.getElementById('sidebarOverlay');
     const hamburger = document.getElementById('hamburgerBtn');
     const isMobile = () => window.innerWidth < 992;
 
-    // ── Desktop: hover to expand, main content shifts ──
     sidebar.addEventListener('mouseenter', () => {
         if (!isMobile()) {
             sidebar.classList.add('expanded');
@@ -26,7 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // ── Mobile: hamburger toggle ──
     hamburger.addEventListener('click', () => {
         sidebar.classList.toggle('expanded');
         overlay.classList.toggle('active');
@@ -37,28 +33,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         overlay.classList.remove('active');
     });
 
-    // ── Profile Dropdown Toggle ──
-    const profileWrapper = document.getElementById('profileWrapper');
-    const profileToggle = document.getElementById('profileToggle');
-
-    profileToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        profileWrapper.classList.toggle('open');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!profileWrapper.contains(e.target)) {
-            profileWrapper.classList.remove('open');
-        }
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            profileWrapper.classList.remove('open');
-        }
-    });
-
-    // ── Digital Clock + Date ──
     const clockEl = document.getElementById('topbarClock');
     function updateClock() {
         const now = new Date();
@@ -72,19 +46,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateClock();
     setInterval(updateClock, 1000);
 
-    // ── Dark Mode Toggle ──
-    const darkModeBtn = document.getElementById('darkModeBtn');
-    darkModeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const icon = darkModeBtn.querySelector('i');
-        if (document.body.classList.contains('dark-mode')) {
-            icon.className = 'bi bi-sun-fill';
-        } else {
-            icon.className = 'bi bi-moon-fill';
-        }
-    });
-
-    // ── Sign Out ──
     const signOutBtn = document.getElementById('signOutBtn');
     if (signOutBtn) {
         signOutBtn.addEventListener('click', (e) => {
@@ -94,7 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // =========================================================================
-    // FETCH DASHBOARD DATA FROM SUPABASE
     // =========================================================================
     let totalStudents = 0, clearedStudents = 0, notClearedStudents = 0, atRiskStudents = 0;
 
