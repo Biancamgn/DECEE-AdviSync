@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Test - No Auth</title>
+</head>
+<body>
+    <h1>Database Connection Test (No Authentication)</h1>
+    <div id="result"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script>
+        async function testDatabase() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>🔄 Testing database connection...</p>';
+
+            try {
+                console.log('Testing courses table access...');
+
+                const { data: courses, error } = await supabaseClient
+                    .from('courses')
+                    .select('*')
+                    .limit(10);
+
+                console.log('Query result:', { courses, error });
+
+                if (error) {
+                    resultDiv.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+                    resultDiv.innerHTML += `<p>Error code: ${error.code}</p>`;
+                    resultDiv.innerHTML += `<p>Error details: ${JSON.stringify(error)}</p>`;
+                } else {
+                    resultDiv.innerHTML += `<p>✅ Success! Found ${courses.length} courses</p>`;
+                    if (courses.length > 0) {
+                        resultDiv.innerHTML += '<h3>Sample Courses:</h3><ul>';
+                        courses.slice(0, 3).forEach(course => {
+                            resultDiv.innerHTML += `<li>${course.code} - ${course.title} (${course.program_code})</li>`;
+                        });
+                        resultDiv.innerHTML += '</ul>';
+                    }
+                }
+            } catch (err) {
+                resultDiv.innerHTML += `<p>💥 Unexpected error: ${err.message}</p>`;
+                console.error('Unexpected error:', err);
+            }
+        }
+
+        // Run test when page loads
+        testDatabase();
+    </script>
+</body>
+</html>
