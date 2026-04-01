@@ -38,8 +38,8 @@ async function loadAdvisees() {
         const studentIds = adviseeRows.map(r => r.student_id);
 
         const { data: students, error: studentError } = await supabaseClient
-            .from('users')
-            .select('*')
+            .from('profiles')
+            .select('*, students(*)')
             .in('id', studentIds);
 
         if (studentError) {
@@ -56,8 +56,11 @@ async function loadAdvisees() {
         let riskCount = 0;
 
         students.forEach(student => {
-            const failedUnits = student.failed_units || 0;
+            const profile = student;
+            const studentInfo = student.students || {};
+            const failedUnits = studentInfo.failed_units || 0;
             const maxUnits = 30;
+            const isCleared = studentInfo.is_cleared || false;
             let status = 'cleared';
             let statusLabel = 'Cleared';
             let failedClass = 'safe';
@@ -67,7 +70,7 @@ async function loadAdvisees() {
                 statusLabel = 'At-Risk';
                 failedClass = failedUnits >= 24 ? 'danger' : 'warn';
                 riskCount++;
-            } else if (!student.is_cleared) {
+            } else if (!isCleared) {
                 status = 'pending';
                 statusLabel = 'Pending';
                 pendingCount++;
@@ -77,7 +80,7 @@ async function loadAdvisees() {
 
             totalCount++;
 
-            const program = student.program || 'BS-CpE';
+            const program = studentInfo.program || profile.program || 'BS-CpE';
             let programClass = 'cpe';
             if (program.includes('ECE')) programClass = 'ece';
             else if (program.includes('EE') && !program.includes('ECE')) programClass = 'ee';
@@ -85,14 +88,20 @@ async function loadAdvisees() {
             const row = document.createElement('tr');
             row.dataset.program = programClass;
             row.dataset.status = status;
+
+            const fullName = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
+            const idNumber = profile.school_id || profile.id || '-';
+            const email = profile.email || '-';
+            const currentTerm = studentInfo.current_term || '-';
+
             row.innerHTML = `
                 <td>
-                    <div class="student-name">${student.full_name}</div>
-                    <div class="student-email">${student.email}</div>
+                    <div class="student-name">${fullName}</div>
+                    <div class="student-email">${email}</div>
                 </td>
-                <td>${student.id_number}</td>
+                <td>${idNumber}</td>
                 <td><span class="program-badge ${programClass}">${program}</span></td>
-                <td>${student.current_term || '-'}</td>
+                <td>${currentTerm}</td>
                 <td><span class="failed-units ${failedClass}">${failedUnits} / ${maxUnits}</span></td>
                 <td><span class="status-badge ${status}">${statusLabel}</span></td>
                 <td><a href="#" class="btn-view">View</a></td>
