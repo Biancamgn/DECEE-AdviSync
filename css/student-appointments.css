@@ -56,117 +56,127 @@
         .profile-btn { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--dlsu-gray-200); background: var(--dlsu-green); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; font-weight: 700; }
         .hamburger-btn { display: none; background: none; border: none; font-size: 1.3rem; color: var(--dlsu-gray-800); cursor: pointer; margin-right: 0.75rem; }
         .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; }
-        .page-body { padding: 1.75rem 2rem; max-width: 860px; margin: 0 auto; }
+        .page-body { padding: 1.75rem 2rem; }
 
-        /* ══ PAGE ══ */
+        /* ══ PAGE HEADER ══ */
         .page-title { font-size: 1.4rem; font-weight: 800; color: var(--dlsu-green); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem; }
         .page-title i { font-size: 1.2rem; }
         .page-subtitle { font-size: 0.82rem; color: var(--dlsu-gray-400); margin-bottom: 1.75rem; }
 
-        /* ══ COMPOSE CARD ══ */
-        .compose-card {
-            background: white; border-radius: 14px; border: 1px solid var(--dlsu-gray-200);
-            padding: 1.5rem; margin-bottom: 1.75rem;
+        /* ══ ADVISER CARD ══ */
+        .adviser-banner {
+            display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;
+            background: var(--dlsu-green-light); border-radius: 12px; margin-bottom: 1.75rem;
         }
-        .compose-title {
+        .adviser-banner .adv-avatar {
+            width: 48px; height: 48px; border-radius: 12px; background: var(--dlsu-green);
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 1rem; flex-shrink: 0;
+        }
+        .adviser-banner .adv-name { font-size: 0.9rem; font-weight: 700; }
+        .adviser-banner .adv-dept { font-size: 0.73rem; color: var(--dlsu-gray-600); }
+
+        /* ══ SECTION CARD ══ */
+        .section-card {
+            background: white; border-radius: 14px; border: 1px solid var(--dlsu-gray-200);
+            padding: 1.5rem; margin-bottom: 1.5rem;
+        }
+        .section-title {
             font-size: 0.95rem; font-weight: 700; margin-bottom: 0.25rem;
             display: flex; align-items: center; gap: 0.5rem;
         }
-        .compose-title i { color: var(--dlsu-green); }
-        .compose-desc { font-size: 0.78rem; color: var(--dlsu-gray-400); margin-bottom: 1.15rem; }
+        .section-title i { color: var(--dlsu-green); font-size: 1rem; }
+        .section-desc { font-size: 0.78rem; color: var(--dlsu-gray-400); margin-bottom: 1.15rem; }
 
-        .form-group { margin-bottom: 1rem; }
-        .form-label-custom { font-size: 0.78rem; font-weight: 600; color: var(--dlsu-gray-800); margin-bottom: 0.35rem; display: block; }
-        .form-label-custom .required { color: var(--dlsu-danger); }
-
-        .form-control-custom {
-            width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--dlsu-gray-200);
-            border-radius: 8px; font-size: 0.82rem; font-family: inherit; color: var(--dlsu-gray-800);
-            background: white; transition: border-color 0.2s ease, box-shadow 0.2s ease; outline: none;
+        /* ══ DATE PICKER BAR ══ */
+        .date-picker-bar {
+            display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.5rem; margin-bottom: 1.25rem;
         }
-        .form-control-custom:focus { border-color: var(--dlsu-green); box-shadow: 0 0 0 3px var(--dlsu-green-light); }
-        .form-control-custom::placeholder { color: var(--dlsu-gray-400); }
-        select.form-control-custom { cursor: pointer; }
-        textarea.form-control-custom { resize: vertical; min-height: 120px; }
+        .date-chip {
+            display: flex; flex-direction: column; align-items: center; padding: 0.6rem 0.85rem;
+            border: 2px solid var(--dlsu-gray-200); border-radius: 12px; cursor: pointer;
+            transition: all 0.2s ease; min-width: 72px; background: white; flex-shrink: 0;
+        }
+        .date-chip:hover { border-color: var(--dlsu-green-muted); }
+        .date-chip.selected { border-color: var(--dlsu-green); background: var(--dlsu-green-light); }
+        .date-chip .day-name { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dlsu-gray-400); font-weight: 600; }
+        .date-chip .day-num { font-size: 1.15rem; font-weight: 800; color: var(--dlsu-gray-800); line-height: 1.2; }
+        .date-chip .day-month { font-size: 0.62rem; color: var(--dlsu-gray-400); font-weight: 500; }
+        .date-chip.selected .day-name,
+        .date-chip.selected .day-month { color: var(--dlsu-green); }
 
-        .char-count { font-size: 0.68rem; color: var(--dlsu-gray-400); text-align: right; margin-top: 0.25rem; }
+        /* ══ TIME SLOTS GRID ══ */
+        .slots-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem;
+        }
+        .time-slot {
+            padding: 0.65rem 0.75rem; border: 1px solid var(--dlsu-gray-200); border-radius: 10px;
+            text-align: center; cursor: pointer; transition: all 0.2s ease; background: white;
+        }
+        .time-slot:hover { border-color: var(--dlsu-green); background: var(--dlsu-green-light); }
+        .time-slot.selected { border-color: var(--dlsu-green); background: var(--dlsu-green); color: white; }
+        .time-slot.booked { background: var(--dlsu-gray-100); color: var(--dlsu-gray-400); cursor: not-allowed; border-color: var(--dlsu-gray-100); text-decoration: line-through; }
+        .time-slot .slot-time { font-size: 0.85rem; font-weight: 700; }
+        .time-slot .slot-status { font-size: 0.65rem; font-weight: 500; margin-top: 0.1rem; }
+        .time-slot.selected .slot-status { color: rgba(255,255,255,0.8); }
 
-        .btn-submit {
+        .no-slots { text-align: center; padding: 2rem; color: var(--dlsu-gray-400); font-size: 0.85rem; }
+        .no-slots i { font-size: 2rem; display: block; margin-bottom: 0.5rem; opacity: 0.3; }
+
+        /* Book button */
+        .btn-book {
             display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.5rem;
             background: var(--dlsu-green); color: white; border: none; border-radius: 10px;
             font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer;
-            transition: background 0.2s ease;
+            transition: background 0.2s ease; margin-top: 1.25rem;
         }
-        .btn-submit:hover { background: var(--dlsu-green-dark); }
+        .btn-book:hover { background: var(--dlsu-green-dark); }
+        .btn-book:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* ══ CONCERN HISTORY ══ */
-        .section-header {
-            font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem;
-            display: flex; align-items: center; justify-content: space-between;
+        /* ══ MY BOOKINGS ══ */
+        .booking-item {
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+            padding: 1rem 1.25rem; border: 1px solid var(--dlsu-gray-200); border-radius: 12px;
+            margin-bottom: 0.65rem; background: white; transition: box-shadow 0.2s ease;
         }
-        .section-header .count-badge {
-            font-size: 0.7rem; font-weight: 700; background: var(--dlsu-gray-100);
-            color: var(--dlsu-gray-600); padding: 0.2rem 0.65rem; border-radius: 20px;
+        .booking-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
+        .booking-left { display: flex; align-items: center; gap: 0.85rem; }
+        .booking-date-box {
+            width: 52px; height: 56px; border-radius: 10px; background: var(--dlsu-green-light);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;
         }
+        .booking-date-box .bdb-month { font-size: 0.58rem; text-transform: uppercase; font-weight: 700; color: var(--dlsu-green); letter-spacing: 0.04em; }
+        .booking-date-box .bdb-day { font-size: 1.15rem; font-weight: 800; color: var(--dlsu-green); line-height: 1; }
+        .booking-info .bi-title { font-size: 0.85rem; font-weight: 700; }
+        .booking-info .bi-detail { font-size: 0.73rem; color: var(--dlsu-gray-400); display: flex; align-items: center; gap: 0.35rem; margin-top: 0.15rem; }
+        .booking-status {
+            font-size: 0.68rem; font-weight: 600; padding: 0.25rem 0.7rem; border-radius: 20px;
+            text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap;
+        }
+        .booking-status.confirmed { background: var(--dlsu-green-light); color: var(--dlsu-green); }
+        .booking-status.pending { background: #fef3dc; color: #b8860b; }
+        .booking-status.cancelled { background: var(--dlsu-gray-100); color: var(--dlsu-gray-400); }
+        .btn-cancel {
+            padding: 0.35rem 0.75rem; border: 1px solid var(--dlsu-gray-200); border-radius: 8px;
+            background: white; color: var(--dlsu-danger); font-size: 0.72rem; font-weight: 600;
+            font-family: inherit; cursor: pointer; transition: all 0.2s ease; white-space: nowrap;
+        }
+        .btn-cancel:hover { background: #fdeaea; border-color: var(--dlsu-danger); }
+        .booking-actions { display: flex; align-items: center; gap: 0.5rem; }
 
-        .concern-item {
-            background: white; border: 1px solid var(--dlsu-gray-200); border-radius: 12px;
-            padding: 1.15rem 1.35rem; margin-bottom: 0.75rem; transition: box-shadow 0.2s ease;
-        }
-        .concern-item:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
-
-        .concern-top {
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.5rem;
-        }
-        .concern-meta { display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap; }
-        .concern-term {
-            font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 6px;
-            background: var(--dlsu-green-light); color: var(--dlsu-green); text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-        .concern-date { font-size: 0.72rem; color: var(--dlsu-gray-400); }
-
-        .concern-status {
-            font-size: 0.65rem; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 20px;
-            text-transform: uppercase; letter-spacing: 0.03em;
-        }
-        .concern-status.read { background: var(--dlsu-green-light); color: var(--dlsu-green); }
-        .concern-status.unread { background: #fef3dc; color: #b8860b; }
-        .concern-status.replied { background: #e4edfb; color: #1a56a8; }
-
-        .concern-message {
-            font-size: 0.82rem; color: var(--dlsu-gray-800); line-height: 1.55; margin-bottom: 0;
-        }
-
-        /* Adviser Reply */
-        .adviser-reply {
-            margin-top: 0.85rem; padding: 0.85rem 1rem; background: var(--dlsu-gray-50);
-            border-radius: 10px; border-left: 3px solid var(--dlsu-green);
-        }
-        .reply-header {
-            font-size: 0.7rem; font-weight: 700; color: var(--dlsu-green); margin-bottom: 0.3rem;
-            display: flex; align-items: center; gap: 0.35rem;
-        }
-        .reply-text { font-size: 0.8rem; color: var(--dlsu-gray-600); line-height: 1.5; }
-
-        /* Filter */
-        .filter-row {
-            display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;
-        }
-        .filter-chip {
-            padding: 0.35rem 0.85rem; border: 1px solid var(--dlsu-gray-200); border-radius: 20px;
-            font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
-            background: white; color: var(--dlsu-gray-600);
-        }
-        .filter-chip:hover { border-color: var(--dlsu-green-muted); }
-        .filter-chip.active { background: var(--dlsu-green); color: white; border-color: var(--dlsu-green); }
+        .empty-state { text-align: center; padding: 2.5rem 1rem; color: var(--dlsu-gray-400); }
+        .empty-state i { font-size: 2.5rem; opacity: 0.25; margin-bottom: 0.65rem; }
+        .empty-state p { font-size: 0.85rem; }
 
         /* ══ RESPONSIVE ══ */
         @media (max-width: 991.98px) {
             .sidebar { width: 0; border-radius: 0; } .sidebar.expanded { width: var(--sidebar-expanded); }
             .sidebar-overlay.active { display: block; } .main-content, .main-content.shifted { margin-left: 0; }
             .hamburger-btn { display: block; } .page-body { padding: 1.25rem 1rem; } .topbar { padding: 0.85rem 1rem; }
+        }
+        @media (max-width: 575.98px) {
+            .booking-item { flex-direction: column; align-items: flex-start; }
+            .booking-actions { width: 100%; justify-content: flex-end; }
         }
 
         /* ══ DARK MODE ══ */
@@ -231,7 +241,7 @@
         body.dark-mode .stat-card .stat-label { color: #6b7e70; }
         body.dark-mode .stat-card .stat-value { color: #d4ddd7; }
         body.dark-mode .welcome-banner {
-            background: linear-gradient(135deg, #0d3d1f 0%, #122e1d 100%);
+            background: linear-gradient(135deg, #0d3d1f 0%, #0a2e18 100%);
         }
         body.dark-mode .adviser-card { background: #232a25; border-color: #2f3832; }
         body.dark-mode .adviser-card .adviser-name { color: #d4ddd7; }
