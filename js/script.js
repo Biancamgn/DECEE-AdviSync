@@ -1,12 +1,9 @@
-
-// ── Elements ──
 const sidebar = document.getElementById('sidebar');
 const mainContent = document.getElementById('mainContent');
 const overlay = document.getElementById('sidebarOverlay');
 const hamburger = document.getElementById('hamburgerBtn');
 const isMobile = () => window.innerWidth < 992;
 
-// ── Desktop: hover to expand, main content shifts ──
 sidebar.addEventListener('mouseenter', () => {
     if (!isMobile()) {
         sidebar.classList.add('expanded');
@@ -21,7 +18,6 @@ sidebar.addEventListener('mouseleave', () => {
     }
 });
 
-// ── Mobile: hamburger toggle ──
 hamburger.addEventListener('click', () => {
     sidebar.classList.toggle('expanded');
     overlay.classList.toggle('active');
@@ -32,6 +28,7 @@ overlay.addEventListener('click', () => {
     overlay.classList.remove('active');
 });
 
+<<<<<<< HEAD
 // ── Dynamic Greeting ──
 const greetingEl = document.querySelector('.welcome-banner h2');
 const hour = new Date().getHours();
@@ -39,3 +36,5 @@ let greeting = 'Good morning';
 if (hour >= 12 && hour < 18) greeting = 'Good afternoon';
 else if (hour >= 18) greeting = 'Good evening';
 if (greetingEl) greetingEl.textContent = `${greeting}, Bianca!`;
+=======
+>>>>>>> ce96f73d6ac40d9d8f5a3e5040c1aa3bb6e78ca4
