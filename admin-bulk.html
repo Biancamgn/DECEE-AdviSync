@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdviSync — Bulk Operations</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div>
+            <div class="brand-text">
+                <h6>AdviSync</h6>
+                <small>Admin Panel</small>
+            </div>
+        </div>
+
+        <div class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <div class="nav-divider"></div>
+            <a href="admin-dashboard.html" class="nav-link">
+                <i class="bi bi-speedometer2"></i>
+                <span class="link-text">Dashboard</span>
+            </a>
+            <a href="admin-users.html" class="nav-link">
+                <i class="bi bi-people"></i>
+                <span class="link-text">User Management</span>
+            </a>
+
+            <div class="nav-section-label">Data</div>
+            <div class="nav-divider"></div>
+            <a href="admin-curriculum.html" class="nav-link">
+                <i class="bi bi-journal-code"></i>
+                <span class="link-text">Curriculum</span>
+            </a>
+            <a href="admin-advising.html" class="nav-link">
+                <i class="bi bi-person-check"></i>
+                <span class="link-text">Advising</span>
+            </a>
+            <a href="admin-reports.html" class="nav-link">
+                <i class="bi bi-bar-chart-line"></i>
+                <span class="link-text">Reports</span>
+            </a>
+            <a href="admin-bulk.html" class="nav-link active">
+                <i class="bi bi-gear-wide-connected"></i>
+                <span class="link-text">Bulk Tools</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="avatar">AD</div>
+                <div class="user-info">
+                    <div class="user-name">System Admin</div>
+                    <div class="user-id">DECEE Department</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Top Bar -->
+        <div class="topbar">
+            <div class="d-flex align-items-center">
+                <button class="hamburger-btn" id="hamburgerBtn"><i class="bi bi-list"></i></button>
+                <div class="topbar-left">
+                    <h1>Bulk Operations</h1>
+                    <p id="topbarClock"></p>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <button class="topbar-btn" id="darkModeBtn" title="Toggle Dark Mode">
+                    <i class="bi bi-moon-fill"></i>
+                </button>
+                <button class="topbar-btn" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                    <span class="notif-dot"></span>
+                </button>
+                <div class="profile-wrapper" id="profileWrapper">
+                    <div class="profile-toggle" id="profileToggle">
+                        <div class="avatar-sm">AD</div>
+                        <div class="d-none d-sm-block">
+                            <div class="profile-name">Admin</div>
+                            <div class="profile-role">DECEE Dept</div>
+                        </div>
+                    </div>
+                    <div class="profile-dropdown">
+                        <a href="#">Settings</a>
+                        <a href="#">Profile</a>
+                        <a href="index.html" class="danger">Sign out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Body -->
+        <div class="page-body">
+
+            <!-- Page Header -->
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+                <div>
+                    <div class="section-header mb-0"><span>Bulk Operations & Communication</span></div>
+                    <p style="font-size: 0.82rem; color: var(--dlsu-gray-400); margin: 0;">Automate data imports, mass clearance actions, and targeted email notifications.</p>
+                </div>
+            </div>
+
+            <!-- Report Navigation Tabs -->
+            <div class="content-card mb-4">
+                <div class="card-body-inner p-0">
+                    <ul class="nav user-tabs" id="bulkTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="csv-tab" data-bs-toggle="tab" data-bs-target="#csvPanel" type="button" role="tab" aria-selected="true">
+                                <i class="bi bi-filetype-csv me-2"></i>CSV Upload
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="clearance-tab" data-bs-toggle="tab" data-bs-target="#clearancePanel" type="button" role="tab" aria-selected="false">
+                                <i class="bi bi-check2-all me-2"></i>Mass Clearance
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="email-tab" data-bs-toggle="tab" data-bs-target="#emailPanel" type="button" role="tab" aria-selected="false">
+                                <i class="bi bi-envelope-paper me-2"></i>Mass Email
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+
+                        <!-- ════════════════════════════════════════════ -->
+                        <!-- TAB 1: CSV Data Upload                     -->
+                        <!-- ════════════════════════════════════════════ -->
+                        <div class="tab-pane fade show active" id="csvPanel" role="tabpanel">
+                            <div class="px-4 py-4">
+
+                                <!-- Upload Type Selector -->
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <div class="upload-type-card active" id="uploadStudents" data-type="students">
+                                            <div class="upload-type-icon">
+                                                <i class="bi bi-mortarboard"></i>
+                                            </div>
+                                            <div>
+                                                <div class="upload-type-title">Student List Import</div>
+                                                <div class="upload-type-desc">Upload student records: ID, name, program, year level, email</div>
+                                            </div>
+                                            <i class="bi bi-check-circle-fill upload-type-check"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="upload-type-card" id="uploadCourses" data-type="courses">
+                                            <div class="upload-type-icon courses">
+                                                <i class="bi bi-journal-code"></i>
+                                            </div>
+                                            <div>
+                                                <div class="upload-type-title">Course Catalog Import</div>
+                                                <div class="upload-type-desc">Upload courses: code, title, units, term, prerequisites</div>
+                                            </div>
+                                            <i class="bi bi-check-circle-fill upload-type-check"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Drop Zone -->
+                                <div class="csv-dropzone" id="csvDropzone">
+                                    <div class="csv-dropzone-inner">
+                                        <div class="csv-dropzone-icon">
+                                            <i class="bi bi-cloud-arrow-up"></i>
+                                        </div>
+                                        <div class="csv-dropzone-title">Drag & drop your CSV file here</div>
+                                        <div class="csv-dropzone-subtitle">or click to browse files</div>
+                                        <div class="csv-dropzone-hint">Supports .csv and .xlsx files up to 5MB</div>
+                                        <input type="file" id="csvFileInput" accept=".csv,.xlsx" hidden>
+                                    </div>
+                                </div>
+
+                                <!-- Upload Progress -->
+                                <div class="csv-progress-area" id="csvProgressArea" style="display:none;">
+                                    <div class="csv-file-info">
+                                        <div class="csv-file-icon"><i class="bi bi-file-earmark-spreadsheet"></i></div>
+                                        <div class="csv-file-details">
+                                            <div class="csv-file-name" id="csvFileName">file.csv</div>
+                                            <div class="csv-file-size" id="csvFileSize">0 KB</div>
+                                        </div>
+                                        <button class="btn btn-sm csv-remove-btn" id="csvRemoveBtn"><i class="bi bi-x-lg"></i></button>
+                                    </div>
+                                    <div class="csv-progress-track">
+                                        <div class="csv-progress-fill" id="csvProgressBar"></div>
+                                    </div>
+                                    <div class="csv-progress-status" id="csvProgressStatus">Uploading...</div>
+                                </div>
+
+                                <!-- Preview Table -->
+                                <div id="csvPreviewArea" style="display:none;" class="mt-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <h6 class="fw-bold mb-0" style="font-size: 0.88rem;">Data Preview</h6>
+                                            <span style="font-size: 0.72rem; color: var(--dlsu-gray-400);" id="csvRowCount">0 rows detected</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-sm px-3" id="csvDownloadTemplate" style="background: var(--dlsu-gray-100); color: var(--dlsu-gray-600); font-weight: 600; border-radius: 8px; font-size: 0.78rem;">
+                                                <i class="bi bi-download me-1"></i> Template
+                                            </button>
+                                            <button class="btn btn-sm px-3" id="csvImportBtn" style="background: var(--dlsu-green); color: white; font-weight: 600; border-radius: 8px; font-size: 0.78rem;">
+                                                <i class="bi bi-database-add me-1"></i> Import Data
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="admin-table" id="csvPreviewTable">
+                                            <thead id="csvPreviewHead"></thead>
+                                            <tbody id="csvPreviewBody"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- ════════════════════════════════════════════ -->
+                        <!-- TAB 2: Mass Clearance                      -->
+                        <!-- ════════════════════════════════════════════ -->
+                        <div class="tab-pane fade" id="clearancePanel" role="tabpanel">
+                            <div class="px-4 py-4">
+
+                                <!-- Stats -->
+                                <div class="row g-3 mb-4">
+                                    <div class="col-6 col-md-3">
+                                        <div class="report-metric-card">
+                                            <div class="report-metric-value" id="clearTotalStudents">1,250</div>
+                                            <div class="report-metric-label">Total Students</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="report-metric-card">
+                                            <div class="report-metric-value" style="color: var(--dlsu-green);" id="clearCleared">938</div>
+                                            <div class="report-metric-label">Cleared</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="report-metric-card">
+                                            <div class="report-metric-value" style="color: var(--dlsu-danger);" id="clearNotCleared">312</div>
+                                            <div class="report-metric-label">Not Cleared</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6 col-md-3">
+                                        <div class="report-metric-card">
+                                            <div class="report-metric-value" style="color: var(--dlsu-warning);" id="clearAtRisk">70</div>
+                                            <div class="report-metric-label">At Risk</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Clearance Filters -->
+                                <div class="clearance-action-card">
+                                    <h6 class="fw-bold mb-1" style="font-size: 0.88rem;"><i class="bi bi-funnel me-2" style="color: var(--dlsu-green);"></i>Select Group to Clear</h6>
+                                    <p style="font-size: 0.72rem; color: var(--dlsu-gray-400); margin-bottom: 1rem;">Define the scope of students to be cleared for enrollment in one action.</p>
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold" style="font-size: 0.78rem;">Program</label>
+                                            <select class="form-select form-select-sm" id="clearProgram" style="border-color: var(--dlsu-gray-200);">
+                                                <option value="all">All Programs</option>
+                                                <option value="BSCpE">BSCpE</option>
+                                                <option value="BSECE">BSECE</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold" style="font-size: 0.78rem;">Year Level</label>
+                                            <select class="form-select form-select-sm" id="clearYear" style="border-color: var(--dlsu-gray-200);">
+                                                <option value="all">All Years</option>
+                                                <option value="1">1st Year</option>
+                                                <option value="2">2nd Year</option>
+                                                <option value="3">3rd Year</option>
+                                                <option value="4">4th Year</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold" style="font-size: 0.78rem;">Current Status</label>
+                                            <select class="form-select form-select-sm" id="clearStatus" style="border-color: var(--dlsu-gray-200);">
+                                                <option value="not-cleared">Not Cleared Only</option>
+                                                <option value="all">All Statuses</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="clearance-match-count">
+                                            <i class="bi bi-people-fill me-1"></i>
+                                            <span id="clearMatchCount">312</span> students match this criteria
+                                        </div>
+                                        <button class="btn btn-sm px-4" id="clearApplyBtn" style="background: var(--dlsu-green); color: white; font-weight: 600; border-radius: 8px; font-size: 0.82rem;">
+                                            <i class="bi bi-check2-all me-1"></i> Clear Selected Group
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Clearance Log -->
+                                <div class="mt-4">
+                                    <h6 class="fw-bold mb-3" style="font-size: 0.88rem;"><i class="bi bi-clock-history me-2" style="color: var(--dlsu-gray-400);"></i>Recent Clearance Actions</h6>
+                                    <div id="clearanceLog"></div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- ════════════════════════════════════════════ -->
+                        <!-- TAB 3: Targeted Mass Email                 -->
+                        <!-- ════════════════════════════════════════════ -->
+                        <div class="tab-pane fade" id="emailPanel" role="tabpanel">
+                            <div class="px-4 py-4">
+
+                                <div class="row g-4">
+                                    <!-- Compose Area -->
+                                    <div class="col-lg-7">
+                                        <div class="email-compose-card">
+                                            <h6 class="fw-bold mb-3" style="font-size: 0.88rem;"><i class="bi bi-pencil-square me-2" style="color: var(--dlsu-green);"></i>Compose Email</h6>
+
+                                            <!-- Recipients -->
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold" style="font-size: 0.78rem;">Recipient Group</label>
+                                                <select class="form-select form-select-sm" id="emailRecipient" style="border-color: var(--dlsu-gray-200);">
+                                                    <option value="" disabled selected>Select a target group...</option>
+                                                    <optgroup label="Faculty">
+                                                        <option value="all-professors">All Professors</option>
+                                                    </optgroup>
+                                                    <optgroup label="Students">
+                                                        <option value="all-students">All Students</option>
+                                                        <option value="bscpe-students">BSCpE Students Only</option>
+                                                        <option value="bsece-students">BSECE Students Only</option>
+                                                        <option value="at-risk">All At-Risk Students</option>
+                                                        <option value="not-cleared">Not Cleared Students</option>
+                                                        <option value="unassigned">Unassigned Students</option>
+                                                    </optgroup>
+                                                    <optgroup label="Year Level">
+                                                        <option value="year-1">All 1st Year Students</option>
+                                                        <option value="year-2">All 2nd Year Students</option>
+                                                        <option value="year-3">All 3rd Year Students</option>
+                                                        <option value="year-4">All 4th Year Students</option>
+                                                    </optgroup>
+                                                </select>
+                                            </div>
+
+                                            <!-- Subject -->
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold" style="font-size: 0.78rem;">Subject</label>
+                                                <input type="text" class="form-control form-control-sm" id="emailSubject" placeholder="e.g. Advising Deadline Reminder – Term 3" style="border-color: var(--dlsu-gray-200); font-size: 0.82rem;">
+                                            </div>
+
+                                            <!-- Template shortcuts -->
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold" style="font-size: 0.78rem;">Quick Templates</label>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    <button class="email-template-chip" data-template="advising-deadline">
+                                                        <i class="bi bi-calendar-event me-1"></i> Advising Deadline
+                                                    </button>
+                                                    <button class="email-template-chip" data-template="clearance-notice">
+                                                        <i class="bi bi-shield-check me-1"></i> Clearance Notice
+                                                    </button>
+                                                    <button class="email-template-chip" data-template="at-risk-warning">
+                                                        <i class="bi bi-exclamation-triangle me-1"></i> At-Risk Warning
+                                                    </button>
+                                                    <button class="email-template-chip" data-template="study-plan-reminder">
+                                                        <i class="bi bi-journal-check me-1"></i> Study Plan Review
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Body -->
+                                            <div class="mb-3">
+                                                <label class="form-label fw-semibold" style="font-size: 0.78rem;">Message Body</label>
+                                                <textarea class="form-control" id="emailBody" rows="8" placeholder="Type your message here..." style="border-color: var(--dlsu-gray-200); font-size: 0.82rem; resize: vertical;"></textarea>
+                                            </div>
+
+                                            <!-- Actions -->
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="email-recipient-count" id="emailRecipientCount">
+                                                    <i class="bi bi-people me-1"></i> No group selected
+                                                </div>
+                                                <div class="d-flex gap-2">
+                                                    <button class="btn btn-sm px-3" id="emailPreviewBtn" style="background: var(--dlsu-gray-100); color: var(--dlsu-gray-600); font-weight: 600; border-radius: 8px; font-size: 0.78rem;">
+                                                        <i class="bi bi-eye me-1"></i> Preview
+                                                    </button>
+                                                    <button class="btn btn-sm px-4" id="emailSendBtn" style="background: var(--dlsu-green); color: white; font-weight: 600; border-radius: 8px; font-size: 0.82rem;">
+                                                        <i class="bi bi-send me-1"></i> Send Email
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Recent Emails Sidebar -->
+                                    <div class="col-lg-5">
+                                        <div class="email-history-card">
+                                            <h6 class="fw-bold mb-3" style="font-size: 0.88rem;"><i class="bi bi-clock-history me-2" style="color: var(--dlsu-gray-400);"></i>Recent Emails</h6>
+                                            <div id="emailHistory"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- MODAL: Clearance Confirmation                                       -->
+    <!-- ================================================================== -->
+    <div class="modal fade" id="clearanceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content" style="border: none; border-radius: 14px;">
+                <div class="modal-body text-center" style="padding: 2rem 1.5rem;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--dlsu-green-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="bi bi-check2-all fs-4" style="color: var(--dlsu-green);"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">Confirm Mass Clearance</h6>
+                    <p style="font-size: 0.82rem; color: var(--dlsu-gray-400);" id="clearanceModalText">This will clear 312 students for enrollment.</p>
+                </div>
+                <div class="modal-footer justify-content-center" style="border-top: 1px solid var(--dlsu-gray-200); padding: 1rem;">
+                    <button type="button" class="btn btn-sm px-3" data-bs-dismiss="modal" style="background: var(--dlsu-gray-100); color: var(--dlsu-gray-600); font-weight: 600; border-radius: 8px;">Cancel</button>
+                    <button type="button" class="btn btn-sm px-4" id="confirmClearBtn" style="background: var(--dlsu-green); color: white; font-weight: 600; border-radius: 8px;">Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================================================== -->
+    <!-- MODAL: Email Sent Confirmation                                      -->
+    <!-- ================================================================== -->
+    <div class="modal fade" id="emailSentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content" style="border: none; border-radius: 14px;">
+                <div class="modal-body text-center" style="padding: 2rem 1.5rem;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: var(--dlsu-green-light); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="bi bi-send-check fs-4" style="color: var(--dlsu-green);"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2">Email Sent Successfully</h6>
+                    <p style="font-size: 0.82rem; color: var(--dlsu-gray-400);" id="emailSentText">Your email has been sent to 0 recipients.</p>
+                </div>
+                <div class="modal-footer justify-content-center" style="border-top: 1px solid var(--dlsu-gray-200); padding: 1rem;">
+                    <button type="button" class="btn btn-sm px-4" data-bs-dismiss="modal" style="background: var(--dlsu-green); color: white; font-weight: 600; border-radius: 8px;">Done</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/admin-bulk.js"></script>
+</body>
+</html>
