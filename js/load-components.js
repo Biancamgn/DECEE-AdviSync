@@ -15,6 +15,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadComponent('sidebar-container', 'components/sidebar.html');
     await loadComponent('topbar-container', 'components/topbar.html');
 
+    // ── Auto-highlight the active sidebar link ──
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
+        const linkPage = link.getAttribute('href');
+        if (linkPage && linkPage !== '#' && currentPage === linkPage) {
+            link.classList.add('active');
+        }
+    });
+
     const pageTitle = document.body.dataset.pageTitle;
     const pageSubtitle = document.body.dataset.pageSubtitle;
     
