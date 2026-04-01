@@ -1,21 +1,10 @@
-// ═══════════════════════════════════════════════════════════════════════
-// AdviSync — Authentication & Route Guards
-// ═══════════════════════════════════════════════════════════════════════
-
-/**
- * Check if user is authenticated and has an allowed role.
- * Redirects to login if not authenticated or unauthorized.
- * @param {string[]} allowedRoles - e.g. ['admin'], ['admin','professor']
- * @returns {Promise<object|null>} The user's profile or null
- */
 async function requireAuth(allowedRoles = []) {
     try {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
 
         if (error || !session) {
-            // No active Supabase session — allow fallback access for demos
-            console.warn('No Supabase session. Allowing fallback access.');
-            return { id: 'demo', role: 'admin', school_id: 'ADMIN001', first_name: 'Demo', last_name: 'User', email: 'demo@dlsu.edu.ph', status: 'active' };
+            window.location.href = 'index.html';
+            return null;
         }
 
         const { data: profile, error: profileError } = await supabaseClient
@@ -25,9 +14,8 @@ async function requireAuth(allowedRoles = []) {
             .single();
 
         if (profileError || !profile) {
-            // Session exists but profile lookup failed — allow fallback
-            console.warn('Profile lookup failed. Allowing fallback access.');
-            return { id: session.user.id, role: 'admin', school_id: 'ADMIN001', first_name: 'Admin', last_name: 'User', email: session.user.email, status: 'active' };
+            window.location.href = 'index.html';
+            return null;
         }
 
         if (allowedRoles.length > 0 && !allowedRoles.includes(profile.role)) {
@@ -37,30 +25,20 @@ async function requireAuth(allowedRoles = []) {
 
         return profile;
     } catch (err) {
-        // Supabase completely unavailable — allow fallback
-        console.warn('Auth check failed. Allowing fallback access.', err);
-        return { id: 'demo', role: 'admin', school_id: 'ADMIN001', first_name: 'Demo', last_name: 'User', email: 'demo@dlsu.edu.ph', status: 'active' };
+        window.location.href = 'index.html';
+        return null;
     }
 }
 
-/**
- * Sign out and redirect to login.
- */
 async function signOut() {
     await supabaseClient.auth.signOut();
     window.location.href = 'index.html';
 }
 
-/**
- * Handle login form submission.
- * Uses ID Number to look up the user's email via secure RPC,
- * then authenticates via Supabase Auth.
- */
 function initLoginForm() {
     const form = document.getElementById('loginForm');
     if (!form) return;
 
-    // ── Password Toggle ──
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     const toggleIcon = document.getElementById('toggleIcon');
@@ -74,7 +52,6 @@ function initLoginForm() {
         });
     }
 
-    // ── Login Submit ──
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -82,74 +59,50 @@ function initLoginForm() {
         const password = document.getElementById('password').value;
         const errorEl = document.getElementById('errorMessage');
 
-        // Clear previous error
         errorEl.classList.add('d-none');
         errorEl.textContent = '';
 
-        // Disable button while loading
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Signing in...';
 
         try {
-            let loginSuccess = false;
+            const { data: email, error: rpcError } = await supabaseClient.rpc('get_email_by_school_id', { p_school_id: idNumber });
 
-            // ── Attempt 1: Supabase Authentication ──
-            if (typeof supabaseClient !== 'undefined') {
-                try {
-                    const { data: email, error: rpcError } = await supabaseClient.rpc('get_email_by_school_id', { p_school_id: idNumber });
-
-                    if (!rpcError && email) {
-                        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
-                        if (!error && data?.user) {
-                            const { data: profile } = await supabaseClient
-                                .from('profiles')
-                                .select('role')
-                                .eq('id', data.user.id)
-                                .single();
-
-                            if (profile?.role) {
-                                loginSuccess = true;
-                                switch (profile.role) {
-                                    case 'admin':    window.location.href = 'admin-dashboard.html'; break;
-                                    case 'professor': window.location.href = 'academic-advising.html'; break;
-                                    case 'student':   window.location.href = 'student-dashboard.html'; break;
-                                    default:          window.location.href = 'index.html';
-                                }
-                                return;
-                            }
-                        }
-                    }
-                } catch (supabaseErr) {
-                    console.warn('Supabase auth unavailable, using fallback login.', supabaseErr);
-                }
+            if (rpcError || !email) {
+                errorEl.textContent = 'Invalid ID number or password. Please try again.';
+                errorEl.classList.remove('d-none');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                return;
             }
 
-            // ── Attempt 2: Fallback — ID-format-based routing ──
-            if (!loginSuccess) {
-                const id = idNumber.toLowerCase();
-                let role = '';
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
-                if (id === 'admin' || id.startsWith('admin')) {
-                    role = 'admin';
-                } else if (/^1\d{7}$/.test(id)) {
-                    role = 'student';
-                } else if (/^2\d{6,7}$/.test(id)) {
-                    role = 'professor';
+            if (error || !data?.user) {
+                errorEl.textContent = 'Invalid ID number or password. Please try again.';
+                errorEl.classList.remove('d-none');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                return;
+            }
+
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('role')
+                .eq('id', data.user.id)
+                .single();
+
+            if (profile?.role) {
+                switch (profile.role) {
+                    case 'admin':     window.location.href = 'admin-dashboard.html'; break;
+                    case 'adviser': window.location.href = 'academic-advising.html'; break;
+                    case 'student':   window.location.href = 'student-dashboard.html'; break;
+                    default:          window.location.href = 'index.html';
                 }
-
-                if (role) {
-                    switch (role) {
-                        case 'admin':     window.location.href = 'admin-dashboard.html'; break;
-                        case 'professor': window.location.href = 'academic-advising.html'; break;
-                        case 'student':   window.location.href = 'student-dashboard.html'; break;
-                    }
-                    return;
-                }
-
-                errorEl.textContent = 'Invalid ID format. Use a student ID (1xxxxxxx), professor ID (2xxxxxxx), or admin ID.';
+            } else {
+                errorEl.textContent = 'Account profile not found. Contact your administrator.';
                 errorEl.classList.remove('d-none');
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
@@ -162,24 +115,46 @@ function initLoginForm() {
         }
     });
 
-    // ── Forgot Password ──
     const forgotPasswordForm = document.getElementById('forgotPasswordForm');
     const resetAlert = document.getElementById('resetAlert');
 
     if (forgotPasswordForm && resetAlert) {
-        forgotPasswordForm.addEventListener('submit', function(e) {
+        forgotPasswordForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const resetId = document.getElementById('resetId').value.trim();
 
+            let userEmail = null;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('profiles')
+                    .select('email')
+                    .eq('school_id', resetId)
+                    .single();
+
+                if (!error && data?.email) {
+                    userEmail = data.email;
+                }
+            } catch (err) {
+                userEmail = null;
+            }
+
+            if (!userEmail) {
+                userEmail = resetId + '@dlsu.edu.ph';
+            }
+
             resetAlert.classList.remove('d-none');
-            resetAlert.textContent = `Reset instructions have been sent to ${resetId}@dlsu.edu.ph`;
-            
+            resetAlert.textContent = 'Reset instructions have been sent to ' + userEmail;
+
+            console.log('[Forgot Password] Reset requested for ID: ' + resetId);
+            console.log('[Forgot Password] Email: ' + userEmail);
+            console.log('[Forgot Password] Status: Reset link sent successfully (demo mode)');
+
             document.getElementById('resetId').value = '';
         });
     }
 }
 
-// Auto-init login form if on the login page
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('loginForm')) {
         initLoginForm();
