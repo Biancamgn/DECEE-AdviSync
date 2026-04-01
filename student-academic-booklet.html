@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Plan — AdviSync</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dlsu-green: #00703C; --dlsu-green-dark: #005a30; --dlsu-green-light: #e8f5ee;
+            --dlsu-white: #ffffff; --dlsu-gray-50: #f8faf9; --dlsu-gray-100: #f0f4f2;
+            --dlsu-gray-200: #e2e8e5; --dlsu-gray-400: #94a89c; --dlsu-gray-600: #5a6b60;
+            --dlsu-gray-800: #2d3a32; --dlsu-warning: #e6a817; --dlsu-danger: #c0392b;
+            --dlsu-info: #2980b9; --sidebar-collapsed: 70px; --sidebar-expanded: 250px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--dlsu-gray-50); color: var(--dlsu-gray-800); min-height: 100vh; }
+
+        /* ══ SIDEBAR (shared) ══ */
+        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-collapsed); height: 100vh; background: var(--dlsu-green); color: white; display: flex; flex-direction: column; z-index: 1000; transition: width 0.3s cubic-bezier(0.4,0,0.2,1); overflow: hidden; border-radius: 0 18px 18px 0; }
+        .sidebar.expanded { width: var(--sidebar-expanded); }
+        .sidebar-brand { display: flex; align-items: center; justify-content: center; padding: 1.2rem 0; border-bottom: 1px solid rgba(255,255,255,0.12); min-height: 68px; overflow: hidden; }
+        .sidebar-brand .brand-icon { width: 38px; height: 38px; min-width: 38px; background: rgba(255,255,255,0.18); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .sidebar-brand .brand-text { opacity: 0; white-space: nowrap; margin-left: 0.75rem; transition: opacity 0.15s ease; width: 0; overflow: hidden; }
+        .sidebar.expanded .sidebar-brand { justify-content: flex-start; padding-left: 1rem; }
+        .sidebar.expanded .brand-text { opacity: 1; width: auto; }
+        .sidebar-brand h6 { font-size: 0.88rem; font-weight: 700; margin: 0; }
+        .sidebar-brand small { font-size: 0.63rem; opacity: 0.6; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+        .sidebar-nav { flex: 1; padding: 0.6rem 0; overflow-y: auto; overflow-x: hidden; }
+        .nav-section-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; white-space: nowrap; color: rgba(255,255,255,0.4); max-height: 0; opacity: 0; overflow: hidden; padding: 0 1.1rem; transition: max-height 0.3s ease, opacity 0.2s ease, padding 0.3s ease; }
+        .sidebar.expanded .nav-section-label { max-height: 30px; opacity: 1; padding: 0.7rem 1.1rem 0.3rem; }
+        .nav-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 0.4rem 1.1rem; }
+        .sidebar.expanded .nav-divider { opacity: 0; margin: 0; height: 0; }
+        .sidebar-nav .nav-link { color: rgba(255,255,255,0.65); display: flex; align-items: center; justify-content: center; padding: 0.65rem 0; margin: 2px 0.5rem; border-radius: 10px; font-size: 0.82rem; font-weight: 500; white-space: nowrap; position: relative; transition: all 0.2s ease; text-decoration: none; }
+        .sidebar-nav .nav-link i { font-size: 1.2rem; width: 22px; min-width: 22px; text-align: center; transition: margin 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .sidebar-nav .nav-link .link-text { opacity: 0; width: 0; overflow: hidden; margin-left: 0; transition: opacity 0.15s ease, width 0.3s ease, margin 0.3s ease; }
+        .sidebar.expanded .nav-link { justify-content: flex-start; padding: 0.55rem 0.75rem; }
+        .sidebar.expanded .nav-link i { margin-left: 0.35rem; }
+        .sidebar.expanded .nav-link .link-text { opacity: 1; width: auto; margin-left: 0.75rem; }
+        .sidebar-nav .nav-link:hover { color: white; background: rgba(255,255,255,0.12); }
+        .sidebar-nav .nav-link.active { color: white; background: rgba(255,255,255,0.18); font-weight: 600; }
+        .sidebar-nav .nav-link.active::before { content: ''; position: absolute; left: -0.5rem; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: white; border-radius: 0 3px 3px 0; }
+        .sidebar-footer { padding: 0.85rem 0; border-top: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: center; }
+        .sidebar.expanded .sidebar-footer { justify-content: flex-start; padding-left: 1rem; }
+        .sidebar-footer .user-card { display: flex; align-items: center; gap: 0.65rem; }
+        .sidebar-footer .avatar { width: 34px; height: 34px; min-width: 34px; border-radius: 8px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; }
+        .sidebar-footer .user-info { opacity: 0; white-space: nowrap; width: 0; overflow: hidden; transition: opacity 0.15s ease; }
+        .sidebar.expanded .sidebar-footer .user-info { opacity: 1; width: auto; }
+        .sidebar-footer .user-name { font-size: 0.78rem; font-weight: 600; }
+        .sidebar-footer .user-id { font-size: 0.65rem; opacity: 0.6; }
+
+        /* ══ MAIN ══ */
+        .main-content { margin-left: var(--sidebar-collapsed); min-height: 100vh; transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .main-content.shifted { margin-left: var(--sidebar-expanded); }
+        .topbar { background: white; padding: 0.75rem 2rem; border-bottom: 1px solid var(--dlsu-gray-200); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+        .topbar-left h1 { font-size: 1.15rem; font-weight: 700; margin: 0; }
+        .topbar-left p { font-size: 0.78rem; color: var(--dlsu-gray-400); margin: 0; }
+        .topbar-right { display: flex; align-items: center; gap: 0.75rem; }
+        .topbar-circle-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--dlsu-gray-200); background: white; display: flex; align-items: center; justify-content: center; color: var(--dlsu-gray-600); cursor: pointer; position: relative; transition: all 0.2s ease; }
+        .topbar-circle-btn:hover { background: var(--dlsu-gray-100); color: var(--dlsu-green); }
+        .topbar-circle-btn i { font-size: 1.1rem; }
+        .topbar-circle-btn .notif-badge { position: absolute; top: -2px; right: -2px; width: 20px; height: 20px; background: var(--dlsu-danger); color: white; border-radius: 50%; font-size: 0.6rem; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+        .topbar-clock { font-size: 0.82rem; font-weight: 600; color: var(--dlsu-gray-600); font-variant-numeric: tabular-nums; padding: 0.35rem 0.75rem; background: var(--dlsu-gray-100); border-radius: 20px; white-space: nowrap; }
+        .profile-btn { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--dlsu-gray-200); background: var(--dlsu-green); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; font-weight: 700; }
+        .hamburger-btn { display: none; background: none; border: none; font-size: 1.3rem; color: var(--dlsu-gray-800); cursor: pointer; margin-right: 0.75rem; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; }
+        .page-body { padding: 1.75rem 2rem; max-width: 900px; margin: 0 auto; }
+
+        /* ══ FORM STYLES ══ */
+        .page-title { font-size: 1.4rem; font-weight: 800; color: var(--dlsu-green); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem; }
+        .page-title i { font-size: 1.2rem; }
+        .page-subtitle { font-size: 0.82rem; color: var(--dlsu-gray-400); margin-bottom: 1.75rem; }
+
+        /* Stepper */
+        .form-stepper { display: flex; align-items: center; gap: 0; margin-bottom: 2rem; }
+        .step { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+        .step-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; border: 2px solid var(--dlsu-gray-200); color: var(--dlsu-gray-400); background: white; transition: all 0.2s ease; flex-shrink: 0; }
+        .step-label { font-size: 0.75rem; font-weight: 600; color: var(--dlsu-gray-400); white-space: nowrap; transition: color 0.2s ease; }
+        .step.active .step-num { background: var(--dlsu-green); color: white; border-color: var(--dlsu-green); }
+        .step.active .step-label { color: var(--dlsu-gray-800); }
+        .step.done .step-num { background: var(--dlsu-green-light); color: var(--dlsu-green); border-color: var(--dlsu-green); }
+        .step.done .step-label { color: var(--dlsu-green); }
+        .step-line { flex: 1; height: 2px; background: var(--dlsu-gray-200); margin: 0 0.5rem; min-width: 20px; }
+        .step-line.done { background: var(--dlsu-green); }
+
+        /* Sections */
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+
+        .section-card {
+            background: white;
+            border-radius: 14px;
+            border: 1px solid var(--dlsu-gray-200);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .section-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--dlsu-gray-800);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-card-title i { color: var(--dlsu-green); font-size: 1rem; }
+
+        .section-card-desc {
+            font-size: 0.78rem;
+            color: var(--dlsu-gray-400);
+            margin-bottom: 1.15rem;
+        }
+
+        /* Form Controls */
+        .form-label-custom {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--dlsu-gray-800);
+            margin-bottom: 0.35rem;
+        }
+
+        .form-label-custom .required { color: var(--dlsu-danger); }
+
+        .form-control-custom {
+            width: 100%;
+            padding: 0.55rem 0.85rem;
+            border: 1px solid var(--dlsu-gray-200);
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-family: inherit;
+            color: var(--dlsu-gray-800);
+            background: white;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            outline: none;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--dlsu-green);
+            box-shadow: 0 0 0 3px var(--dlsu-green-light);
+        }
+
+        .form-control-custom::placeholder { color: var(--dlsu-gray-400); }
+
+        select.form-control-custom { cursor: pointer; }
+        textarea.form-control-custom { resize: vertical; min-height: 80px; }
+
+        .form-group { margin-bottom: 1rem; }
+
+        /* Course Row (dynamic add) */
+        .course-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr 80px 40px;
+            gap: 0.5rem;
+            align-items: end;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-row .remove-row {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: #fdeaea;
+            color: var(--dlsu-danger);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: background 0.2s ease;
+        }
+
+        .course-row .remove-row:hover { background: #f9c4c0; }
+
+        .course-row.course-header {
+            align-items: end;
+            margin-bottom: 0.35rem;
+        }
+
+        .course-row.course-header .form-label-custom {
+            margin-bottom: 0;
+        }
+
+        .add-row-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.85rem;
+            background: var(--dlsu-green-light);
+            color: var(--dlsu-green);
+            border: 1px dashed var(--dlsu-green);
+            border-radius: 8px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            margin-top: 0.5rem;
+        }
+
+        .add-row-btn:hover { background: #d0eadb; }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--dlsu-gray-200);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--dlsu-gray-50);
+        }
+
+        .upload-area:hover {
+            border-color: var(--dlsu-green);
+            background: var(--dlsu-green-light);
+        }
+
+        .upload-area i { font-size: 1.8rem; color: var(--dlsu-gray-400); margin-bottom: 0.5rem; }
+        .upload-area:hover i { color: var(--dlsu-green); }
+        .upload-area .upload-text { font-size: 0.82rem; color: var(--dlsu-gray-600); }
+        .upload-area .upload-hint { font-size: 0.7rem; color: var(--dlsu-gray-400); margin-top: 0.25rem; }
+
+        /* Radio Buttons styled */
+        .radio-card-group { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+
+        .radio-card {
+            flex: 1;
+            min-width: 200px;
+            padding: 1rem 1.15rem;
+            border: 2px solid var(--dlsu-gray-200);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .radio-card:hover { border-color: var(--dlsu-green-muted); }
+        .radio-card.selected { border-color: var(--dlsu-green); background: var(--dlsu-green-light); }
+
+        .radio-card .rc-title { font-size: 0.85rem; font-weight: 700; color: var(--dlsu-gray-800); display: flex; align-items: center; gap: 0.5rem; }
+        .radio-card .rc-title i { font-size: 1.1rem; color: var(--dlsu-green); }
+        .radio-card .rc-desc { font-size: 0.73rem; color: var(--dlsu-gray-400); margin-top: 0.3rem; }
+
+        /* Navigation Buttons */
+        .form-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--dlsu-gray-200);
+        }
+
+        .btn-nav {
+            padding: 0.55rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-nav.prev { background: white; border: 1px solid var(--dlsu-gray-200); color: var(--dlsu-gray-600); }
+        .btn-nav.prev:hover { border-color: var(--dlsu-gray-400); color: var(--dlsu-gray-800); }
+        .btn-nav.next { background: var(--dlsu-green); border: none; color: white; }
+        .btn-nav.next:hover { background: var(--dlsu-green-dark); }
+        .btn-nav.submit { background: var(--dlsu-green); border: none; color: white; padding: 0.6rem 2rem; }
+        .btn-nav.submit:hover { background: var(--dlsu-green-dark); }
+
+        /* Prereq validation inline */
+        .prereq-badge { font-size: 0.68rem; padding: 0.15rem 0.45rem; border-radius: 4px; font-weight: 600; }
+        .prereq-badge.ok { background: var(--dlsu-green-light); color: var(--dlsu-green); }
+        .prereq-badge.fail { background: #fdeaea; color: var(--dlsu-danger); }
+
+        /* Review Summary */
+        .review-table { width: 100%; font-size: 0.82rem; }
+        .review-table th { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--dlsu-gray-400); font-weight: 600; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--dlsu-gray-200); background: var(--dlsu-gray-50); }
+        .review-table td { padding: 0.55rem 0.85rem; border-bottom: 1px solid var(--dlsu-gray-100); }
+        .review-table .code { font-weight: 700; color: var(--dlsu-green); }
+
+        /* ══ RESPONSIVE ══ */
+        @media (max-width: 991.98px) {
+            .sidebar { width: 0; border-radius: 0; }
+            .sidebar.expanded { width: var(--sidebar-expanded); }
+            .sidebar-overlay.active { display: block; }
+            .main-content, .main-content.shifted { margin-left: 0; }
+            .hamburger-btn { display: block; }
+            .page-body { padding: 1.25rem 1rem; }
+            .topbar { padding: 0.85rem 1rem; }
+        }
+
+        @media (max-width: 575.98px) {
+            .course-row { grid-template-columns: 1fr 1fr; }
+            .form-stepper { flex-wrap: wrap; gap: 0.25rem; }
+            .step-label { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><div class="brand-text"><h6>DECEE Advising</h6><small>De La Salle University</small></div></div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a href="student-dashboard.html" class="nav-link"><i class="bi bi-grid-1x2-fill"></i><span class="link-text">Dashboard</span></a>
+            <a href="academic-history.html" class="nav-link"><i class="bi bi-journal-text"></i><span class="link-text">Academic History</span></a>
+            <a href="#" class="nav-link active"><i class="bi bi-file-earmark-check"></i><span class="link-text">Study Plan</span></a>
+            <a href="program-checklist.html" class="nav-link"><i class="bi bi-list-check"></i><span class="link-text">Program Checklist</span></a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Advising</div>
+            <a href="#" class="nav-link"><i class="bi bi-calendar-event"></i><span class="link-text">Appointments</span></a>
+            <a href="#" class="nav-link"><i class="bi bi-chat-left-text"></i><span class="link-text">Concerns</span></a>
+            <div class="nav-divider"></div>
+            <div class="nav-section-label">Account</div>
+            <a href="#" class="nav-link"><i class="bi bi-person"></i><span class="link-text">Profile</span></a>
+            <a href="#" class="nav-link"><i class="bi bi-gear"></i><span class="link-text">Settings</span></a>
+        </nav>
+        <div class="sidebar-footer"><div class="user-card"><div class="avatar">BM</div><div class="user-info"><div class="user-name">Bianca M.</div><div class="user-id">12012345 · BS-CpE</div></div></div></div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <header class="topbar">
+            <div class="d-flex align-items-center">
+                <button class="hamburger-btn" id="hamburgerBtn"><i class="bi bi-list"></i></button>
+                <div class="topbar-left"><h1>Study Plan Submission</h1><p>Term 9 · Academic Year 2025–2026</p></div>
+            </div>
+            <div class="topbar-right">
+                <span class="topbar-clock" id="topbarClock"></span>
+                <button class="topbar-circle-btn" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
+                <button class="topbar-circle-btn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
+                <div class="profile-btn">BM</div>
+            </div>
+        </header>
+
+        <div class="page-body">
+            <h2 class="page-title"><i class="bi bi-file-earmark-plus-fill"></i> Submit Study Plan</h2>
+            <p class="page-subtitle">Complete all sections below to submit your academic advising study plan for the upcoming term.</p>
+
+            <!-- Stepper -->
+            <div class="form-stepper">
+                <div class="step active" data-step="1"><div class="step-num">1</div><span class="step-label">Failed Courses</span></div>
+                <div class="step-line"></div>
+                <div class="step" data-step="2"><div class="step-num">2</div><span class="step-label">Current Subjects</span></div>
+                <div class="step-line"></div>
+                <div class="step" data-step="3"><div class="step-num">3</div><span class="step-label">Planned Courses</span></div>
+                <div class="step-line"></div>
+                <div class="step" data-step="4"><div class="step-num">4</div><span class="step-label">Uploads & Meeting</span></div>
+                <div class="step-line"></div>
+                <div class="step" data-step="5"><div class="step-num">5</div><span class="step-label">Review</span></div>
+            </div>
+
+            <!-- ══ STEP 1: Failed Courses ══ -->
+            <div class="form-section active" id="step1">
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-exclamation-circle"></i> Previously Failed Courses</div>
+                    <div class="section-card-desc">List any courses you failed in the previous term. Leave empty if none.</div>
+
+                    <!-- Column Headers -->
+                    <div class="course-row course-header" style="margin-bottom: 0.35rem;">
+                        <div class="form-label-custom">Course Code</div>
+                        <div class="form-label-custom">Course Name</div>
+                        <div class="form-label-custom">Units</div>
+                        <div></div>
+                    </div>
+
+                    <div id="failedCoursesContainer">
+                        <div class="course-row">
+                            <div><input type="text" class="form-control-custom" placeholder="e.g. CSMCPRO"></div>
+                            <div><input type="text" class="form-control-custom" placeholder="e.g. Microprocessors"></div>
+                            <div><input type="number" class="form-control-custom" placeholder="3"></div>
+                            <div><button class="remove-row"><i class="bi bi-x-lg"></i></button></div>
+                        </div>
+                    </div>
+                    <button class="add-row-btn" id="addFailedRow"><i class="bi bi-plus-circle"></i> Add Course</button>
+                </div>
+
+                <div class="form-nav">
+                    <div></div>
+                    <button class="btn-nav next" onclick="goStep(2)">Next <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ══ STEP 2: Current Enrolled Subjects ══ -->
+            <div class="form-section" id="step2">
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-book"></i> Current Enrolled Subjects</div>
+                    <div class="section-card-desc">List all subjects you are currently enrolled in this term, along with their prerequisites.</div>
+
+                    <!-- Column Headers -->
+                    <div class="course-row course-header" style="grid-template-columns: 1fr 2fr 80px 1fr 40px; margin-bottom: 0.35rem;">
+                        <div class="form-label-custom">Course Code</div>
+                        <div class="form-label-custom">Course Name</div>
+                        <div class="form-label-custom">Units</div>
+                        <div class="form-label-custom">Prerequisite</div>
+                        <div></div>
+                    </div>
+
+                    <div id="currentSubjectsContainer">
+                        <div class="course-row" style="grid-template-columns: 1fr 2fr 80px 1fr 40px;">
+                            <div><input type="text" class="form-control-custom" value="OPESSYS"></div>
+                            <div><input type="text" class="form-control-custom" value="Operating Systems"></div>
+                            <div><input type="number" class="form-control-custom" value="3"></div>
+                            <div><input type="text" class="form-control-custom" value="CCDATRCL"></div>
+                            <div><button class="remove-row"><i class="bi bi-x-lg"></i></button></div>
+                        </div>
+                        <div class="course-row" style="grid-template-columns: 1fr 2fr 80px 1fr 40px;">
+                            <div><input type="text" class="form-control-custom" value="NSSECU1"></div>
+                            <div><input type="text" class="form-control-custom" value="Network Security 1"></div>
+                            <div><input type="number" class="form-control-custom" value="3"></div>
+                            <div><input type="text" class="form-control-custom" value="CCNETCM"></div>
+                            <div><button class="remove-row"><i class="bi bi-x-lg"></i></button></div>
+                        </div>
+                    </div>
+                    <button class="add-row-btn" id="addCurrentRow"><i class="bi bi-plus-circle"></i> Add Subject</button>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn-nav prev" onclick="goStep(1)"><i class="bi bi-arrow-left"></i> Previous</button>
+                    <button class="btn-nav next" onclick="goStep(3)">Next <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ══ STEP 3: Planned Courses ══ -->
+            <div class="form-section" id="step3">
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-calendar-plus"></i> Planned Courses for Next Term</div>
+                    <div class="section-card-desc">List the courses you plan to enroll in for the upcoming term. Prerequisites will be validated automatically.</div>
+
+                    <!-- Column Headers -->
+                    <div class="course-row course-header" style="grid-template-columns: 1fr 2fr 80px 1fr 40px; margin-bottom: 0.35rem;">
+                        <div class="form-label-custom">Course Code</div>
+                        <div class="form-label-custom">Course Name</div>
+                        <div class="form-label-custom">Units</div>
+                        <div class="form-label-custom">Prerequisite</div>
+                        <div></div>
+                    </div>
+
+                    <div id="plannedCoursesContainer">
+                        <div class="course-row" style="grid-template-columns: 1fr 2fr 80px 1fr 40px;">
+                            <div><input type="text" class="form-control-custom" placeholder="e.g. EMBDSYS"></div>
+                            <div><input type="text" class="form-control-custom" placeholder="Course name"></div>
+                            <div><input type="number" class="form-control-custom" placeholder="3"></div>
+                            <div><input type="text" class="form-control-custom" placeholder="e.g. MICPROS"></div>
+                            <div><button class="remove-row"><i class="bi bi-x-lg"></i></button></div>
+                        </div>
+                    </div>
+                    <button class="add-row-btn" id="addPlannedRow"><i class="bi bi-plus-circle"></i> Add Course</button>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-chat-square-text"></i> Concerns (Optional)</div>
+                    <div class="section-card-desc">Share any academic concerns or questions for your adviser.</div>
+                    <textarea class="form-control-custom" placeholder="Type your concerns here..."></textarea>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn-nav prev" onclick="goStep(2)"><i class="bi bi-arrow-left"></i> Previous</button>
+                    <button class="btn-nav next" onclick="goStep(4)">Next <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ══ STEP 4: Uploads & Meeting ══ -->
+            <div class="form-section" id="step4">
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-cloud-arrow-up"></i> Upload Documents</div>
+                    <div class="section-card-desc">Upload the required screenshots and documents for your adviser's review.</div>
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Grade Report Screenshot <span class="required">*</span></label>
+                        <div class="upload-area" onclick="this.querySelector('input').click()">
+                            <input type="file" accept="image/*,.pdf" style="display:none;">
+                            <i class="bi bi-image"></i>
+                            <div class="upload-text">Click to upload or drag and drop</div>
+                            <div class="upload-hint">PNG, JPG, or PDF · Max 10MB</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-custom">Updated Academic Advising Booklet <span class="required">*</span></label>
+                        <div class="upload-area" onclick="this.querySelector('input').click()">
+                            <input type="file" accept=".pdf,.docx,.doc" style="display:none;">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <div class="upload-text">Click to upload or drag and drop</div>
+                            <div class="upload-hint">PDF or DOCX · Max 10MB</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-people"></i> Advising Appointment</div>
+                    <div class="section-card-desc">Would you like to schedule a meeting with your academic adviser?</div>
+
+                    <div class="radio-card-group">
+                        <div class="radio-card" onclick="selectRadio(this, 'waive')">
+                            <div class="rc-title"><i class="bi bi-check-circle"></i> Waive Appointment</div>
+                            <div class="rc-desc">I don't need to meet with my adviser this term.</div>
+                        </div>
+                        <div class="radio-card" onclick="selectRadio(this, 'schedule')">
+                            <div class="rc-title"><i class="bi bi-camera-video"></i> Schedule a Meeting</div>
+                            <div class="rc-desc">I'd like to book a Zoom or in-person meeting.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn-nav prev" onclick="goStep(3)"><i class="bi bi-arrow-left"></i> Previous</button>
+                    <button class="btn-nav next" onclick="goStep(5)">Review & Submit <i class="bi bi-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ══ STEP 5: Review & Submit ══ -->
+            <div class="form-section" id="step5">
+                <div class="section-card">
+                    <div class="section-card-title"><i class="bi bi-clipboard-check"></i> Review Your Submission</div>
+                    <div class="section-card-desc">Please review all information before submitting. Your adviser will review your study plan and provide feedback.</div>
+
+                    <h6 style="font-size: 0.82rem; font-weight: 700; margin: 1rem 0 0.5rem; color: var(--dlsu-gray-800);">Planned Courses for Next Term</h6>
+                    <table class="review-table">
+                        <thead><tr><th>Course Code</th><th>Course Name</th><th>Units</th><th>Prerequisite</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr><td class="code">EMBDSYS</td><td>Embedded Systems Lecture</td><td>3</td><td>MICPROS</td><td><span class="prereq-badge ok">✓ Passed</span></td></tr>
+                            <tr><td class="code">LBYCPM3</td><td>Embedded Systems Lab</td><td>1</td><td>EMBDSYS</td><td><span class="prereq-badge ok">✓ Co-req</span></td></tr>
+                            <tr><td class="code">CSYSARC</td><td>Computer Architecture</td><td>3</td><td>MICPROS</td><td><span class="prereq-badge ok">✓ Passed</span></td></tr>
+                            <tr><td class="code">REMETHS</td><td>Methods of Research</td><td>3</td><td>ENGDATA</td><td><span class="prereq-badge ok">✓ Passed</span></td></tr>
+                        </tbody>
+                    </table>
+
+                    <h6 style="font-size: 0.82rem; font-weight: 700; margin: 1.25rem 0 0.5rem; color: var(--dlsu-gray-800);">Summary</h6>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; font-size: 0.82rem;">
+                        <div style="padding: 0.6rem 0.85rem; background: var(--dlsu-gray-50); border-radius: 8px;"><span style="color: var(--dlsu-gray-400); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Total Planned Units</span><div style="font-weight: 700; font-size: 1.1rem;">10</div></div>
+                        <div style="padding: 0.6rem 0.85rem; background: var(--dlsu-gray-50); border-radius: 8px;"><span style="color: var(--dlsu-gray-400); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Prerequisite Violations</span><div style="font-weight: 700; font-size: 1.1rem; color: var(--dlsu-green);">0</div></div>
+                        <div style="padding: 0.6rem 0.85rem; background: var(--dlsu-gray-50); border-radius: 8px;"><span style="color: var(--dlsu-gray-400); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Failed Units (Accumulated)</span><div style="font-weight: 700; font-size: 1.1rem;">6</div></div>
+                        <div style="padding: 0.6rem 0.85rem; background: var(--dlsu-gray-50); border-radius: 8px;"><span style="color: var(--dlsu-gray-400); font-size: 0.7rem; font-weight: 600; text-transform: uppercase;">Advising Meeting</span><div style="font-weight: 700; font-size: 1.1rem;">Waived</div></div>
+                    </div>
+                </div>
+
+                <div class="form-nav">
+                    <button class="btn-nav prev" onclick="goStep(4)"><i class="bi bi-arrow-left"></i> Previous</button>
+                    <button class="btn-nav submit" onclick="alert('Study plan submitted! Your adviser will review it shortly.')"><i class="bi bi-send-fill"></i> Submit Study Plan</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar
+        const sidebar = document.getElementById('sidebar'), mainContent = document.getElementById('mainContent'), overlay = document.getElementById('sidebarOverlay'), hamburger = document.getElementById('hamburgerBtn');
+        const isMobile = () => window.innerWidth < 992;
+        sidebar.addEventListener('mouseenter', () => { if (!isMobile()) { sidebar.classList.add('expanded'); mainContent.classList.add('shifted'); } });
+        sidebar.addEventListener('mouseleave', () => { if (!isMobile()) { sidebar.classList.remove('expanded'); mainContent.classList.remove('shifted'); } });
+        hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
+        overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
+
+        // Clock
+        const clockEl = document.getElementById('topbarClock');
+        function updateClock() { const n = new Date(); clockEl.textContent = n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) + ' · ' + String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0'); }
+        updateClock(); setInterval(updateClock, 1000);
+
+        // Stepper
+        let currentStep = 1;
+        function goStep(n) {
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + n).classList.add('active');
+            document.querySelectorAll('.step').forEach(s => {
+                const sn = parseInt(s.dataset.step);
+                s.classList.remove('active', 'done');
+                if (sn === n) s.classList.add('active');
+                else if (sn < n) s.classList.add('done');
+            });
+            document.querySelectorAll('.step-line').forEach((line, i) => {
+                line.classList.toggle('done', i < n - 1);
+            });
+            currentStep = n;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Add Row Helpers
+        function addRow(containerId, cols) {
+            const container = document.getElementById(containerId);
+            const row = document.createElement('div');
+            row.className = 'course-row';
+            row.style.gridTemplateColumns = cols;
+            const hasPrereq = cols.includes('1fr 40px') && cols.split(' ').length === 5;
+            if (hasPrereq) {
+                row.innerHTML = '<div><input type="text" class="form-control-custom" placeholder="Course code"></div><div><input type="text" class="form-control-custom" placeholder="Course name"></div><div><input type="number" class="form-control-custom" placeholder="3"></div><div><input type="text" class="form-control-custom" placeholder="Prerequisite"></div><div><button class="remove-row" onclick="this.closest(\'.course-row\').remove()"><i class="bi bi-x-lg"></i></button></div>';
+            } else {
+                row.innerHTML = '<div><input type="text" class="form-control-custom" placeholder="Course code"></div><div><input type="text" class="form-control-custom" placeholder="Course name"></div><div><input type="number" class="form-control-custom" placeholder="3"></div><div><button class="remove-row" onclick="this.closest(\'.course-row\').remove()"><i class="bi bi-x-lg"></i></button></div>';
+            }
+            container.appendChild(row);
+        }
+
+        document.getElementById('addFailedRow').addEventListener('click', () => addRow('failedCoursesContainer', '1fr 2fr 80px 40px'));
+        document.getElementById('addCurrentRow').addEventListener('click', () => addRow('currentSubjectsContainer', '1fr 2fr 80px 1fr 40px'));
+        document.getElementById('addPlannedRow').addEventListener('click', () => addRow('plannedCoursesContainer', '1fr 2fr 80px 1fr 40px'));
+
+        // Remove row
+        document.addEventListener('click', e => { if (e.target.closest('.remove-row')) e.target.closest('.course-row').remove(); });
+
+        // Radio Cards
+        function selectRadio(el, value) {
+            el.closest('.radio-card-group').querySelectorAll('.radio-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+    </script>
+</body>
+</html>
