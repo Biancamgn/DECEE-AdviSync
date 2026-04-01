@@ -267,30 +267,64 @@ document.addEventListener('DOMContentLoaded', async () => {
     let clearanceStudents = [];
 
     async function fetchClearanceStudents() {
-        const { data, error } = await supabaseClient
-            .from('students')
-            .select('*, profiles!inner(school_id, first_name, last_name, status)')
-            .eq('profiles.status', 'active');
+        try {
+            // Fetch student profiles separately (same pattern as admin-advising.js)
+            const { data: profileData, error: profileError } = await supabaseClient
+                .from('profiles')
+                .select('id, school_id, first_name, last_name, status')
+                .eq('role', 'student')
+                .eq('status', 'active');
 
-        if (!error && data) {
-            clearanceStudents = data.map(s => ({
-                uuid: s.id,
-                id: s.profiles.school_id,
-                name: `${s.profiles.first_name} ${s.profiles.last_name}`,
-                program: s.program,
-                year: s.year_level,
-                cleared: s.is_cleared || false
-            }));
+            if (profileError) {
+                console.error('Error fetching student profiles for clearance:', profileError);
+                return;
+            }
+
+            // Fetch student details
+            const { data: studentData, error: studentError } = await supabaseClient
+                .from('students')
+                .select('id, program, year_level, is_cleared, failed_units');
+
+            if (studentError) {
+                console.error('Error fetching student details for clearance:', studentError);
+                return;
+            }
+
+            // Build lookup map
+            const studentMap = {};
+            (studentData || []).forEach(s => { studentMap[s.id] = s; });
+
+            // Merge profile + student data
+            clearanceStudents = (profileData || []).map(p => {
+                const d = studentMap[p.id] || {};
+                return {
+                    uuid: p.id,
+                    id: p.school_id,
+                    name: `${p.first_name} ${p.last_name}`,
+                    program: d.program || 'BSCpE',
+                    year: d.year_level || 1,
+                    cleared: d.is_cleared || false,
+                    failedUnits: Number(d.failed_units || 0)
+                };
+            });
+
+            console.log(`[Bulk] Loaded ${clearanceStudents.length} active students for clearance`);
+        } catch (e) {
+            console.error('fetchClearanceStudents failed:', e);
         }
     }
 
     await fetchClearanceStudents();
 
     function updateClearanceStats() {
+        const total = clearanceStudents.length;
         const cleared = clearanceStudents.filter(s => s.cleared).length;
-        const notCleared = clearanceStudents.filter(s => !s.cleared).length;
+        const notCleared = total - cleared;
+        const atRisk = clearanceStudents.filter(s => s.failedUnits >= 15).length;
+        document.getElementById('clearTotalStudents').textContent = total.toLocaleString();
         document.getElementById('clearCleared').textContent = cleared.toLocaleString();
         document.getElementById('clearNotCleared').textContent = notCleared.toLocaleString();
+        document.getElementById('clearAtRisk').textContent = atRisk.toLocaleString();
     }
 
     function updateClearanceCount() {
@@ -430,26 +464,54 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ═══════════════════════════════════════════════════════════════════════
     // TAB 3: TARGETED MASS EMAIL — Supabase
     // ═══════════════════════════════════════════════════════════════════════
-    // Fetch dynamic recipient counts
+    // Fetch dynamic recipient counts from base tables
     let recipientCounts = {};
     try {
-        const { data: stats } = await supabaseClient.from('dashboard_stats').select('*').single();
-        if (stats) {
-            recipientCounts = {
-                'all-professors': await supabaseClient.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'professor').then(r => r.count || 0),
-                'all-students': stats.total_students || 0,
-                'bscpe-students': stats.bscpe_count || 0,
-                'bsece-students': stats.bsece_count || 0,
-                'at-risk': stats.at_risk || 0,
-                'not-cleared': stats.not_cleared || 0,
-                'unassigned': await supabaseClient.from('students').select('*', { count: 'exact', head: true }).is('adviser_id', null).then(r => r.count || 0),
-            };
-        }
+        // Count active students by querying base tables
+        const totalStudents = clearanceStudents.length;
+        const bscpeStudents = clearanceStudents.filter(s => s.program === 'BSCpE').length;
+        const bseceStudents = clearanceStudents.filter(s => s.program === 'BSECE').length;
+        const atRiskStudents = clearanceStudents.filter(s => s.failedUnits >= 15).length;
+        const notClearedStudents = clearanceStudents.filter(s => !s.cleared).length;
+
+        // Count advisers
+        const { count: adviserCount } = await supabaseClient
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+            .eq('role', 'adviser')
+            .eq('status', 'active');
+
+        // Count unassigned students
+        const { count: unassignedCount } = await supabaseClient
+            .from('students')
+            .select('*', { count: 'exact', head: true })
+            .is('adviser_id', null);
+
+        // Count students by year level
+        const year1 = clearanceStudents.filter(s => s.year === 1).length;
+        const year2 = clearanceStudents.filter(s => s.year === 2).length;
+        const year3 = clearanceStudents.filter(s => s.year === 3).length;
+        const year4 = clearanceStudents.filter(s => s.year === 4).length;
+
+        recipientCounts = {
+            'all-professors': adviserCount || 0,
+            'all-students': totalStudents,
+            'bscpe-students': bscpeStudents,
+            'bsece-students': bseceStudents,
+            'at-risk': atRiskStudents,
+            'not-cleared': notClearedStudents,
+            'unassigned': unassignedCount || 0,
+            'year-1': year1,
+            'year-2': year2,
+            'year-3': year3,
+            'year-4': year4,
+        };
     } catch (e) {
-        console.warn('Recipient counts fetch failed:', e);
+        console.warn('Recipient counts calculation failed:', e);
         recipientCounts = {
             'all-professors': 0, 'all-students': 0, 'bscpe-students': 0,
             'bsece-students': 0, 'at-risk': 0, 'not-cleared': 0, 'unassigned': 0,
+            'year-1': 0, 'year-2': 0, 'year-3': 0, 'year-4': 0,
         };
     }
 
@@ -548,6 +610,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'at-risk': 'At-Risk Students',
                 'not-cleared': 'Not Cleared Students',
                 'unassigned': 'Unassigned Students',
+                'year-1': '1st Year Students',
+                'year-2': '2nd Year Students',
+                'year-3': '3rd Year Students',
+                'year-4': '4th Year Students',
             };
             emailLogs = data.map(log => {
                 const date = new Date(log.created_at);
@@ -578,6 +644,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             'at-risk': 'At-Risk Students',
             'not-cleared': 'Not Cleared Students',
             'unassigned': 'Unassigned Students',
+            'year-1': '1st Year Students',
+            'year-2': '2nd Year Students',
+            'year-3': '3rd Year Students',
+            'year-4': '4th Year Students',
         };
         emailLogs.unshift({ date: `${now.toLocaleDateString('en-US', options)} · ${time}`, subject, group: groupMap[recipientKey] || recipientKey, count, status: 'delivered' });
         renderEmailLogs();
