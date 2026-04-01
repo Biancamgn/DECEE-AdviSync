@@ -1,13 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════════
-// AdviSync — Authentication & Route Guards
-// ═══════════════════════════════════════════════════════════════════════
-
-/**
- * Check if user is authenticated and has an allowed role.
- * Redirects to login if not authenticated or unauthorized.
- * @param {string[]} allowedRoles - e.g. ['admin'], ['admin','professor']
- * @returns {Promise<object|null>} The user's profile or null
- */
 async function requireAuth(allowedRoles = []) {
     try {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
@@ -25,7 +15,6 @@ async function requireAuth(allowedRoles = []) {
             .single();
 
         if (profileError || !profile) {
-            // Session exists but profile lookup failed — allow fallback
             console.warn('Profile lookup failed. Allowing fallback access.');
             return { id: session.user.id, role: 'admin', school_id: 'ADMIN001', first_name: 'Admin', last_name: 'User', email: session.user.email, status: 'active' };
         }
@@ -37,30 +26,20 @@ async function requireAuth(allowedRoles = []) {
 
         return profile;
     } catch (err) {
-        // Supabase completely unavailable — allow fallback
         console.warn('Auth check failed. Allowing fallback access.', err);
         return { id: 'demo', role: 'admin', school_id: 'ADMIN001', first_name: 'Demo', last_name: 'User', email: 'demo@dlsu.edu.ph', status: 'active' };
     }
 }
 
-/**
- * Sign out and redirect to login.
- */
 async function signOut() {
     await supabaseClient.auth.signOut();
     window.location.href = 'index.html';
 }
 
-/**
- * Handle login form submission.
- * Uses ID Number to look up the user's email via secure RPC,
- * then authenticates via Supabase Auth.
- */
 function initLoginForm() {
     const form = document.getElementById('loginForm');
     if (!form) return;
 
-    // ── Password Toggle ──
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     const toggleIcon = document.getElementById('toggleIcon');
@@ -74,7 +53,6 @@ function initLoginForm() {
         });
     }
 
-    // ── Login Submit ──
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -82,11 +60,9 @@ function initLoginForm() {
         const password = document.getElementById('password').value;
         const errorEl = document.getElementById('errorMessage');
 
-        // Clear previous error
         errorEl.classList.add('d-none');
         errorEl.textContent = '';
 
-        // Disable button while loading
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
@@ -95,7 +71,6 @@ function initLoginForm() {
         try {
             let loginSuccess = false;
 
-            // ── Attempt 1: Supabase Authentication ──
             if (typeof supabaseClient !== 'undefined') {
                 try {
                     const { data: email, error: rpcError } = await supabaseClient.rpc('get_email_by_school_id', { p_school_id: idNumber });
@@ -127,7 +102,6 @@ function initLoginForm() {
                 }
             }
 
-            // ── Attempt 2: Fallback — ID-format-based routing ──
             if (!loginSuccess) {
                 const id = idNumber.toLowerCase();
                 let role = '';
@@ -162,7 +136,6 @@ function initLoginForm() {
         }
     });
 
-    // ── Forgot Password ──
     const forgotPasswordForm = document.getElementById('forgotPasswordForm');
     const resetAlert = document.getElementById('resetAlert');
 
@@ -179,7 +152,6 @@ function initLoginForm() {
     }
 }
 
-// Auto-init login form if on the login page
 document.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('loginForm')) {
         initLoginForm();
