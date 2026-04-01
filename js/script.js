@@ -38,4 +38,4 @@ const hour = new Date().getHours();
 let greeting = 'Good morning';
 if (hour >= 12 && hour < 18) greeting = 'Good afternoon';
 else if (hour >= 18) greeting = 'Good evening';
-greetingEl.textContent = `${greeting}, Bianca!`;
+if (greetingEl) greetingEl.textContent = `${greeting}, Bianca!`;

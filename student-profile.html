@@ -39,8 +39,25 @@
             </div>
             <div class="topbar-right">
                 <button class="topbar-circle-btn" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
-                <button class="topbar-circle-btn"><i class="bi bi-bell-fill"></i></button>
-                <div class="profile-btn">BM</div>
+                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i></button>
+                <div class="profile-wrapper" id="profileWrapper">
+                    <div class="d-flex align-items-center gap-1" style="cursor:pointer;" id="profileToggle">
+                        <div class="profile-btn" title="Profile">BM</div>
+                        <i class="bi bi-chevron-down profile-chevron"></i>
+                    </div>
+                    <div class="profile-dropdown">
+                        <div class="dropdown-header"><div class="dropdown-avatar">BM</div><div><div class="dropdown-name">Bianca Magsino</div><div class="dropdown-role">Student</div></div></div>
+                        <div class="dropdown-info">
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">ID Number</span><span class="dropdown-info-value">12012345</span></div>
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">Program</span><span class="dropdown-info-value">BS-CpE</span></div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i> Profile</a>
+                        <a href="student-settings.html" class="dropdown-action"><i class="bi bi-gear"></i> Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-action logout" onclick="window.location.href='index.html'"><i class="bi bi-box-arrow-left"></i> Sign out</button>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -181,5 +198,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/student-profile.js"></script>
+    <script src="js/notifications.js"></script>
 </body>
 </html>

@@ -1573,6 +1573,48 @@ body.dark-mode .profile-dropdown a:hover {
     color: var(--dlsu-green-muted);
 }
 
+body.dark-mode .dropdown-header {
+    background: #1a1e24;
+    border-color: #3b4049;
+}
+
+body.dark-mode .dropdown-header .dropdown-name {
+    color: #d1d5db;
+}
+
+body.dark-mode .dropdown-info-row {
+    border-color: #3b4049;
+}
+
+body.dark-mode .dropdown-info-label {
+    color: #6b7280;
+}
+
+body.dark-mode .dropdown-info-value {
+    color: #d1d5db;
+}
+
+body.dark-mode .dropdown-divider {
+    background: #3b4049;
+}
+
+body.dark-mode .dropdown-action {
+    color: #9ca3af;
+}
+
+body.dark-mode .dropdown-action:hover {
+    background: #2d323c;
+    color: #d1d5db;
+}
+
+body.dark-mode .dropdown-action.logout {
+    color: #ef4444;
+}
+
+body.dark-mode .dropdown-action.logout:hover {
+    background: #3b1a1a;
+}
+
 /* Dark Mode: User Management */
 body.dark-mode .user-tabs {
     border-bottom-color: #2d323c;

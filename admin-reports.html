@@ -57,6 +57,17 @@
                 <i class="bi bi-gear-wide-connected"></i>
                 <span class="link-text">Bulk Tools</span>
             </a>
+
+            <div class="nav-section-label">Account</div>
+            <div class="nav-divider"></div>
+            <a href="admin-profile.html" class="nav-link">
+                <i class="bi bi-person"></i>
+                <span class="link-text">Profile</span>
+            </a>
+            <a href="admin-settings.html" class="nav-link">
+                <i class="bi bi-gear"></i>
+                <span class="link-text">Settings</span>
+            </a>
         </div>
 
         <div class="sidebar-footer">
@@ -89,7 +100,7 @@
                 <button class="topbar-btn" id="darkModeBtn" title="Toggle Dark Mode">
                     <i class="bi bi-moon-fill"></i>
                 </button>
-                <button class="topbar-btn" title="Notifications">
+                <button class="topbar-btn" title="Notifications" id="notifBtn">
                     <i class="bi bi-bell"></i>
                     <span class="notif-dot"></span>
                 </button>
@@ -102,9 +113,16 @@
                         </div>
                     </div>
                     <div class="profile-dropdown">
-                        <a href="#">Settings</a>
-                        <a href="#">Profile</a>
-                        <a href="index.html" class="danger">Sign out</a>
+                        <div class="dropdown-header"><div class="dropdown-avatar">AD</div><div><div class="dropdown-name">System Admin</div><div class="dropdown-role">Administrator</div></div></div>
+                        <div class="dropdown-info">
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">Department</span><span class="dropdown-info-value">DECEE</span></div>
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">College</span><span class="dropdown-info-value">GCOE</span></div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="admin-profile.html" class="dropdown-action"><i class="bi bi-person"></i> Profile</a>
+                        <a href="admin-settings.html" class="dropdown-action"><i class="bi bi-gear"></i> Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-action logout" onclick="window.location.href='index.html'"><i class="bi bi-box-arrow-left"></i> Sign out</button>
                     </div>
                 </div>
             </div>
@@ -383,5 +401,6 @@
     <script src="js/supabase-config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/admin-reports.js"></script>
+    <script src="js/notifications.js"></script>
 </body>
 </html>
