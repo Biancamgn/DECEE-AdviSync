@@ -7,121 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --dlsu-green: #00703C; --dlsu-green-dark: #005a30; --dlsu-green-light: #e8f5ee;
-            --dlsu-white: #ffffff; --dlsu-gray-50: #f8faf9; --dlsu-gray-100: #f0f4f2;
-            --dlsu-gray-200: #e2e8e5; --dlsu-gray-400: #94a89c; --dlsu-gray-600: #5a6b60;
-            --dlsu-gray-800: #2d3a32; --dlsu-warning: #e6a817; --dlsu-danger: #c0392b;
-            --dlsu-info: #2980b9; --sidebar-collapsed: 70px; --sidebar-expanded: 250px;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--dlsu-gray-50); color: var(--dlsu-gray-800); min-height: 100vh; }
-
-        /* ══ SIDEBAR ══ */
-        .sidebar { position: fixed; top: 0; left: 0; width: var(--sidebar-collapsed); height: 100vh; background: var(--dlsu-green); color: white; display: flex; flex-direction: column; z-index: 1000; transition: width 0.3s cubic-bezier(0.4,0,0.2,1); overflow: hidden; border-radius: 0 18px 18px 0; }
-        .sidebar.expanded { width: var(--sidebar-expanded); }
-        .sidebar-brand { display: flex; align-items: center; justify-content: center; padding: 1.2rem 0; border-bottom: 1px solid rgba(255,255,255,0.12); min-height: 68px; overflow: hidden; }
-        .sidebar-brand .brand-icon { width: 38px; height: 38px; min-width: 38px; background: rgba(255,255,255,0.18); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
-        .sidebar-brand .brand-text { opacity: 0; white-space: nowrap; margin-left: 0.75rem; transition: opacity 0.15s ease; width: 0; overflow: hidden; }
-        .sidebar.expanded .sidebar-brand { justify-content: flex-start; padding-left: 1rem; }
-        .sidebar.expanded .brand-text { opacity: 1; width: auto; }
-        .sidebar-brand h6 { font-size: 0.88rem; font-weight: 700; margin: 0; }
-        .sidebar-brand small { font-size: 0.63rem; opacity: 0.6; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
-        .sidebar-nav { flex: 1; padding: 0.6rem 0; overflow-y: auto; overflow-x: hidden; }
-        .nav-section-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; white-space: nowrap; color: rgba(255,255,255,0.4); max-height: 0; opacity: 0; overflow: hidden; padding: 0 1.1rem; transition: max-height 0.3s ease, opacity 0.2s ease, padding 0.3s ease; }
-        .sidebar.expanded .nav-section-label { max-height: 30px; opacity: 1; padding: 0.7rem 1.1rem 0.3rem; }
-        .nav-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 0.4rem 1.1rem; }
-        .sidebar.expanded .nav-divider { opacity: 0; margin: 0; height: 0; }
-        .sidebar-nav .nav-link { color: rgba(255,255,255,0.65); display: flex; align-items: center; justify-content: center; padding: 0.65rem 0; margin: 2px 0.5rem; border-radius: 10px; font-size: 0.82rem; font-weight: 500; white-space: nowrap; position: relative; transition: all 0.2s ease; text-decoration: none; }
-        .sidebar-nav .nav-link i { font-size: 1.2rem; width: 22px; min-width: 22px; text-align: center; transition: margin 0.3s cubic-bezier(0.4,0,0.2,1); }
-        .sidebar-nav .nav-link .link-text { opacity: 0; width: 0; overflow: hidden; margin-left: 0; transition: opacity 0.15s ease, width 0.3s ease, margin 0.3s ease; }
-        .sidebar.expanded .nav-link { justify-content: flex-start; padding: 0.55rem 0.75rem; }
-        .sidebar.expanded .nav-link i { margin-left: 0.35rem; }
-        .sidebar.expanded .nav-link .link-text { opacity: 1; width: auto; margin-left: 0.75rem; }
-        .sidebar-nav .nav-link:hover { color: white; background: rgba(255,255,255,0.12); }
-        .sidebar-nav .nav-link.active { color: white; background: rgba(255,255,255,0.18); font-weight: 600; }
-        .sidebar-nav .nav-link.active::before { content: ''; position: absolute; left: -0.5rem; top: 50%; transform: translateY(-50%); width: 3px; height: 20px; background: white; border-radius: 0 3px 3px 0; }
-        .sidebar-footer { padding: 0.85rem 0; border-top: 1px solid rgba(255,255,255,0.12); display: flex; justify-content: center; }
-        .sidebar.expanded .sidebar-footer { justify-content: flex-start; padding-left: 1rem; }
-        .sidebar-footer .user-card { display: flex; align-items: center; gap: 0.65rem; }
-        .sidebar-footer .avatar { width: 34px; height: 34px; min-width: 34px; border-radius: 8px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.75rem; }
-        .sidebar-footer .user-info { opacity: 0; white-space: nowrap; width: 0; overflow: hidden; transition: opacity 0.15s ease; }
-        .sidebar.expanded .sidebar-footer .user-info { opacity: 1; width: auto; }
-        .sidebar-footer .user-name { font-size: 0.78rem; font-weight: 600; }
-        .sidebar-footer .user-id { font-size: 0.65rem; opacity: 0.6; }
-
-        /* ══ MAIN ══ */
-        .main-content { margin-left: var(--sidebar-collapsed); min-height: 100vh; transition: margin-left 0.3s cubic-bezier(0.4,0,0.2,1); }
-        .main-content.shifted { margin-left: var(--sidebar-expanded); }
-        .topbar { background: white; padding: 0.75rem 2rem; border-bottom: 1px solid var(--dlsu-gray-200); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-        .topbar-left h1 { font-size: 1.15rem; font-weight: 700; margin: 0; }
-        .topbar-left p { font-size: 0.78rem; color: var(--dlsu-gray-400); margin: 0; }
-        .topbar-right { display: flex; align-items: center; gap: 0.75rem; }
-        .topbar-circle-btn { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--dlsu-gray-200); background: white; display: flex; align-items: center; justify-content: center; color: var(--dlsu-gray-600); cursor: pointer; position: relative; transition: all 0.2s ease; }
-        .topbar-circle-btn:hover { background: var(--dlsu-gray-100); color: var(--dlsu-green); }
-        .topbar-circle-btn i { font-size: 1.1rem; }
-        .profile-btn { width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--dlsu-gray-200); background: var(--dlsu-green); color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; font-weight: 700; }
-        .hamburger-btn { display: none; background: none; border: none; font-size: 1.3rem; color: var(--dlsu-gray-800); cursor: pointer; margin-right: 0.75rem; }
-        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 999; }
-        .page-body { padding: 1.75rem 2rem; max-width: 900px; margin: 0 auto; }
-
-        /* ══ PROFILE PAGE ══ */
-        .profile-hero { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem; }
-        .profile-avatar-lg { width: 90px; height: 90px; border-radius: 50%; background: var(--dlsu-green); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; flex-shrink: 0; border: 4px solid var(--dlsu-green-light); }
-        .profile-hero-info h2 { font-size: 1.4rem; font-weight: 800; color: var(--dlsu-gray-800); margin-bottom: 0.15rem; }
-        .profile-hero-info .role-badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 20px; background: var(--dlsu-green-light); color: var(--dlsu-green); text-transform: uppercase; letter-spacing: 0.03em; }
-        .profile-hero-info .id-text { font-size: 0.82rem; color: var(--dlsu-gray-400); margin-top: 0.25rem; }
-
-        .section-card { background: white; border-radius: 14px; border: 1px solid var(--dlsu-gray-200); padding: 1.5rem; margin-bottom: 1.25rem; }
-        .section-card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-        .section-card-title i { color: var(--dlsu-green); font-size: 1rem; }
-
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.85rem; }
-        .form-row.single { grid-template-columns: 1fr; }
-        .form-group { display: flex; flex-direction: column; }
-        .form-label-custom { font-size: 0.75rem; font-weight: 600; color: var(--dlsu-gray-600); margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.03em; }
-        .form-control-custom { width: 100%; padding: 0.55rem 0.85rem; border: 1px solid var(--dlsu-gray-200); border-radius: 8px; font-size: 0.82rem; font-family: inherit; color: var(--dlsu-gray-800); background: white; transition: border-color 0.2s ease, box-shadow 0.2s ease; outline: none; }
-        .form-control-custom:focus { border-color: var(--dlsu-green); box-shadow: 0 0 0 3px var(--dlsu-green-light); }
-        .form-control-custom:disabled { background: var(--dlsu-gray-50); color: var(--dlsu-gray-400); cursor: not-allowed; }
-        select.form-control-custom { cursor: pointer; }
-
-        .btn-save { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.5rem; background: var(--dlsu-green); color: white; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: background 0.2s ease; }
-        .btn-save:hover { background: var(--dlsu-green-dark); }
-        .btn-secondary { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 1.25rem; background: white; color: var(--dlsu-gray-600); border: 1px solid var(--dlsu-gray-200); border-radius: 10px; font-size: 0.85rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s ease; }
-        .btn-secondary:hover { border-color: var(--dlsu-gray-400); color: var(--dlsu-gray-800); }
-        .btn-group-right { display: flex; gap: 0.65rem; justify-content: flex-end; margin-top: 1.25rem; }
-
-        /* Toast */
-        .toast-notification { position: fixed; bottom: 2rem; right: 2rem; background: var(--dlsu-green); color: white; padding: 0.85rem 1.5rem; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: none; align-items: center; gap: 0.5rem; z-index: 9999; box-shadow: 0 8px 30px rgba(0,112,60,0.3); animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        @media (max-width: 991.98px) {
-            .sidebar { width: 0; border-radius: 0; } .sidebar.expanded { width: var(--sidebar-expanded); }
-            .sidebar-overlay.active { display: block; } .main-content, .main-content.shifted { margin-left: 0; }
-            .hamburger-btn { display: block; } .page-body { padding: 1.25rem 1rem; } .topbar { padding: 0.85rem 1rem; }
-        }
-        @media (max-width: 575.98px) { .form-row { grid-template-columns: 1fr; } .profile-hero { flex-direction: column; text-align: center; } }
-
-        /* ══ DARK MODE ══ */
-        body.dark-mode { background-color: #1a1f1c; color: #d4ddd7; }
-        body.dark-mode .topbar { background: #232a25; border-bottom-color: #2f3832; }
-        body.dark-mode .topbar-left h1 { color: #d4ddd7; }
-        body.dark-mode .topbar-left p { color: #6b7e70; }
-        body.dark-mode .topbar-circle-btn { background: #2a332c; border-color: #3a4a3e; color: #94a89c; }
-        body.dark-mode .topbar-circle-btn:hover { background: #354038; color: #b8ccbe; }
-        body.dark-mode .sidebar { background: #0d3d1f; }
-        body.dark-mode .main-content, body.dark-mode .page-body { background: #1a1f1c; }
-        body.dark-mode .section-card { background: #232a25; border-color: #2f3832; color: #d4ddd7; }
-        body.dark-mode .section-card-title { color: #d4ddd7; }
-        body.dark-mode .form-label-custom { color: #6b7e70; }
-        body.dark-mode .form-control-custom { background: #2a332c; border-color: #3a4a3e; color: #d4ddd7; }
-        body.dark-mode .form-control-custom:disabled { background: #1a1f1c; color: #5a6b60; }
-        body.dark-mode .profile-hero-info h2 { color: #d4ddd7; }
-        body.dark-mode .profile-hero-info .id-text { color: #6b7e70; }
-        body.dark-mode .btn-secondary { background: #2a332c; border-color: #3a4a3e; color: #94a89c; }
-        body.dark-mode .profile-avatar-lg { border-color: #0d3d1f; }
-    </style>
+    <link href="css/shared.css" rel="stylesheet">
+    <link href="css/student-profile.css" rel="stylesheet">
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -154,7 +41,26 @@
             <div class="topbar-right">
                 <button class="topbar-circle-btn" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
                 <button class="topbar-circle-btn"><i class="bi bi-bell-fill"></i></button>
-                <div class="profile-btn">BM</div>
+                <div class="profile-wrapper" id="profileWrapper">
+                    <div class="d-flex align-items-center gap-1" style="cursor:pointer;" id="profileToggle">
+                        <div class="profile-btn">BM</div>
+                        <i class="bi bi-chevron-down profile-chevron"></i>
+                    </div>
+                    <div class="profile-dropdown">
+                        <div class="dropdown-header">
+                            <div class="dropdown-avatar">BM</div>
+                            <div><div class="dropdown-name">Bianca Magsino</div><div class="dropdown-role">Student</div></div>
+                        </div>
+                        <div class="dropdown-info">
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">ID Number</span><span class="dropdown-info-value">12012345</span></div>
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">Program</span><span class="dropdown-info-value">BS-CpE</span></div>
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">Term</span><span class="dropdown-info-value">8 of 12</span></div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i>View Profile</a>
+                        <a href="student-settings.html" class="dropdown-action"><i class="bi bi-gear"></i>Settings</a>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -175,31 +81,31 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label-custom">First Name</label>
-                        <input type="text" class="form-control-custom" value="Bianca">
+                        <input type="text" class="form-control-custom" value="Bianca" disabled>
                     </div>
                     <div class="form-group">
                         <label class="form-label-custom">Last Name</label>
-                        <input type="text" class="form-control-custom" value="Magsino">
+                        <input type="text" class="form-control-custom" value="Magsino" disabled>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label-custom">Email Address</label>
-                        <input type="email" class="form-control-custom" value="bianca_magsino@dlsu.edu.ph">
+                        <input type="email" class="form-control-custom" value="bianca_magsino@dlsu.edu.ph" disabled>
                     </div>
                     <div class="form-group">
                         <label class="form-label-custom">Phone Number</label>
-                        <input type="tel" class="form-control-custom" value="+63 917 123 4567">
+                        <input type="tel" class="form-control-custom" value="+63 917 123 4567" disabled>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label-custom">Date of Birth</label>
-                        <input type="date" class="form-control-custom" value="2004-06-15">
+                        <input type="date" class="form-control-custom" value="2004-06-15" disabled>
                     </div>
                     <div class="form-group">
                         <label class="form-label-custom">Gender</label>
-                        <select class="form-control-custom">
+                        <select class="form-control-custom" disabled>
                             <option value="female" selected>Female</option>
                             <option value="male">Male</option>
                             <option value="other">Other</option>
@@ -260,11 +166,11 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label-custom">Contact Name</label>
-                        <input type="text" class="form-control-custom" value="Maria Magsino">
+                        <input type="text" class="form-control-custom" value="Maria Magsino" disabled>
                     </div>
                     <div class="form-group">
                         <label class="form-label-custom">Relationship</label>
-                        <select class="form-control-custom">
+                        <select class="form-control-custom" disabled>
                             <option value="mother" selected>Mother</option>
                             <option value="father">Father</option>
                             <option value="guardian">Guardian</option>
@@ -276,18 +182,17 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label-custom">Contact Number</label>
-                        <input type="tel" class="form-control-custom" value="+63 918 765 4321">
+                        <input type="tel" class="form-control-custom" value="+63 918 765 4321" disabled>
                     </div>
                     <div class="form-group">
                         <label class="form-label-custom">Contact Email</label>
-                        <input type="email" class="form-control-custom" value="maria.magsino@email.com">
+                        <input type="email" class="form-control-custom" value="maria.magsino@email.com" disabled>
                     </div>
                 </div>
             </div>
 
             <div class="btn-group-right">
-                <button class="btn-secondary" onclick="location.reload()"><i class="bi bi-arrow-counterclockwise"></i> Discard</button>
-                <button class="btn-save" onclick="saveProfile()"><i class="bi bi-check-lg"></i> Save Changes</button>
+                <button class="btn-secondary" onclick="location.reload()"><i class="bi bi-arrow-counterclockwise"></i> Refresh</button>
             </div>
         </div>
     </div>
@@ -295,32 +200,6 @@
     <div class="toast-notification" id="toast"><i class="bi bi-check-circle-fill"></i> <span id="toastMsg">Profile saved successfully!</span></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const sidebar = document.getElementById('sidebar'), mainContent = document.getElementById('mainContent'), overlay = document.getElementById('sidebarOverlay'), hamburger = document.getElementById('hamburgerBtn');
-        const isMobile = () => window.innerWidth < 992;
-        sidebar.addEventListener('mouseenter', () => { if (!isMobile()) { sidebar.classList.add('expanded'); mainContent.classList.add('shifted'); } });
-        sidebar.addEventListener('mouseleave', () => { if (!isMobile()) { sidebar.classList.remove('expanded'); mainContent.classList.remove('shifted'); } });
-        hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
-        overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
-
-        const clockEl = document.getElementById('topbarClock');
-        function updateClock() { const n = new Date(); clockEl.textContent = n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) + ' \u00b7 ' + String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0'); }
-        updateClock(); setInterval(updateClock, 1000);
-
-        const darkModeBtn = document.getElementById('darkModeBtn');
-        darkModeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            darkModeBtn.querySelector('i').className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-        });
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toastMsg').textContent = msg;
-            t.style.display = 'flex';
-            setTimeout(() => t.style.display = 'none', 3000);
-        }
-
-        function saveProfile() { showToast('Profile saved successfully!'); }
-    </script>
+    <script src="js/student-profile.js"></script>
 </body>
 </html>
