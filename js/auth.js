@@ -54,7 +54,7 @@ function initLoginForm() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const email = document.getElementById('emailInput').value.trim();
+        const idNumber = document.getElementById('idInput').value.trim();
         const password = document.getElementById('passwordInput').value;
         const errorEl = document.getElementById('errorMessage');
 
@@ -69,6 +69,17 @@ function initLoginForm() {
         submitBtn.textContent = 'Signing in...';
 
         try {
+            // First, get the email associated with this ID Number using the secure RPC function
+            const { data: email, error: rpcError } = await supabaseClient.rpc('get_email_by_school_id', { p_school_id: idNumber });
+            
+            if (rpcError || !email) {
+                errorEl.textContent = 'Invalid ID Number or Password.';
+                errorEl.classList.remove('d-none');
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                return;
+            }
+
             const { data, error } = await supabaseClient.auth.signInWithPassword({
                 email,
                 password
