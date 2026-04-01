@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadComponent('sidebar-container', 'components/sidebar.html');
     await loadComponent('topbar-container', 'components/topbar.html');
 
-    // ── Auto-highlight the active sidebar link ──
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
         const linkPage = link.getAttribute('href');
@@ -37,5 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     initShared();
+    
+    await new Promise(resolve => setTimeout(resolve, 50));
     await loadUserProfile();
 });
