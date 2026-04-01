@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // ROUTE GUARD + SHARED UI
-    // ═══════════════════════════════════════════════════════════════════════
     const currentUser = await requireAuth(['admin']);
     if (!currentUser) return;
 
@@ -45,29 +42,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const signOutBtn = document.getElementById('signOutBtn');
     if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // FETCH COURSES FROM SUPABASE
-    // ═══════════════════════════════════════════════════════════════════════
     let bscpeCourses = [];
     let bseceCourses = [];
 
     async function fetchCourses() {
-        // Fetch all courses with their prerequisites
-        const { data: courses, error } = await supabaseClient
-            .from('courses')
+        const { data: curriculum_courses, error } = await supabaseClient
+            .from('curriculum_courses') // ✅ FIXED
             .select('*, prerequisites(*)')
             .order('term', { ascending: true });
 
         if (error) {
-            console.error('Error fetching courses:', error);
+            console.error('Error fetching curriculum_courses:', error);
             return;
         }
 
-        // Transform to frontend format
         bscpeCourses = [];
         bseceCourses = [];
 
-        (courses || []).forEach(c => {
+        (curriculum_courses || []).forEach(c => {
             const prereqs = c.prerequisites || [];
             const courseObj = {
                 dbId: c.id,
@@ -88,9 +80,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await fetchCourses();
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // VIEW MODE STATE
-    // ═══════════════════════════════════════════════════════════════════════
     let currentView = 'grid';
     const viewGridBtn = document.getElementById('viewGrid');
     const viewTableBtn = document.getElementById('viewTable');
@@ -113,9 +102,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderAll();
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // RENDER HELPERS
-    // ═══════════════════════════════════════════════════════════════════════
     const courseSearch = document.getElementById('courseSearch');
     const termFilter = document.getElementById('termFilter');
 
@@ -127,10 +113,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return html || '<span style="color:var(--dlsu-gray-400); font-size:0.75rem;">None</span>';
     }
 
-    function filterCourses(courses) {
+    function filterCourses(curriculum_courses) {
         const q = courseSearch.value.toLowerCase();
         const t = termFilter.value;
-        return courses.filter(c => {
+        return curriculum_courses.filter(c => {
             const matchSearch = !q || c.code.toLowerCase().includes(q) || c.title.toLowerCase().includes(q);
             const matchTerm = t === 'all' || c.term === parseInt(t);
             return matchSearch && matchTerm;
@@ -144,11 +130,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         return 4;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // RENDER: GRID VIEW
-    // ═══════════════════════════════════════════════════════════════════════
-    function renderGrid(courses, gridEl, programKey) {
-        const filtered = filterCourses(courses);
+    function renderGrid(curriculum_courses, gridEl, programKey) {
+        const filtered = filterCourses(curriculum_courses);
         const terms = {};
         filtered.forEach(c => {
             if (!terms[c.term]) terms[c.term] = [];
@@ -158,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const sortedTerms = Object.keys(terms).map(Number).sort((a, b) => a - b);
 
         if (sortedTerms.length === 0) {
-            gridEl.innerHTML = `<div class="text-center py-5" style="color:var(--dlsu-gray-400); font-size:0.85rem;"><i class="bi bi-inbox fs-2 d-block mb-2"></i>No courses found</div>`;
+            gridEl.innerHTML = `<div class="text-center py-5" style="color:var(--dlsu-gray-400); font-size:0.85rem;"><i class="bi bi-inbox fs-2 d-block mb-2"></i>No curriculum_courses found</div>`;
             return;
         }
 
@@ -197,14 +180,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).join('');
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // RENDER: TABLE VIEW
-    // ═══════════════════════════════════════════════════════════════════════
-    function renderTable(courses, tbodyEl, programKey) {
-        const filtered = filterCourses(courses);
+    function renderTable(curriculum_courses, tbodyEl, programKey) {
+        const filtered = filterCourses(curriculum_courses);
 
         if (filtered.length === 0) {
-            tbodyEl.innerHTML = `<tr><td colspan="6" class="text-center py-4" style="color:var(--dlsu-gray-400); font-size:0.82rem;"><i class="bi bi-inbox fs-4 d-block mb-2"></i>No courses found</td></tr>`;
+            tbodyEl.innerHTML = `<tr><td colspan="6" class="text-center py-4" style="color:var(--dlsu-gray-400); font-size:0.82rem;"><i class="bi bi-inbox fs-4 d-block mb-2"></i>No curriculum_courses found</td></tr>`;
             return;
         }
 
@@ -225,9 +205,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         `).join('');
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // RENDER ALL
-    // ═══════════════════════════════════════════════════════════════════════
     function renderAll() {
         document.getElementById('bscpeGrid').classList.toggle('d-none', currentView !== 'grid');
         document.getElementById('bscpeTable').classList.toggle('d-none', currentView !== 'table');
@@ -248,11 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     renderAll();
     courseSearch.addEventListener('input', renderAll);
-    termFilter.addEventListener('change', renderAll);
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Add Course
-    // ═══════════════════════════════════════════════════════════════════════
     const courseModal = new bootstrap.Modal(document.getElementById('courseModal'));
 
     document.getElementById('addCourseBtn').addEventListener('click', () => {
@@ -266,9 +239,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         courseModal.show();
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Save (Create or Update) — Supabase
-    // ═══════════════════════════════════════════════════════════════════════
     document.getElementById('saveCourseBtn').addEventListener('click', async () => {
         const editCode = document.getElementById('editCourseCode').value;
         const editProg = document.getElementById('editCourseProgram').value;
@@ -288,19 +258,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!code || !title) { alert('Please fill in Course Code and Title.'); return; }
 
         if (editCode) {
-            // ── UPDATE ──
             const srcArr = editProg === 'BSCpE' ? bscpeCourses : bseceCourses;
             const existing = srcArr.find(c => c.code === editCode);
             if (!existing) return;
 
             const { error } = await supabaseClient
-                .from('courses')
+                .from('curriculum_courses')
                 .update({ code, title, units, term, year_level: year, program_code: program })
                 .eq('id', existing.dbId);
 
             if (error) { alert('Error updating course: ' + error.message); return; }
 
-            // Replace prerequisites: delete old, insert new
             await supabaseClient.from('prerequisites').delete().eq('course_id', existing.dbId);
 
             const prereqRows = [
@@ -313,16 +281,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await supabaseClient.from('prerequisites').insert(prereqRows);
             }
         } else {
-            // ── CREATE ──
             const { data: newCourse, error } = await supabaseClient
-                .from('courses')
+                .from('curriculum_courses')
                 .insert({ code, title, units, term, year_level: year, program_code: program })
                 .select()
                 .single();
 
             if (error) { alert('Error creating course: ' + error.message); return; }
 
-            // Insert prerequisites
             const prereqRows = [
                 ...hardPrereqs.map(p => ({ course_id: newCourse.id, prerequisite_code: p, type: 'hard' })),
                 ...softPrereqs.map(p => ({ course_id: newCourse.id, prerequisite_code: p, type: 'soft' })),
@@ -339,9 +305,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         courseModal.hide();
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Edit
-    // ═══════════════════════════════════════════════════════════════════════
     window.editCourse = function(code, program) {
         const arr = program === 'BSCpE' ? bscpeCourses : bseceCourses;
         const c = arr.find(x => x.code === code);
@@ -364,9 +327,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         courseModal.show();
     };
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Delete — Supabase
-    // ═══════════════════════════════════════════════════════════════════════
     const deleteCourseModal = new bootstrap.Modal(document.getElementById('deleteCourseModal'));
 
     window.deleteCourse = function(code, program) {
@@ -384,7 +344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (course) {
             const { error } = await supabaseClient
-                .from('courses')
+                .from('curriculum_courses')
                 .delete()
                 .eq('id', course.dbId);
 
