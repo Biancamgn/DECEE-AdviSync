@@ -52,31 +52,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     let professors = [];
 
     async function fetchStudents() {
-        const { data, error } = await supabaseClient
+        const { data: profileData, error: profileError } = await supabaseClient
             .from('profiles')
-            .select('*, students(*)')
+            .select('id, school_id, first_name, last_name, email, status')
             .eq('role', 'student')
             .order('school_id', { ascending: true });
 
-        if (!error && data) {
-            students = data.map(p => ({
+        if (profileError) {
+            console.error('Error fetching student profiles:', profileError);
+            students = [];
+            return;
+        }
+
+        const studentIds = profileData.map((p) => p.id);
+        const { data: studentData, error: studentError } = await supabaseClient
+            .from('students')
+            .select('id, program, year_level')
+            .in('id', studentIds);
+
+        if (studentError) {
+            console.error('Error fetching student details:', studentError);
+        }
+
+        const studentMap = (studentData || []).reduce((acc, student) => {
+            acc[student.id] = student;
+            return acc;
+        }, {});
+
+        students = profileData.map(p => {
+            const detail = studentMap[p.id] || {};
+            return {
                 id: p.school_id,
                 uuid: p.id,
                 firstName: p.first_name,
                 lastName: p.last_name,
                 email: p.email,
-                program: p.students?.program || 'BSCpE',
-                year: p.students?.year_level || 1,
+                program: detail.program || 'BSCpE',
+                year: detail.year_level || 1,
                 status: p.status
-            }));
-        }
+            };
+        });
     }
 
     async function fetchProfessors() {
         const { data, error } = await supabaseClient
             .from('profiles')
             .select('*, professors(*)')
-            .eq('role', 'professor')
+            .eq('role', 'adviser')
             .order('school_id', { ascending: true });
 
         if (!error && data) {
@@ -91,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 status: p.status
             }));
 
-            // Count advisees per professor
+            // Count advisees per adviser
             for (let prof of professors) {
                 const { count } = await supabaseClient
                     .from('students')
@@ -175,7 +197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <td><span class="badge-program">${p.department}</span></td>
                     <td>${p.advisees}</td>
                     <td>${statusBadge(p.status)}</td>
-                    <td>${actionButtons(p.id, 'professor')}</td>
+                    <td>${actionButtons(p.id, 'adviser')}</td>
                 </tr>
             `).join('');
 
@@ -273,7 +295,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             year_level: parseInt(document.getElementById('formYear').value)
                         })
                         .eq('id', existingUser.uuid);
-                } else {
+                } else if (editType === 'adviser') {
                     await supabaseClient
                         .from('professors')
                         .update({
@@ -316,7 +338,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         is_cleared: false,
                         failed_units: 0
                     });
-            } else {
+            } else if (role === 'adviser') {
                 await supabaseClient
                     .from('professors')
                     .insert({
@@ -355,7 +377,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             const p = professors.find(x => x.id === id);
             if (!p) return;
-            formRole.value = 'professor';
+            formRole.value = 'adviser';
             formRole.dispatchEvent(new Event('change'));
             formRole.disabled = true;
             document.getElementById('formUserId').value = p.id;
