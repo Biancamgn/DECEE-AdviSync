@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // ROUTE GUARD + SHARED UI
-    // ═══════════════════════════════════════════════════════════════════════
     const currentUser = await requireAuth(['admin']);
     if (!currentUser) return;
 
@@ -17,12 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
 
-    const profileWrapper = document.getElementById('profileWrapper');
-    const profileToggle = document.getElementById('profileToggle');
-    profileToggle.addEventListener('click', (e) => { e.stopPropagation(); profileWrapper.classList.toggle('open'); });
-    document.addEventListener('click', (e) => { if (!profileWrapper.contains(e.target)) profileWrapper.classList.remove('open'); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileWrapper.classList.remove('open'); });
-
     const clockEl = document.getElementById('topbarClock');
     function updateClock() {
         const now = new Date();
@@ -35,19 +26,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateClock();
     setInterval(updateClock, 1000);
 
-    const darkModeBtn = document.getElementById('darkModeBtn');
-    darkModeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const icon = darkModeBtn.querySelector('i');
-        icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-    });
-
     const signOutBtn = document.getElementById('signOutBtn');
     if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // FETCH DATA FROM SUPABASE
-    // ═══════════════════════════════════════════════════════════════════════
     let students = [];
     let professors = [];
 
@@ -91,7 +72,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 status: p.status
             }));
 
-            // Count advisees per professor
             for (let prof of professors) {
                 const { count } = await supabaseClient
                     .from('students')
@@ -104,9 +84,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await Promise.all([fetchStudents(), fetchProfessors()]);
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // RENDER TABLES
-    // ═══════════════════════════════════════════════════════════════════════
     const studentsBody = document.getElementById('studentsBody');
     const professorsBody = document.getElementById('professorsBody');
     const searchInput = document.getElementById('searchInput');
@@ -188,9 +165,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     searchInput.addEventListener('input', renderAll);
     programFilter.addEventListener('change', renderAll);
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // FORM: Role Toggle
-    // ═══════════════════════════════════════════════════════════════════════
     const formRole = document.getElementById('formRole');
     const studentFields = document.getElementById('studentFields');
     const professorFields = document.getElementById('professorFields');
@@ -208,9 +182,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Add User
-    // ═══════════════════════════════════════════════════════════════════════
     const userModal = new bootstrap.Modal(document.getElementById('userModal'));
 
     document.getElementById('addUserBtn').addEventListener('click', () => {
@@ -224,9 +195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         userModal.show();
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
     // CRUD: Save (Create or Update) — Supabase
-    // ═══════════════════════════════════════════════════════════════════════
     document.getElementById('saveUserBtn').addEventListener('click', async () => {
         const editId = document.getElementById('editUserId').value;
         const editType = document.getElementById('editUserType').value;
@@ -242,13 +211,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (editId) {
-            // ── UPDATE existing user ──
             const existingUser = editType === 'student'
                 ? students.find(x => x.id === editId)
                 : professors.find(x => x.id === editId);
 
             if (existingUser) {
-                // Update profile
                 const { error: profileError } = await supabaseClient
                     .from('profiles')
                     .update({
@@ -264,7 +231,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return;
                 }
 
-                // Update role-specific table
                 if (editType === 'student') {
                     await supabaseClient
                         .from('students')
@@ -283,7 +249,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         } else {
-            // ── CREATE new user ──
             // Create auth user via Supabase Admin (or use invite)
             // For client-side, we insert directly into profiles + role table
             // Note: In production, use a Supabase Edge Function to create auth users
@@ -326,15 +291,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        // Refresh data and re-render
         await Promise.all([fetchStudents(), fetchProfessors()]);
         renderAll();
         userModal.hide();
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // CRUD: Edit User
-    // ═══════════════════════════════════════════════════════════════════════
     window.editUser = function(id, type) {
         document.getElementById('userModalLabel').textContent = 'Edit User';
         document.getElementById('editUserId').value = id;
@@ -368,9 +329,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         userModal.show();
     };
 
-    // ═══════════════════════════════════════════════════════════════════════
     // CRUD: Delete User — Supabase
-    // ═══════════════════════════════════════════════════════════════════════
     const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
 
     window.deleteUser = function(id, type) {
@@ -406,9 +365,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         deleteModal.hide();
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // ACCOUNT RECOVERY
-    // ═══════════════════════════════════════════════════════════════════════
     const recoveryModal = new bootstrap.Modal(document.getElementById('recoveryModal'));
 
     document.getElementById('resetPasswordBtn').addEventListener('click', () => {
@@ -427,7 +383,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const q = document.getElementById('recoverySearchInput').value.trim().toLowerCase();
         if (!q) return;
 
-        // Search in Supabase
         const { data: results, error } = await supabaseClient
             .from('profiles')
             .select('*')

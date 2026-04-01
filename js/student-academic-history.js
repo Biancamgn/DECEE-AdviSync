@@ -1,4 +1,3 @@
-// ── Sidebar ──
 const sidebar = document.getElementById('sidebar');
 const mainContent = document.getElementById('mainContent');
 const overlay = document.getElementById('sidebarOverlay');
@@ -10,14 +9,6 @@ sidebar.addEventListener('mouseleave', () => { if (!isMobile()) { sidebar.classL
 hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
 overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
 
-// ── Profile Dropdown ──
-const profileWrapper = document.getElementById('profileWrapper');
-const profileToggle = document.getElementById('profileToggle');
-profileToggle.addEventListener('click', (e) => { e.stopPropagation(); profileWrapper.classList.toggle('open'); });
-document.addEventListener('click', (e) => { if (!profileWrapper.contains(e.target)) profileWrapper.classList.remove('open'); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileWrapper.classList.remove('open'); });
-
-// ── Clock ──
 const clockEl = document.getElementById('topbarClock');
 function updateClock() {
     const now = new Date();
@@ -30,7 +21,6 @@ function updateClock() {
 updateClock();
 setInterval(updateClock, 1000);
 
-// ── Term Card Filters ──
 const filterYear = document.getElementById('filterYear');
 const filterTerm = document.getElementById('filterTerm');
 const resetBtn = document.getElementById('resetFilters');

@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // ROUTE GUARD + SHARED UI
-    // ═══════════════════════════════════════════════════════════════════════
     const currentUser = await requireAuth(['admin']);
     if (!currentUser) return;
 
@@ -17,12 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
 
-    const profileWrapper = document.getElementById('profileWrapper');
-    const profileToggle = document.getElementById('profileToggle');
-    profileToggle.addEventListener('click', (e) => { e.stopPropagation(); profileWrapper.classList.toggle('open'); });
-    document.addEventListener('click', (e) => { if (!profileWrapper.contains(e.target)) profileWrapper.classList.remove('open'); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileWrapper.classList.remove('open'); });
-
     const clockEl = document.getElementById('topbarClock');
     function updateClock() {
         const now = new Date();
@@ -35,19 +26,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateClock();
     setInterval(updateClock, 1000);
 
-    const darkModeBtn = document.getElementById('darkModeBtn');
-    darkModeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const icon = darkModeBtn.querySelector('i');
-        icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-    });
-
     const signOutBtn = document.getElementById('signOutBtn');
     if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });
 
-    // ═══════════════════════════════════════════════════════════════════════
     // TAB 1: CSV DATA UPLOAD
-    // ═══════════════════════════════════════════════════════════════════════
     let selectedUploadType = 'students';
     let parsedCsvRows = []; // store parsed CSV data for actual import
 
@@ -81,7 +63,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ext = file.name.split('.').pop().toLowerCase();
         if (!['csv'].includes(ext)) { alert('Only CSV files are accepted.'); return; }
 
-        // Read and parse CSV
         const reader = new FileReader();
         reader.onload = function(event) {
             const text = event.target.result;
@@ -96,7 +77,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return row;
             });
 
-            // Show progress
             dropzone.style.display = 'none';
             const progressArea = document.getElementById('csvProgressArea');
             progressArea.style.display = 'block';
@@ -148,7 +128,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('csvPreviewArea').style.display = 'block';
     }
 
-    // ACTUAL CSV IMPORT TO SUPABASE
     document.getElementById('csvImportBtn').addEventListener('click', async () => {
         if (parsedCsvRows.length === 0) { alert('No data to import.'); return; }
 
@@ -198,7 +177,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         } else {
-            // Course import
             for (const row of parsedCsvRows) {
                 const code = (row['Course Code'] || row['code'] || '').toUpperCase();
                 const title = row['Title'] || row['title'] || '';
@@ -215,7 +193,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     .single();
 
                 if (!error && newCourse) {
-                    // Parse prerequisites
                     if (prereqs && prereqs.toLowerCase() !== 'none') {
                         const prereqCodes = prereqs.split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
                         const prereqRows = prereqCodes.map(p => ({
@@ -261,9 +238,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
     // TAB 2: MASS CLEARANCE — Supabase
-    // ═══════════════════════════════════════════════════════════════════════
     let clearanceStudents = [];
 
     async function fetchClearanceStudents() {
@@ -332,7 +307,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return matchProg && matchYr && matchStatus && !s.cleared;
         });
 
-        // Batch update in Supabase
         const uuids = toClear.map(s => s.uuid);
         if (uuids.length > 0) {
             for (const uuid of uuids) {
@@ -347,7 +321,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        // Log the clearance action
         await supabaseClient.from('clearance_log').insert({
             admin_id: currentUser.id,
             program_filter: prog === 'all' ? null : prog,
@@ -355,7 +328,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             students_cleared: uuids.length
         });
 
-        // Update local state
         toClear.forEach(s => { s.cleared = true; });
 
         addClearanceLog(uuids.length, prog, yr);
@@ -364,7 +336,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateClearanceCount();
     });
 
-    // Clearance logs from Supabase
     let clearanceLogs = [];
 
     async function fetchClearanceLogs() {
@@ -427,10 +398,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     renderClearanceLogs();
 
-    // ═══════════════════════════════════════════════════════════════════════
     // TAB 3: TARGETED MASS EMAIL — Supabase
-    // ═══════════════════════════════════════════════════════════════════════
-    // Fetch dynamic recipient counts
     let recipientCounts = {};
     try {
         const { data: stats } = await supabaseClient.from('dashboard_stats').select('*').single();
@@ -507,7 +475,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const count = recipientCounts[recipient] || 0;
 
-        // Log email to Supabase
         await supabaseClient.from('email_log').insert({
             sender_id: currentUser.id,
             recipient_group: recipient,
@@ -529,7 +496,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.email-template-chip').forEach(c => c.classList.remove('active'));
     });
 
-    // Email logs from Supabase
     let emailLogs = [];
 
     async function fetchEmailLogs() {

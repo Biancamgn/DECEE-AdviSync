@@ -14,12 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
 
-    const profileWrapper = document.getElementById('profileWrapper');
-    const profileToggle = document.getElementById('profileToggle');
-    profileToggle.addEventListener('click', (e) => { e.stopPropagation(); profileWrapper.classList.toggle('open'); });
-    document.addEventListener('click', (e) => { if (!profileWrapper.contains(e.target)) profileWrapper.classList.remove('open'); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileWrapper.classList.remove('open'); });
-
     const clockEl = document.getElementById('topbarClock');
     function updateClock() {
         const now = new Date();
@@ -31,13 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     updateClock();
     setInterval(updateClock, 1000);
-
-    const darkModeBtn = document.getElementById('darkModeBtn');
-    darkModeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const icon = darkModeBtn.querySelector('i');
-        icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-    });
 
     const signOutBtn = document.getElementById('signOutBtn');
     if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });

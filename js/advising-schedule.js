@@ -1,4 +1,3 @@
-/* ══ Advising Schedule — Page Script ══ */
 function addSlot() {
     const date = document.getElementById('slotDate').value;
     const start = document.getElementById('slotStart').value;

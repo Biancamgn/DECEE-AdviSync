@@ -28,13 +28,9 @@ overlay.addEventListener('click', () => {
     overlay.classList.remove('active');
 });
 
-<<<<<<< HEAD
-// ── Dynamic Greeting ──
 const greetingEl = document.querySelector('.welcome-banner h2');
 const hour = new Date().getHours();
 let greeting = 'Good morning';
 if (hour >= 12 && hour < 18) greeting = 'Good afternoon';
 else if (hour >= 18) greeting = 'Good evening';
 if (greetingEl) greetingEl.textContent = `${greeting}, Bianca!`;
-=======
->>>>>>> ce96f73d6ac40d9d8f5a3e5040c1aa3bb6e78ca4

@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // ROUTE GUARD + SHARED UI
-    // ═══════════════════════════════════════════════════════════════════════
     const currentUser = await requireAuth(['admin']);
     if (!currentUser) return;
 
@@ -17,12 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
 
-    const profileWrapper = document.getElementById('profileWrapper');
-    const profileToggle = document.getElementById('profileToggle');
-    profileToggle.addEventListener('click', (e) => { e.stopPropagation(); profileWrapper.classList.toggle('open'); });
-    document.addEventListener('click', (e) => { if (!profileWrapper.contains(e.target)) profileWrapper.classList.remove('open'); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileWrapper.classList.remove('open'); });
-
     const clockEl = document.getElementById('topbarClock');
     function updateClock() {
         const now = new Date();
@@ -36,14 +27,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     setInterval(updateClock, 1000);
 
     const darkModeBtn = document.getElementById('darkModeBtn');
-    darkModeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const icon = darkModeBtn.querySelector('i');
-        icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-        renderEnrollmentChart();
-        renderYearDistChart();
-        renderCoursePerformanceChart();
-    });
+    if (!darkModeBtn._dmBound) {
+        darkModeBtn._dmBound = true;
+        darkModeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const icon = darkModeBtn.querySelector('i');
+            icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            renderEnrollmentChart();
+            renderYearDistChart();
+            renderCoursePerformanceChart();
+        });
+    } else {
+        // notifications.js already handles the dark mode toggle;
+        // just re-render charts on click
+        darkModeBtn.addEventListener('click', () => {
+            renderEnrollmentChart();
+            renderYearDistChart();
+            renderCoursePerformanceChart();
+        });
+    }
 
     const signOutBtn = document.getElementById('signOutBtn');
     if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });
@@ -56,11 +59,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function gridColor() { return isDark() ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'; }
     function labelColor() { return isDark() ? '#9ca3af' : '#6b7280'; }
 
-    // ═══════════════════════════════════════════════════════════════════════
     // TAB 1: ENROLLMENT STATISTICS
     // Uses hardcoded historical data (enrollment trends are not live-tracked)
     // Year distribution is populated from Supabase
-    // ═══════════════════════════════════════════════════════════════════════
     const enrollmentData = {
         years: ['2019–20', '2020–21', '2021–22', '2022–23', '2023–24', '2024–25', '2025–26'],
         bscpe: [480, 510, 530, 560, 590, 618, 650],
@@ -167,9 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderEnrollmentChart();
     renderYearDistChart();
 
-    // ═══════════════════════════════════════════════════════════════════════
     // TAB 2: FAILED UNITS REPORT (from at_risk_students view)
-    // ═══════════════════════════════════════════════════════════════════════
     let failedStudents = [];
 
     try {
@@ -241,11 +240,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('failed-tab').addEventListener('shown.bs.tab', renderFailedTable);
     renderFailedTable();
 
-    // ═══════════════════════════════════════════════════════════════════════
     // TAB 3: COURSE PERFORMANCE ANALYTICS
     // Note: Enrollment-level pass/fail data is not tracked in current schema.
     // Using mock data as placeholder until grade records are implemented.
-    // ═══════════════════════════════════════════════════════════════════════
     const coursePerformanceData = {
         BSCpE: [
             { code: 'LBYCPD1', title: 'Computer Programming 1', enrolled: 120, passed: 98, failed: 22 },
@@ -382,9 +379,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     renderCoursePerformanceChart();
 
-    // ═══════════════════════════════════════════════════════════════════════
     // TAB 4: PROFESSOR WORKLOAD REPORT (from faculty_workload view)
-    // ═══════════════════════════════════════════════════════════════════════
     let facultyWorkload = [];
 
     try {
@@ -453,9 +448,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('workload-tab').addEventListener('shown.bs.tab', renderWorkloadTable);
     renderWorkloadTable();
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // EXPORT STUB
-    // ═══════════════════════════════════════════════════════════════════════
     document.getElementById('exportBtn').addEventListener('click', () => {
         alert('Export feature: In the production version, this will generate a downloadable PDF/Excel report for the active tab.');
     });

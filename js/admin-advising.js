@@ -1,8 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // ROUTE GUARD + SHARED UI
-    // ═══════════════════════════════════════════════════════════════════════
     const currentUser = await requireAuth(['admin']);
     if (!currentUser) return;
 
@@ -17,12 +14,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
     overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
 
-    const profileWrapper = document.getElementById('profileWrapper');
-    const profileToggle = document.getElementById('profileToggle');
-    profileToggle.addEventListener('click', (e) => { e.stopPropagation(); profileWrapper.classList.toggle('open'); });
-    document.addEventListener('click', (e) => { if (!profileWrapper.contains(e.target)) profileWrapper.classList.remove('open'); });
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileWrapper.classList.remove('open'); });
-
     const clockEl = document.getElementById('topbarClock');
     function updateClock() {
         const now = new Date();
@@ -35,19 +26,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateClock();
     setInterval(updateClock, 1000);
 
-    const darkModeBtn = document.getElementById('darkModeBtn');
-    darkModeBtn.addEventListener('click', () => {
-        document.body.classList.toggle('dark-mode');
-        const icon = darkModeBtn.querySelector('i');
-        icon.className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-    });
-
     const signOutBtn = document.getElementById('signOutBtn');
     if (signOutBtn) signOutBtn.addEventListener('click', (e) => { e.preventDefault(); signOut(); });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // FETCH DATA FROM SUPABASE
-    // ═══════════════════════════════════════════════════════════════════════
     const OVERLOAD_THRESHOLD = 50;
 
     let professors = [];
@@ -106,9 +87,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // DERIVED HELPERS
-    // ═══════════════════════════════════════════════════════════════════════
     function getAdviseeCount(profId) {
         return students.filter(s => s.adviserId === profId).length;
     }
@@ -129,9 +107,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return { bg: '#e8f0fe', color: 'var(--dlsu-info)', barBg: 'var(--dlsu-info)' };
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // RENDER: STATS
-    // ═══════════════════════════════════════════════════════════════════════
     function renderStats() {
         const assigned = students.filter(s => s.adviserId).length;
         const unassigned = students.filter(s => !s.adviserId).length;
@@ -143,9 +118,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('overloadedAdvisers').textContent = overloaded;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // RENDER: WORKLOAD GRID
-    // ═══════════════════════════════════════════════════════════════════════
     const workloadGrid = document.getElementById('workloadGrid');
     const facultySearch = document.getElementById('facultySearch');
     const workloadFilter = document.getElementById('workloadFilter');
@@ -202,9 +174,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     facultySearch.addEventListener('input', renderWorkload);
     workloadFilter.addEventListener('change', renderWorkload);
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // RENDER: STUDENT TABLES
-    // ═══════════════════════════════════════════════════════════════════════
     const studentSearch = document.getElementById('studentSearch');
     const programFilter = document.getElementById('programFilter');
     const yearFilter = document.getElementById('yearFilter');
@@ -289,9 +258,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     programFilter.addEventListener('change', () => { renderUnassigned(); renderAllStudents(); });
     yearFilter.addEventListener('change', () => { renderUnassigned(); renderAllStudents(); });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // CHECKBOX & BULK SELECTION
-    // ═══════════════════════════════════════════════════════════════════════
     const bulkAssignBar = document.getElementById('bulkAssignBar');
 
     function attachCheckboxListeners() {
@@ -335,7 +301,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const prof = professors.find(p => p.id === advId);
         if (!prof) return;
 
-        // Update all selected students in Supabase
         const studentUuids = [];
         selectedStudents.forEach(sId => {
             const s = students.find(x => x.id === sId);
@@ -349,7 +314,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .eq('id', uuid);
         }
 
-        // Update local state
         selectedStudents.forEach(sId => {
             const s = students.find(x => x.id === sId);
             if (s) {
@@ -364,9 +328,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderEverything();
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // ADVISER DROPDOWN HELPERS
-    // ═══════════════════════════════════════════════════════════════════════
     function populateAdviserDropdowns() {
         const options = professors.map(p => {
             const count = getAdviseeCount(p.id);
@@ -380,9 +341,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('reassignAdviserSelect').innerHTML = `<option value="">Choose a new adviser...</option>` + options;
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
     // MODAL: Assign Single — Supabase
-    // ═══════════════════════════════════════════════════════════════════════
     const assignModal = new bootstrap.Modal(document.getElementById('assignModal'));
 
     window.openAssignModal = function(studentId) {
@@ -434,9 +393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderEverything();
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
     // MODAL: Reassign / Unassign — Supabase
-    // ═══════════════════════════════════════════════════════════════════════
     const reassignModal = new bootstrap.Modal(document.getElementById('reassignModal'));
 
     window.openReassignModal = function(studentId) {
@@ -493,8 +450,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderEverything();
     });
 
-    // ═══════════════════════════════════════════════════════════════════════
-    // INIT
-    // ═══════════════════════════════════════════════════════════════════════
     renderEverything();
 });

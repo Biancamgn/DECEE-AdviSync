@@ -11,6 +11,7 @@
     <link href="css/student-profile.css" rel="stylesheet">
 </head>
 <body>
+<script>if(localStorage.getItem("darkMode")==="true")document.body.classList.add("dark-mode")</script>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><div class="brand-text"><h6>DECEE Advising</h6><small>De La Salle University</small></div></div>
@@ -40,26 +41,7 @@
             </div>
             <div class="topbar-right">
                 <button class="topbar-circle-btn" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
-<<<<<<< HEAD
-                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i></button>
-                <div class="profile-wrapper" id="profileWrapper">
-                    <div class="d-flex align-items-center gap-1" style="cursor:pointer;" id="profileToggle">
-                        <div class="profile-btn" title="Profile">BM</div>
-                        <i class="bi bi-chevron-down profile-chevron"></i>
-                    </div>
-                    <div class="profile-dropdown">
-                        <div class="dropdown-header"><div class="dropdown-avatar">BM</div><div><div class="dropdown-name">Bianca Magsino</div><div class="dropdown-role">Student</div></div></div>
-                        <div class="dropdown-info">
-                            <div class="dropdown-info-row"><span class="dropdown-info-label">ID Number</span><span class="dropdown-info-value">12012345</span></div>
-                            <div class="dropdown-info-row"><span class="dropdown-info-label">Program</span><span class="dropdown-info-value">BS-CpE</span></div>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i> Profile</a>
-                        <a href="student-settings.html" class="dropdown-action"><i class="bi bi-gear"></i> Settings</a>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-action logout" onclick="window.location.href='index.html'"><i class="bi bi-box-arrow-left"></i> Sign out</button>
-=======
-                <button class="topbar-circle-btn"><i class="bi bi-bell-fill"></i></button>
+                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
                 <div class="profile-wrapper" id="profileWrapper">
                     <div class="d-flex align-items-center gap-1" style="cursor:pointer;" id="profileToggle">
                         <div class="profile-btn">BM</div>
@@ -76,16 +58,16 @@
                             <div class="dropdown-info-row"><span class="dropdown-info-label">Term</span><span class="dropdown-info-value">8 of 12</span></div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i>View Profile</a>
-                        <a href="student-settings.html" class="dropdown-action"><i class="bi bi-gear"></i>Settings</a>
->>>>>>> ce96f73d6ac40d9d8f5a3e5040c1aa3bb6e78ca4
+                        <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i> View Profile</a>
+                        <a href="student-settings.html" class="dropdown-action"><i class="bi bi-gear"></i> Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-action logout" onclick="window.location.href='index.html'"><i class="bi bi-box-arrow-left"></i> Sign out</button>
                     </div>
                 </div>
             </div>
         </header>
 
         <div class="page-body">
-            <!-- Profile Hero -->
             <div class="profile-hero">
                 <div class="profile-avatar-lg">BM</div>
                 <div class="profile-hero-info">
@@ -95,7 +77,6 @@
                 </div>
             </div>
 
-            <!-- Personal Information -->
             <div class="section-card">
                 <div class="section-card-title"><i class="bi bi-person-vcard"></i> Personal Information</div>
                 <div class="form-row">
@@ -135,7 +116,6 @@
                 </div>
             </div>
 
-            <!-- Academic Information -->
             <div class="section-card">
                 <div class="section-card-title"><i class="bi bi-book"></i> Academic Information</div>
                 <div class="form-row">
@@ -180,7 +160,6 @@
                 </div>
             </div>
 
-            <!-- Emergency Contact -->
             <div class="section-card">
                 <div class="section-card-title"><i class="bi bi-telephone"></i> Emergency Contact</div>
                 <div class="form-row">

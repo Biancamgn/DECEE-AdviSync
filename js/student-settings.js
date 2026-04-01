@@ -5,30 +5,39 @@ sidebar.addEventListener('mouseleave', () => { if (!isMobile()) { sidebar.classL
 hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
 overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
 
-// Profile Dropdown
-const profileWrapper = document.getElementById('profileWrapper');
-const profileToggle = document.getElementById('profileToggle');
-profileToggle.addEventListener('click', (e) => { e.stopPropagation(); profileWrapper.classList.toggle('open'); });
-document.addEventListener('click', (e) => { if (!profileWrapper.contains(e.target)) profileWrapper.classList.remove('open'); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') profileWrapper.classList.remove('open'); });
-
 const clockEl = document.getElementById('topbarClock');
 function updateClock() { const n = new Date(); clockEl.textContent = n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'}) + ' \u00b7 ' + String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0'); }
 updateClock(); setInterval(updateClock, 1000);
 
-const darkModeBtn = document.getElementById('darkModeBtn');
-darkModeBtn.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    darkModeBtn.querySelector('i').className = document.body.classList.contains('dark-mode') ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-});
-
 function setTheme(el, theme) {
     document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
-    if (theme === 'dark') { document.body.classList.add('dark-mode'); darkModeBtn.querySelector('i').className = 'bi bi-sun-fill'; }
-    else if (theme === 'light') { document.body.classList.remove('dark-mode'); darkModeBtn.querySelector('i').className = 'bi bi-moon-fill'; }
+    const dmBtn = document.getElementById('darkModeBtn');
+    if (theme === 'dark') { document.body.classList.add('dark-mode'); if (dmBtn) dmBtn.querySelector('i').className = 'bi bi-sun-fill'; }
+    else if (theme === 'light') { document.body.classList.remove('dark-mode'); if (dmBtn) dmBtn.querySelector('i').className = 'bi bi-moon-fill'; }
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
     showToast('Theme updated!');
 }
+
+(function () {
+    const dmBtn = document.getElementById('darkModeBtn');
+    if (dmBtn) {
+        dmBtn._dmBound = true;
+        dmBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            dmBtn.querySelector('i').className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+            localStorage.setItem('darkMode', isDark);
+            document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+            const cards = document.querySelectorAll('.theme-card');
+            cards.forEach(c => { if (c.textContent.trim() === (isDark ? 'Dark' : 'Light')) c.classList.add('selected'); });
+        });
+    }
+    if (document.body.classList.contains('dark-mode')) {
+        document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.theme-card').forEach(c => { if (c.textContent.trim() === 'Dark') c.classList.add('selected'); });
+    }
+})();
 
 function showToast(msg) {
     const t = document.getElementById('toast');

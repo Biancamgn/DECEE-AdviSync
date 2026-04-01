@@ -1,13 +1,13 @@
-/**
- * Notifications Panel — shared across all portals (student, adviser, admin).
- * Include this script on any page, and it will:
- *   1. Inject the CSS for the notification panel.
- *   2. Create the notification panel HTML.
- *   3. Wire up the #notifBtn click to toggle it.
- */
-
 (function () {
-    /* ── CSS ─────────────────────────────────────────── */
+    if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark-mode');
+        const dmBtn = document.getElementById('darkModeBtn');
+        if (dmBtn) {
+            const icon = dmBtn.querySelector('i');
+            if (icon) icon.className = 'bi bi-sun-fill';
+        }
+    }
+
     const css = `
     /* ── Profile Dropdown Styles (shared fallback) ── */
     .profile-wrapper { position: relative; }
@@ -212,7 +212,6 @@
     styleEl.textContent = css;
     document.head.appendChild(styleEl);
 
-    /* ── Sample notifications per portal ─────────── */
     const page = window.location.pathname.split('/').pop() || '';
     let notifications = [];
 
@@ -246,7 +245,6 @@
         ];
     }
 
-    /* ── Build HTML ──────────────────────────────────── */
     const unreadCount = notifications.filter(n => n.unread).length;
 
     const overlay = document.createElement('div');
@@ -292,7 +290,15 @@
     document.body.appendChild(overlay);
     document.body.appendChild(panel);
 
-    /* ── Interactions ────────────────────────────────── */
+    function updateTopbarBadge() {
+        const btn = document.getElementById('notifBtn');
+        if (btn) {
+            const badge = btn.querySelector('.notif-badge');
+            if (badge) badge.textContent = unreadCount;
+        }
+    }
+    updateTopbarBadge();
+
     function openPanel() {
         panel.classList.add('open');
         overlay.classList.add('open');
@@ -303,15 +309,22 @@
         overlay.classList.remove('open');
     }
 
-    // Bell button
-    const notifBtn = document.getElementById('notifBtn');
-    if (notifBtn) {
-        notifBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (panel.classList.contains('open')) closePanel();
-            else openPanel();
-        });
+    // Bind bell button (may be loaded dynamically)
+    function bindNotifBtn() {
+        const btn = document.getElementById('notifBtn');
+        if (btn && !btn._notifBound) {
+            btn._notifBound = true;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (panel.classList.contains('open')) closePanel();
+                else openPanel();
+            });
+        }
+        updateTopbarBadge();
     }
+    bindNotifBtn();
+    // Expose for dynamically-loaded components
+    window._bindNotifBtn = bindNotifBtn;
 
     // Close button
     document.getElementById('notifCloseBtn').addEventListener('click', closePanel);
@@ -345,11 +358,11 @@
         const tabUnread = panel.querySelector('[data-filter="unread"]');
         if (tabUnread) tabUnread.textContent = 'Unread (0)';
         // Update topbar badge
-        const topBadge = notifBtn ? notifBtn.querySelector('.notif-badge, .notif-dot') : null;
-        if (topBadge) topBadge.style.display = 'none';
+        const notifBtnEl = document.getElementById('notifBtn');
+        const topBadge = notifBtnEl ? notifBtnEl.querySelector('.notif-badge') : null;
+        if (topBadge) { topBadge.textContent = '0'; topBadge.style.display = 'none'; }
     });
 
-    /* ── Profile Dropdown (fallback for pages without their own toggle logic) ── */
     const profileWrapper = document.getElementById('profileWrapper');
     const profileToggle = document.getElementById('profileToggle');
     if (profileWrapper && profileToggle && !profileWrapper._toggleBound) {
@@ -368,7 +381,6 @@
         });
     }
 
-    /* ── Dark Mode Button (fallback for pages missing their own handler) ── */
     const darkBtn = document.getElementById('darkModeBtn');
     if (darkBtn && !darkBtn._dmBound) {
         darkBtn._dmBound = true;
@@ -379,10 +391,10 @@
                 icon.className = document.body.classList.contains('dark-mode')
                     ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
             }
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
         });
     }
 
-    /* ── Topbar Clock (fallback for pages missing their own handler) ── */
     const clockEl = document.getElementById('topbarClock');
     if (clockEl && !clockEl._clockBound) {
         clockEl._clockBound = true;

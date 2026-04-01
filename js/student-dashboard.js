@@ -1,11 +1,9 @@
-        // ── Elements ──
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('mainContent');
         const overlay = document.getElementById('sidebarOverlay');
         const hamburger = document.getElementById('hamburgerBtn');
         const isMobile = () => window.innerWidth < 992;
 
-        // ── Desktop: hover to expand, main content shifts ──
         sidebar.addEventListener('mouseenter', () => {
             if (!isMobile()) {
                 sidebar.classList.add('expanded');
@@ -20,7 +18,6 @@
             }
         });
 
-        // ── Mobile: hamburger toggle ──
         hamburger.addEventListener('click', () => {
             sidebar.classList.toggle('expanded');
             overlay.classList.toggle('active');
@@ -31,30 +28,6 @@
             overlay.classList.remove('active');
         });
 
-        // ── Profile Dropdown Toggle ──
-        const profileWrapper = document.getElementById('profileWrapper');
-        const profileToggle = document.getElementById('profileToggle');
-
-        profileToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileWrapper.classList.toggle('open');
-        });
-
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!profileWrapper.contains(e.target)) {
-                profileWrapper.classList.remove('open');
-            }
-        });
-
-        // Close dropdown on Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                profileWrapper.classList.remove('open');
-            }
-        });
-
-        // ── Digital Clock + Date ──
         const clockEl = document.getElementById('topbarClock');
         function updateClock() {
             const now = new Date();
@@ -68,19 +41,6 @@
         updateClock();
         setInterval(updateClock, 1000);
 
-        // ── Dark Mode Toggle (placeholder) ──
-        const darkModeBtn = document.getElementById('darkModeBtn');
-        darkModeBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
-            const icon = darkModeBtn.querySelector('i');
-            if (document.body.classList.contains('dark-mode')) {
-                icon.className = 'bi bi-sun-fill';
-            } else {
-                icon.className = 'bi bi-moon-fill';
-            }
-        });
-
-        // ── Dynamic Greeting ──
         const greetingEl = document.querySelector('.welcome-banner h2');
         const hour = new Date().getHours();
         let greeting = 'Good morning';
@@ -88,7 +48,6 @@
         else if (hour >= 18) greeting = 'Good evening';
         greetingEl.textContent = `${greeting}, Bianca!`;
 
-        // ── PDF Download ──
         function downloadBookletPDF() {
             const script = document.createElement('script');
             script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
@@ -99,7 +58,6 @@
                 const gray = [90, 107, 96];
                 let y = 20;
 
-                // Header
                 doc.setFillColor(...green);
                 doc.rect(0, 0, 210, 35, 'F');
                 doc.setTextColor(255, 255, 255);
@@ -137,7 +95,6 @@
                 });
 
                 y += 5;
-                // Term data
                 const terms = [
                     { name: 'First Term — AY 2025–2026', gpa: '2.75', courses: [
                         ['LBYCPG2', 'Online Technologies Lab 2', '1', '2.5'],
@@ -179,7 +136,6 @@
                     doc.text('Term GPA: ' + term.gpa, 160, y + 1);
                     y += 10;
 
-                    // Table header
                     doc.setTextColor(...gray);
                     doc.setFontSize(7);
                     doc.text('CODE', 15, y);
@@ -209,7 +165,6 @@
                     y += 5;
                 });
 
-                // Footer
                 const pageCount = doc.internal.getNumberOfPages();
                 for (let i = 1; i <= pageCount; i++) {
                     doc.setPage(i);

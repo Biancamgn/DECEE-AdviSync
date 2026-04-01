@@ -11,6 +11,7 @@
     <link href="css/student-appointments.css" rel="stylesheet">
 </head>
 <body>
+<script>if(localStorage.getItem("darkMode")==="true")document.body.classList.add("dark-mode")</script>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-brand"><div class="brand-icon"><i class="bi bi-mortarboard-fill"></i></div><div class="brand-text"><h6>DECEE Advising</h6><small>De La Salle University</small></div></div>
@@ -40,26 +41,7 @@
             </div>
             <div class="topbar-right">
                 <button class="topbar-circle-btn" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
-<<<<<<< HEAD
                 <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
-                <div class="profile-wrapper" id="profileWrapper">
-                    <div class="d-flex align-items-center gap-1" style="cursor:pointer;" id="profileToggle">
-                        <div class="profile-btn" title="Profile">BM</div>
-                        <i class="bi bi-chevron-down profile-chevron"></i>
-                    </div>
-                    <div class="profile-dropdown">
-                        <div class="dropdown-header"><div class="dropdown-avatar">BM</div><div><div class="dropdown-name">Bianca Magsino</div><div class="dropdown-role">Student</div></div></div>
-                        <div class="dropdown-info">
-                            <div class="dropdown-info-row"><span class="dropdown-info-label">ID Number</span><span class="dropdown-info-value">12012345</span></div>
-                            <div class="dropdown-info-row"><span class="dropdown-info-label">Program</span><span class="dropdown-info-value">BS-CpE</span></div>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i> Profile</a>
-                        <a href="student-settings.html" class="dropdown-action"><i class="bi bi-gear"></i> Settings</a>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-action logout" onclick="window.location.href='index.html'"><i class="bi bi-box-arrow-left"></i> Sign out</button>
-=======
-                <button class="topbar-circle-btn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
                 <div class="profile-wrapper" id="profileWrapper">
                     <div class="d-flex align-items-center gap-1" style="cursor:pointer;" id="profileToggle">
                         <div class="profile-btn">BM</div>
@@ -76,9 +58,10 @@
                             <div class="dropdown-info-row"><span class="dropdown-info-label">Term</span><span class="dropdown-info-value">8 of 12</span></div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i>View Profile</a>
-                        <a href="student-settings.html" class="dropdown-action"><i class="bi bi-gear"></i>Settings</a>
->>>>>>> ce96f73d6ac40d9d8f5a3e5040c1aa3bb6e78ca4
+                        <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i> View Profile</a>
+                        <a href="student-settings.html" class="dropdown-action"><i class="bi bi-gear"></i> Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-action logout" onclick="window.location.href='index.html'"><i class="bi bi-box-arrow-left"></i> Sign out</button>
                     </div>
                 </div>
             </div>
@@ -89,7 +72,6 @@
             <h2 class="page-title"><i class="bi bi-calendar-event-fill"></i> Advising Appointments</h2>
             <p class="page-subtitle">View your adviser's available slots and book a meeting.</p>
 
-            <!-- Adviser Banner -->
             <div class="adviser-banner">
                 <div class="adv-avatar">RC</div>
                 <div>
@@ -98,12 +80,10 @@
                 </div>
             </div>
 
-            <!-- Book Appointment -->
             <div class="section-card">
                 <div class="section-title"><i class="bi bi-clock"></i> Available Time Slots</div>
                 <div class="section-desc">Select a date, then pick an available time slot to book your appointment.</div>
 
-                <!-- Date Chips -->
                 <div class="date-picker-bar" id="dateBar">
                     <div class="date-chip selected" data-date="2026-03-30" onclick="selectDate(this)">
                         <span class="day-name">Mon</span><span class="day-num">30</span><span class="day-month">Mar</span>
@@ -122,7 +102,6 @@
                     </div>
                 </div>
 
-                <!-- Time Slots -->
                 <div class="slots-grid" id="slotsGrid">
                     <div class="time-slot" onclick="selectSlot(this)"><div class="slot-time">9:00 AM</div><div class="slot-status">Available</div></div>
                     <div class="time-slot" onclick="selectSlot(this)"><div class="slot-time">9:30 AM</div><div class="slot-status">Available</div></div>
@@ -139,7 +118,6 @@
                 <button class="btn-book" id="bookBtn" disabled onclick="bookAppointment()"><i class="bi bi-check-circle"></i> Book This Slot</button>
             </div>
 
-            <!-- My Bookings -->
             <div class="section-card">
                 <div class="section-title"><i class="bi bi-journal-check"></i> My Bookings</div>
                 <div class="section-desc">Your upcoming and past advising appointments.</div>

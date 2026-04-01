@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadComponent('sidebar-container', 'components/sidebar.html');
     await loadComponent('topbar-container', 'components/topbar.html');
 
-    // ── Auto-highlight the active sidebar link ──
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {
         const linkPage = link.getAttribute('href');
@@ -26,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const pageTitle = document.body.dataset.pageTitle;
     const pageSubtitle = document.body.dataset.pageSubtitle;
-    
+
     if (pageTitle) {
         const titleEl = document.getElementById('pageTitle');
         if (titleEl) titleEl.textContent = pageTitle;
@@ -37,5 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     initShared();
+    // Bind notification button after dynamic topbar is loaded
+    if (typeof window._bindNotifBtn === 'function') window._bindNotifBtn();
     await loadUserProfile();
 });

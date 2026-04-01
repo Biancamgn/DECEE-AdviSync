@@ -1,4 +1,3 @@
-/* ══ Advising Forms — Page Script ══ */
 function switchTab(tab) {
     document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
