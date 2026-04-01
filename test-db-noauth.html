@@ -24,14 +24,12 @@
                     .select('*')
                     .limit(10);
 
-                console.log('Query result:', { courses, error });
+                console.log('Courses query result:', { courses, error });
 
                 if (error) {
-                    resultDiv.innerHTML += `<p>❌ Error: ${error.message}</p>`;
-                    resultDiv.innerHTML += `<p>Error code: ${error.code}</p>`;
-                    resultDiv.innerHTML += `<p>Error details: ${JSON.stringify(error)}</p>`;
+                    resultDiv.innerHTML += `<p>❌ Courses Error: ${error.message}</p>`;
                 } else {
-                    resultDiv.innerHTML += `<p>✅ Success! Found ${courses.length} courses</p>`;
+                    resultDiv.innerHTML += `<p>✅ Courses Success! Found ${courses.length} courses</p>`;
                     if (courses.length > 0) {
                         resultDiv.innerHTML += '<h3>Sample Courses:</h3><ul>';
                         courses.slice(0, 3).forEach(course => {
@@ -40,6 +38,36 @@
                         resultDiv.innerHTML += '</ul>';
                     }
                 }
+
+                // Test program_student_checklists table
+                console.log('Testing program_student_checklists table access...');
+                resultDiv.innerHTML += '<p>🔄 Testing program_student_checklists table...</p>';
+
+                const { data: checklists, error: checklistError } = await supabaseClient
+                    .from('program_student_checklists')
+                    .select('*')
+                    .limit(10);
+
+                console.log('Checklists query result:', { checklists, checklistError });
+
+                if (checklistError) {
+                    resultDiv.innerHTML += `<p>❌ Checklists Error: ${checklistError.message}</p>`;
+                    if (checklistError.message.includes('does not exist')) {
+                        resultDiv.innerHTML += '<p>💡 <strong>Table does not exist!</strong> Run the SQL script in Supabase dashboard.</p>';
+                    }
+                } else {
+                    resultDiv.innerHTML += `<p>✅ Checklists Success! Found ${checklists.length} checklist entries</p>`;
+                    if (checklists.length > 0) {
+                        resultDiv.innerHTML += '<h3>Sample Checklists:</h3><ul>';
+                        checklists.slice(0, 3).forEach(item => {
+                            resultDiv.innerHTML += `<li>${item.program_code} ID ${item.student_id_prefix} - ${item.course_code} (${item.year_level}-${item.term})</li>`;
+                        });
+                        resultDiv.innerHTML += '</ul>';
+                    } else {
+                        resultDiv.innerHTML += '<p>⚠️ <strong>No data in table!</strong> Import checklist data using the Python script.</p>';
+                    }
+                }
+
             } catch (err) {
                 resultDiv.innerHTML += `<p>💥 Unexpected error: ${err.message}</p>`;
                 console.error('Unexpected error:', err);

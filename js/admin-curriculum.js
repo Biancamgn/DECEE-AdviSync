@@ -52,6 +52,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let bscpeCourses = [];
     let bseceCourses = [];
+    let programStudentChecklists = [];
+
+    // Track current student ID for each program (set early to avoid TDZ on initial renderAll)
+    let currentStudentIds = { BSCpE: null, BSECE: null };
 
     async function fetchCourses() {
         console.log('🔄 Starting fetchCourses function...');
@@ -133,12 +137,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                         coReqs: []
                     };
 
-                    if (c.program_code === 'BSCpE') {
+                    const programCodeNormalized = c.program_code && c.program_code.toString().toUpperCase();
+                    if (programCodeNormalized === 'BSCPE' || programCodeNormalized === 'CPE') {
                         bscpeCourses.push(courseObj);
-                        console.log('✅ Added to BSCpE courses');
-                    } else if (c.program_code === 'BSECE') {
+                        console.log('✅ Added to BSCpE courses (normalized from', c.program_code + ')');
+                    } else if (programCodeNormalized === 'BSECE' || programCodeNormalized === 'ECE') {
                         bseceCourses.push(courseObj);
-                        console.log('✅ Added to BSECE courses');
+                        console.log('✅ Added to BSECE courses (normalized from', c.program_code + ')');
                     } else {
                         console.warn('⚠️ Unknown program code:', c.program_code);
                     }
@@ -186,6 +191,137 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     await fetchCourses();
+
+    async function fetchProgramStudentChecklists() {
+        console.log('📥 Fetching program student checklists...');
+        const { data, error } = await supabaseClient
+            .from('program_student_checklists')
+            .select('*')
+            .order('program_code', { ascending: true })
+            .order('student_id_prefix', { ascending: true })
+            .order('year_level', { ascending: true })
+            .order('term', { ascending: true })
+            .order('course_sequence', { ascending: true });
+
+        if (error) {
+            console.error('❌ Error fetching program_student_checklists:', error);
+            return;
+        }
+
+        programStudentChecklists = data || [];
+        console.log('✅ Loaded program student checklists:', programStudentChecklists.length);
+
+        // Debug output: grouped by program+student
+        const grouped = programStudentChecklists.reduce((acc, item) => {
+            const key = `${item.program_code}-${item.student_id_prefix}`;
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(item);
+            return acc;
+        }, {});
+        console.log('🗂️ Checklist groups', grouped);
+    }
+
+    await fetchProgramStudentChecklists();
+
+    // Generate student ID tabs for each program
+    function generateStudentIdTabs() {
+        const bscpeStudentIds = [...new Set(programStudentChecklists
+            .filter(c => {
+                const p = c.program_code && c.program_code.toString().toUpperCase();
+                return p === 'BSCPE' || p === 'CPE';
+            })
+            .map(c => c.student_id_prefix))].sort((a, b) => a - b);
+
+        const bseceStudentIds = [...new Set(programStudentChecklists
+            .filter(c => {
+                const p = c.program_code && c.program_code.toString().toUpperCase();
+                return p === 'BSECE' || p === 'ECE';
+            })
+            .map(c => c.student_id_prefix))].sort((a, b) => a - b);
+
+        // BSCpE tabs
+        const bscpeTabsContainer = document.getElementById('bscpeStudentTabs');
+        bscpeTabsContainer.innerHTML = '';
+        bscpeStudentIds.forEach((studentId, index) => {
+            const tabBtn = document.createElement('button');
+            tabBtn.className = `btn btn-sm ${index === 0 ? 'btn-primary' : 'btn-outline-primary'}`;
+            tabBtn.textContent = `ID ${studentId}`;
+            tabBtn.dataset.studentId = studentId;
+            tabBtn.dataset.program = 'BSCpE';
+            tabBtn.addEventListener('click', () => switchStudentTab('BSCpE', studentId));
+            bscpeTabsContainer.appendChild(tabBtn);
+        });
+
+        // BSECE tabs
+        const bseceTabsContainer = document.getElementById('bseceStudentTabs');
+        bseceTabsContainer.innerHTML = '';
+        bseceStudentIds.forEach((studentId, index) => {
+            const tabBtn = document.createElement('button');
+            tabBtn.className = `btn btn-sm ${index === 0 ? 'btn-primary' : 'btn-outline-primary'}`;
+            tabBtn.textContent = `ID ${studentId}`;
+            tabBtn.dataset.studentId = studentId;
+            tabBtn.dataset.program = 'BSECE';
+            tabBtn.addEventListener('click', () => switchStudentTab('BSECE', studentId));
+            bseceTabsContainer.appendChild(tabBtn);
+        });
+    }
+
+    function switchStudentTab(program, studentId) {
+        // Update active tab styling
+        const tabsContainer = document.getElementById(`${program.toLowerCase()}StudentTabs`);
+        const tabButtons = tabsContainer.querySelectorAll('button');
+        tabButtons.forEach(btn => {
+            if (btn.dataset.studentId == studentId) {
+                btn.className = 'btn btn-sm btn-primary';
+            } else {
+                btn.className = 'btn btn-sm btn-outline-primary';
+            }
+        });
+
+        // Update current student ID
+        currentStudentIds[program] = studentId;
+
+        // Re-render the current view
+        renderAll();
+    }
+
+    // Initialize student ID tabs
+    generateStudentIdTabs();
+
+    // Set initial student IDs (first available for each program)
+    const bscpeStudentIds = [...new Set(programStudentChecklists
+        .filter(c => {
+            const p = c.program_code && c.program_code.toString().toUpperCase();
+            return p === 'BSCPE' || p === 'CPE';
+        })
+        .map(c => c.student_id_prefix))].sort((a, b) => a - b);
+
+    const bseceStudentIds = [...new Set(programStudentChecklists
+        .filter(c => {
+            const p = c.program_code && c.program_code.toString().toUpperCase();
+            return p === 'BSECE' || p === 'ECE';
+        })
+        .map(c => c.student_id_prefix))].sort((a, b) => a - b);
+
+    if (bscpeStudentIds.length > 0) currentStudentIds.BSCpE = bscpeStudentIds[0];
+    if (bseceStudentIds.length > 0) currentStudentIds.BSECE = bseceStudentIds[0];
+
+    // Re-render when program tab changes (bootstrap tab event), and ensure a student ID is selected.
+    function getActiveProgram() {
+        const activeProgramTab = document.querySelector('#programTabs .nav-link.active');
+        return activeProgramTab && activeProgramTab.id === 'bscpe-tab' ? 'BSCpE' : 'BSECE';
+    }
+
+    document.querySelectorAll('#programTabs button[data-bs-toggle="tab"]').forEach(btn => {
+        btn.addEventListener('shown.bs.tab', () => {
+            const active = getActiveProgram();
+            if (!currentStudentIds[active]) {
+                const studentIds = active === 'BSCpE' ? bscpeStudentIds : bseceStudentIds;
+                if (studentIds && studentIds.length) currentStudentIds[active] = studentIds[0];
+            }
+            renderAll();
+        });
+    });
 
     let currentView = 'grid';
     const viewGridBtn = document.getElementById('viewGrid');
@@ -312,18 +448,176 @@ document.addEventListener('DOMContentLoaded', async () => {
         `).join('');
     }
 
-    function renderAll() {
-        document.getElementById('bscpeGrid').classList.toggle('d-none', currentView !== 'grid');
-        document.getElementById('bscpeTable').classList.toggle('d-none', currentView !== 'table');
-        document.getElementById('bseceGrid').classList.toggle('d-none', currentView !== 'grid');
-        document.getElementById('bseceTable').classList.toggle('d-none', currentView !== 'table');
+    function renderFlowchart(checklistItems, containerEl, programKey) {
+        if (!checklistItems || checklistItems.length === 0) {
+            containerEl.innerHTML = `<div class="text-center py-5" style="color:var(--dlsu-gray-400); font-size:0.85rem;"><i class="bi bi-inbox fs-2 d-block mb-2"></i>No checklist data found</div>`;
+            return;
+        }
 
-        if (currentView === 'grid') {
-            renderGrid(bscpeCourses, document.getElementById('bscpeGrid'), 'BSCpE');
-            renderGrid(bseceCourses, document.getElementById('bseceGrid'), 'BSECE');
+        // Group by year and term
+        const grouped = checklistItems.reduce((acc, item) => {
+            const key = `Year ${item.year_level} - Term ${item.term}`;
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(item);
+            return acc;
+        }, {});
+
+        containerEl.innerHTML = Object.keys(grouped).sort().map(termKey => {
+            const courses = grouped[termKey].sort((a, b) => a.course_sequence - b.course_sequence);
+            const totalUnits = courses.reduce((sum, c) => sum + c.units, 0);
+
+            return `
+                <div class="term-block mb-4">
+                    <div class="term-header">
+                        <span class="term-label">${termKey}</span>
+                        <span class="term-units">${totalUnits} units</span>
+                    </div>
+                    <div class="row g-2">
+                        ${courses.map(c => {
+                            // Parse prerequisites
+                            let prereqHtml = '<span style="color:var(--dlsu-gray-400); font-size:0.75rem;">None</span>';
+                            if (c.prerequisites) {
+                                try {
+                                    const prereqs = JSON.parse(c.prerequisites);
+                                    if (prereqs && prereqs.length > 0) {
+                                        prereqHtml = prereqs.map(p => {
+                                            const type = p.type === 'H' ? 'hard' : p.type === 'S' ? 'soft' : 'co';
+                                            return `<span class="prereq-badge ${type}">${p.code}</span>`;
+                                        }).join(' ');
+                                    }
+                                } catch (e) {
+                                    // If not JSON, treat as simple string
+                                    prereqHtml = `<span class="prereq-badge hard">${c.prerequisites}</span>`;
+                                }
+                            }
+
+                            return `
+                                <div class="col-sm-6 col-lg-4">
+                                    <div class="course-card">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <span class="course-code">${c.course_code}</span>
+                                            <div class="d-flex gap-1">
+                                                <button class="action-btn edit" title="Edit" onclick="editChecklistCourse('${c.id}', '${programKey}')"><i class="bi bi-pencil-square"></i></button>
+                                                <button class="action-btn delete" title="Delete" onclick="deleteChecklistCourse('${c.id}', '${programKey}')"><i class="bi bi-trash3"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="course-title">${c.course_title}</div>
+                                        <div class="course-units">${c.units} units</div>
+                                        <div class="course-prereqs mt-2">
+                                            ${prereqHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderChecklistTable(checklistItems, tbodyEl, programKey) {
+        if (!checklistItems || checklistItems.length === 0) {
+            tbodyEl.innerHTML = `<tr><td colspan="6" class="text-center py-4" style="color:var(--dlsu-gray-400); font-size:0.82rem;"><i class="bi bi-inbox fs-4 d-block mb-2"></i>No checklist data found</td></tr>`;
+            return;
+        }
+
+        tbodyEl.innerHTML = checklistItems.sort((a, b) => {
+            if (a.year_level !== b.year_level) return a.year_level - b.year_level;
+            if (a.term !== b.term) return a.term - b.term;
+            return a.course_sequence - b.course_sequence;
+        }).map(c => {
+            // Parse prerequisites
+            let prereqHtml = '<span style="color:var(--dlsu-gray-400); font-size:0.75rem;">None</span>';
+            if (c.prerequisites) {
+                try {
+                    const prereqs = JSON.parse(c.prerequisites);
+                    if (prereqs && prereqs.length > 0) {
+                        prereqHtml = prereqs.map(p => {
+                            const type = p.type === 'H' ? 'hard' : p.type === 'S' ? 'soft' : 'co';
+                            return `<span class="prereq-badge ${type}">${p.code}</span>`;
+                        }).join(' ');
+                    }
+                } catch (e) {
+                    prereqHtml = `<span class="prereq-badge hard">${c.prerequisites}</span>`;
+                }
+            }
+
+            return `
+                <tr>
+                    <td class="prof-name">${c.course_code}</td>
+                    <td>${c.course_title}</td>
+                    <td>${c.units}</td>
+                    <td><span class="badge-program">Y${c.year_level} T${c.term}</span></td>
+                    <td>${prereqHtml}</td>
+                    <td>
+                        <div class="d-flex justify-content-end gap-1">
+                            <button class="action-btn edit" title="Edit" onclick="editChecklistCourse('${c.id}', '${programKey}')"><i class="bi bi-pencil-square"></i></button>
+                            <button class="action-btn delete" title="Delete" onclick="deleteChecklistCourse('${c.id}', '${programKey}')"><i class="bi bi-trash3"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderAll() {
+        // Get active program tab
+        const activeProgramTab = document.querySelector('#programTabs .nav-link.active');
+        if (!activeProgramTab) {
+            console.warn('⚠️ No active program tab found, skipping render');
+            return;
+        }
+        
+        const activeProgram = activeProgramTab.id === 'bscpe-tab' ? 'BSCpE' : 'BSECE';
+
+        // Get current student ID for the active program
+        const currentStudentId = currentStudentIds[activeProgram];
+
+        // If we have checklist data and a selected student ID, show checklist view (flowchart or table based on currentView)
+        if (programStudentChecklists.length > 0 && currentStudentId) {
+            // Filter checklist for current program and student ID
+            const checklistItems = programStudentChecklists.filter(c => {
+                const p = c.program_code && c.program_code.toString().toUpperCase();
+                const normalized = (p === 'CPE' ? 'BSCPE' : p === 'ECE' ? 'BSECE' : p);
+                return normalized === activeProgram.toUpperCase() && c.student_id_prefix == currentStudentId;
+            });
+
+            // Get grid/table elements
+            const gridEl = document.getElementById(`${activeProgram.toLowerCase()}Grid`);
+            const tableEl = document.getElementById(`${activeProgram.toLowerCase()}Table`);
+
+            // Show/hide based on currentView
+            if (currentView === 'grid') {
+                gridEl.classList.remove('d-none');
+                tableEl.classList.add('d-none');
+                renderFlowchart(checklistItems, gridEl, activeProgram);
+            } else {
+                gridEl.classList.add('d-none');
+                tableEl.classList.remove('d-none');
+                const tbodyEl = document.getElementById(`${activeProgram.toLowerCase()}TableBody`);
+                renderChecklistTable(checklistItems, tbodyEl, activeProgram);
+            }
+
+            // Hide the other program's content
+            const otherProgram = activeProgram === 'BSCpE' ? 'BSECE' : 'BSCpE';
+            document.getElementById(`${otherProgram.toLowerCase()}Grid`).classList.add('d-none');
+            document.getElementById(`${otherProgram.toLowerCase()}Table`).classList.add('d-none');
+
         } else {
-            renderTable(bscpeCourses, document.getElementById('bscpeTableBody'), 'BSCpE');
-            renderTable(bseceCourses, document.getElementById('bseceTableBody'), 'BSECE');
+            // Show regular course view
+            document.getElementById('bscpeGrid').classList.toggle('d-none', currentView !== 'grid');
+            document.getElementById('bscpeTable').classList.toggle('d-none', currentView !== 'table');
+            document.getElementById('bseceGrid').classList.toggle('d-none', currentView !== 'grid');
+            document.getElementById('bseceTable').classList.toggle('d-none', currentView !== 'table');
+
+            if (currentView === 'grid') {
+                renderGrid(bscpeCourses, document.getElementById('bscpeGrid'), 'BSCpE');
+                renderGrid(bseceCourses, document.getElementById('bseceGrid'), 'BSECE');
+            } else {
+                renderTable(bscpeCourses, document.getElementById('bscpeTableBody'), 'BSCpE');
+                renderTable(bseceCourses, document.getElementById('bseceTableBody'), 'BSECE');
+            }
         }
 
         document.getElementById('bscpeCount').textContent = bscpeCourses.length;
@@ -450,4 +744,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderAll();
         deleteCourseModal.hide();
     });
+
+    // Checklist course management functions
+    window.editChecklistCourse = function(id, program) {
+        const checklistItem = programStudentChecklists.find(c => c.id == id);
+        if (!checklistItem) return;
+
+        // For now, show a simple alert - you can expand this to a full modal
+        alert(`Edit checklist course: ${checklistItem.course_code} - ${checklistItem.course_title}\n\nThis would open an edit modal for checklist courses.`);
+    };
+
+    window.deleteChecklistCourse = function(id, program) {
+        if (confirm('Are you sure you want to delete this checklist course?')) {
+            // Delete from program_student_checklists table
+            supabaseClient
+                .from('program_student_checklists')
+                .delete()
+                .eq('id', id)
+                .then(async ({ error }) => {
+                    if (error) {
+                        alert('Error deleting checklist course: ' + error.message);
+                    } else {
+                        // Refresh data
+                        await fetchProgramStudentChecklists();
+                        renderAll();
+                    }
+                });
+        }
+    };
 });
