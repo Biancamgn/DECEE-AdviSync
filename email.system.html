@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email System — Adviser Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/email-system.css">
+</head>
+<body data-page-title="Email System" data-page-subtitle="Send announcements & individual emails">
+    <div id="sidebar-container"></div>
+    <div class="main-content" id="mainContent">
+        <div id="topbar-container"></div>
+        <div class="page-body">
+            <h2 class="page-title"><i class="bi bi-envelope-fill"></i> Email System</h2>
+            <p class="page-subtitle">Send bulk announcements to all advisees or individual emails to specific students.</p>
+            <div class="mode-toggle">
+                <button class="mode-btn active" onclick="switchMode('bulk')"><i class="bi bi-megaphone"></i> Bulk Announcement</button>
+                <button class="mode-btn" onclick="switchMode('individual')"><i class="bi bi-person"></i> Individual Email</button>
+            </div>
+            <div class="tab-content active" id="mode-bulk">
+                <div class="section-card">
+                    <div class="section-title"><i class="bi bi-megaphone"></i> Send Announcement</div>
+                    <div class="section-desc">This email will be sent to all 24 of your assigned advisees.</div>
+                    <div class="form-group"><label class="form-label-custom">Recipients</label><input type="text" class="form-control-custom" value="All Advisees (24 students)" disabled style="background:var(--dlsu-gray-50);"><div class="recipient-info"><i class="bi bi-info-circle"></i> Includes BS-CpE (16), BS-ECE (5), BS-EE (3)</div></div>
+                    <div class="form-group"><label class="form-label-custom">Subject <span class="required">*</span></label><input type="text" class="form-control-custom" placeholder="e.g. Advising Period Now Open — Submit Your Study Plans"></div>
+                    <div class="form-group"><label class="form-label-custom">Message <span class="required">*</span></label><textarea class="form-control-custom" placeholder="Dear students,&#10;&#10;The academic advising period for Term 2, AY 2025–2026 is now open..."></textarea></div>
+                    <button class="btn-send" onclick="alert('Announcement sent to 24 advisees!')"><i class="bi bi-send-fill"></i> Send to All Advisees</button>
+                </div>
+            </div>
+            <div class="tab-content" id="mode-individual">
+                <div class="section-card">
+                    <div class="section-title"><i class="bi bi-person"></i> Send Individual Email</div>
+                    <div class="section-desc">Send a direct email to a specific student.</div>
+                    <div class="form-group"><label class="form-label-custom">Recipient <span class="required">*</span></label><select class="form-control-custom"><option value="">Select a student...</option><option>Bianca Magsino (12012345) — BS-CpE</option><option>Angelo Torres (12023456) — BS-CpE</option><option>Maria Santos (12087654) — BS-ECE</option><option>Juan Dela Cruz (12098765) — BS-CpE</option><option>Patricia Lim (12034567) — BS-CpE</option><option>Rafael Garcia (12045678) — BS-EE</option><option>Isabella Tan (12056789) — BS-ECE</option><option>Carlos Reyes (12076543) — BS-CpE</option></select></div>
+                    <div class="form-group"><label class="form-label-custom">Subject <span class="required">*</span></label><input type="text" class="form-control-custom" placeholder="e.g. Follow-up on your study plan submission"></div>
+                    <div class="form-group"><label class="form-label-custom">Message <span class="required">*</span></label><textarea class="form-control-custom" placeholder="Write your message here..."></textarea></div>
+                    <button class="btn-send" onclick="alert('Email sent!')"><i class="bi bi-send-fill"></i> Send Email</button>
+                </div>
+            </div>
+            <div class="section-card">
+                <div class="section-title"><i class="bi bi-clock-history"></i> Recently Sent</div>
+                <div class="section-desc">Your last sent emails and announcements.</div>
+                <div class="sent-item"><div class="sent-icon bulk"><i class="bi bi-megaphone"></i></div><div><div class="sent-subject">Advising Period Now Open — Submit Your Study Plans</div><div class="sent-meta">To: All Advisees (24) · Mar 24, 2026 at 8:00 AM</div><div class="sent-preview">Dear students, the academic advising period for Term 2, AY 2025–2026 is now open. Please submit your study plan...</div></div></div>
+                <div class="sent-item"><div class="sent-icon individual"><i class="bi bi-person"></i></div><div><div class="sent-subject">RE: Prerequisite Concern for EMBDSYS</div><div class="sent-meta">To: Bianca Magsino · Mar 22, 2026 at 2:15 PM</div><div class="sent-preview">Hi Bianca, I've checked your records and confirmed that you've passed MICPROS. You're eligible to enroll in...</div></div></div>
+                <div class="sent-item"><div class="sent-icon bulk"><i class="bi bi-megaphone"></i></div><div><div class="sent-subject">Reminder: Advising Deadline — April 4</div><div class="sent-meta">To: All Advisees (24) · Mar 20, 2026 at 9:00 AM</div><div class="sent-preview">This is a reminder that the deadline to submit your academic advising requirements is April 4, 2026...</div></div></div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/load-components.js"></script>
+    <script src="js/email-system.js"></script>
+</body>
+</html>
