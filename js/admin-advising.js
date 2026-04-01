@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function fetchAdvisers() {
         const { data, error } = await supabaseClient
             .from('profiles')
-            .select('*, advisers(*)')
+            .select('*, professors(*)')
             .eq('role', 'adviser')
             .eq('status', 'active')
             .order('last_name');
@@ -66,34 +66,65 @@ document.addEventListener('DOMContentLoaded', async () => {
                 id: p.school_id,
                 uuid: p.id,
                 name: `${p.first_name} ${p.last_name}`,
-                dept: p.advisers?.department || 'DECEE',
-                maxAdvisees: p.advisers?.max_advisees || 50,
+                dept: p.professors?.department || 'DECEE',
+                maxAdvisees: p.professors?.max_advisees || 50,
                 initials: (p.first_name ? p.first_name[0] : '') + (p.last_name ? p.last_name[0] : '')
             }));
         }
     }
 
     async function fetchStudents() {
-        const { data, error } = await supabaseClient
+        // First get student profiles
+        const { data: studentProfiles, error: profileError } = await supabaseClient
             .from('profiles')
-            .select('*, students(*)')
+            .select('*')
             .eq('role', 'student')
+            .eq('status', 'active')
             .order('school_id');
 
-        if (!error && data) {
-            students = data.map(p => {
-                const adviserUuid = p.students?.adviser_id || null;
-                return {
-                    id: p.school_id,
-                    uuid: p.id,
-                    name: `${p.first_name} ${p.last_name}`,
-                    program: p.students?.program || 'BSCpE',
-                    year: p.students?.year_level || 1,
-                    adviserUuid: adviserUuid,
-                    adviserId: null // will be resolved after professors load
-                };
-            });
+        if (profileError || !studentProfiles) {
+            console.error('Error fetching student profiles:', profileError);
+            return;
         }
+
+        // Then get student details for these profiles
+        const studentIds = studentProfiles.map(p => p.id);
+        let { data: studentDetails, error: detailsError } = await supabaseClient
+            .from('students')
+            .select('*')
+            .in('id', studentIds);
+
+        if (detailsError) {
+            console.warn('Error fetching student details with filter, trying fallback to all students:', detailsError);
+            const fallback = await supabaseClient.from('students').select('*');
+            if (fallback.error) {
+                console.error('Fallback error fetching student details:', fallback.error);
+                return;
+            }
+            studentDetails = fallback.data;
+        }
+
+        if (!studentDetails || studentDetails.length === 0) {
+            console.warn('No student details found for student IDs, using profile-only fallback.');
+        }
+
+        console.debug('Fetched students:', studentProfiles.length, 'profiles,', studentDetails?.length || 0, 'details');
+
+        // Merge the data
+        students = studentProfiles.map(profile => {
+            const details = studentDetails?.find(s => s.id === profile.id) || {};
+            const adviserUuid = details.adviser_id || null;
+
+            return {
+                id: profile.school_id,
+                uuid: profile.id,
+                name: `${profile.first_name} ${profile.last_name}`,
+                program: details.program || 'BSCpE',
+                year: details.year_level || 1,
+                adviserUuid: adviserUuid,
+                adviserId: null // will be resolved after professors load
+            };
+        });
     }
 
     await Promise.all([fetchAdvisers(), fetchStudents()]);
@@ -135,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderStats() {
         const assigned = students.filter(s => s.adviserId).length;
         const unassigned = students.filter(s => !s.adviserId).length;
-        const overload = advisers.filter(p => getAdviseeCount(p.id) > OVERLOAD_THRESHOLD).length;
+        const overloaded = advisers.filter(p => getAdviseeCount(p.id) > OVERLOAD_THRESHOLD).length;
 
         document.getElementById('totalAdvisers').textContent = advisers.length;
         document.getElementById('assignedStudents').textContent = assigned;
@@ -345,7 +376,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (const uuid of studentUuids) {
             await supabaseClient
                 .from('students')
-                .update({ adviser_id: prof.uuid })
+                .update({ adviser_id: adv.uuid })
                 .eq('id', uuid);
         }
 

@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/Biancamgn/DECEE-AdviSync/issues"
   },
-  "homepage": "https://github.com/Biancamgn/DECEE-AdviSync#readme"
+  "homepage": "https://github.com/Biancamgn/DECEE-AdviSync#readme",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.101.1"
+  }
 }
