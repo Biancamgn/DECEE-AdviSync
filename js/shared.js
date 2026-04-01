@@ -85,4 +85,13 @@ function initShared() {
         }
     });
 
+
+    // ── Logout ──
+    const logoutBtn = document.querySelector('.dropdown-action.logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    }
+
 }
