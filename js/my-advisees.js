@@ -45,6 +45,8 @@ function renderAdvisees(advisees) {
         return;
     }
 
+    let countCleared = 0, countAtRisk = 0, countPending = 0;
+
     advisees.forEach(advisee => {
         const p = advisee.profiles;
         const s = advisee.students;
@@ -53,9 +55,23 @@ function renderAdvisees(advisees) {
         const yearLevel = s.year_level || '-';
         const failedUnits = s.failed_units ?? 0;
         const isCleared = s.is_cleared;
-        const statusLabel = isCleared ? 'cleared' : 'not-cleared';
-        const statusText = isCleared ? 'Cleared' : 'Not Cleared';
-        const programLower = program.toLowerCase().replace('bs', '');
+
+        let statusLabel, statusText;
+        if (isCleared) {
+            statusLabel = 'cleared';
+            statusText = 'Cleared';
+            countCleared++;
+        } else if (failedUnits >= 15) {
+            statusLabel = 'at-risk';
+            statusText = 'At-Risk';
+            countAtRisk++;
+        } else {
+            statusLabel = 'pending';
+            statusText = 'Pending';
+            countPending++;
+        }
+
+        const programLower = program.replace('BS', '').toLowerCase();
 
         const row = document.createElement('tr');
         row.dataset.program = programLower;
@@ -74,6 +90,11 @@ function renderAdvisees(advisees) {
         `;
         tbody.appendChild(row);
     });
+
+    document.getElementById('countTotal').textContent = advisees.length;
+    document.getElementById('countCleared').textContent = countCleared;
+    document.getElementById('countPending').textContent = countPending;
+    document.getElementById('countAtRisk').textContent = countAtRisk;
 }
 
 function filterTable() {

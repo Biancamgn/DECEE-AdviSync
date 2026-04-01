@@ -18,10 +18,10 @@
             <h2 class="page-title"><i class="bi bi-people-fill"></i> My Advisees</h2>
             <p class="page-subtitle">View and manage all students assigned to you for academic advising.</p>
             <div class="summary-row">
-                <div class="summary-chip"><span class="chip-count">24</span> Total Advisees</div>
-                <div class="summary-chip"><span class="chip-count">16</span> Cleared</div>
-                <div class="summary-chip warn"><span class="chip-count">5</span> Pending</div>
-                <div class="summary-chip danger"><span class="chip-count">3</span> At-Risk</div>
+                <div class="summary-chip"><span class="chip-count" id="countTotal">-</span> Total Advisees</div>
+                <div class="summary-chip"><span class="chip-count" id="countCleared">-</span> Cleared</div>
+                <div class="summary-chip warn"><span class="chip-count" id="countPending">-</span> Pending</div>
+                <div class="summary-chip danger"><span class="chip-count" id="countAtRisk">-</span> At-Risk</div>
             </div>
             <div class="filter-bar">
                 <div class="search-box"><i class="bi bi-search"></i><input type="text" placeholder="Search by name, ID, or email..." id="searchInput" oninput="filterTable()"></div>
@@ -30,15 +30,8 @@
             </div>
             <table class="advisee-table" id="adviseeTable">
                 <thead><tr><th>Student</th><th>ID</th><th>Program</th><th>Term</th><th>Failed Units</th><th>Status</th><th>Action</th></tr></thead>
-                <tbody>
-                    <tr data-program="cpe" data-status="cleared"><td><div class="student-name">Bianca Magsino</div><div class="student-email">bianca.magsino@dlsu.edu.ph</div></td><td>12012345</td><td><span class="program-badge cpe">BS-CpE</span></td><td>8</td><td><span class="failed-units safe">6 / 30</span></td><td><span class="status-badge cleared">Cleared</span></td><td><a href="#" class="btn-view">View</a></td></tr>
-                    <tr data-program="cpe" data-status="pending"><td><div class="student-name">Angelo Torres</div><div class="student-email">angelo.torres@dlsu.edu.ph</div></td><td>12023456</td><td><span class="program-badge cpe">BS-CpE</span></td><td>6</td><td><span class="failed-units safe">3 / 30</span></td><td><span class="status-badge pending">Pending</span></td><td><a href="#" class="btn-view">View</a></td></tr>
-                    <tr data-program="ece" data-status="at-risk"><td><div class="student-name">Maria Santos</div><div class="student-email">maria.santos@dlsu.edu.ph</div></td><td>12087654</td><td><span class="program-badge ece">BS-ECE</span></td><td>7</td><td><span class="failed-units danger">24 / 30</span></td><td><span class="status-badge at-risk">At-Risk</span></td><td><a href="#" class="btn-view">View</a></td></tr>
-                    <tr data-program="cpe" data-status="at-risk"><td><div class="student-name">Juan Dela Cruz</div><div class="student-email">juan.delacruz@dlsu.edu.ph</div></td><td>12098765</td><td><span class="program-badge cpe">BS-CpE</span></td><td>9</td><td><span class="failed-units warn">18 / 30</span></td><td><span class="status-badge at-risk">At-Risk</span></td><td><a href="#" class="btn-view">View</a></td></tr>
-                    <tr data-program="cpe" data-status="cleared"><td><div class="student-name">Patricia Lim</div><div class="student-email">patricia.lim@dlsu.edu.ph</div></td><td>12034567</td><td><span class="program-badge cpe">BS-CpE</span></td><td>10</td><td><span class="failed-units safe">0 / 30</span></td><td><span class="status-badge cleared">Cleared</span></td><td><a href="#" class="btn-view">View</a></td></tr>
-                    <tr data-program="ee" data-status="pending"><td><div class="student-name">Rafael Garcia</div><div class="student-email">rafael.garcia@dlsu.edu.ph</div></td><td>12045678</td><td><span class="program-badge ee">BS-EE</span></td><td>5</td><td><span class="failed-units safe">9 / 30</span></td><td><span class="status-badge pending">Pending</span></td><td><a href="#" class="btn-view">View</a></td></tr>
-                    <tr data-program="ece" data-status="cleared"><td><div class="student-name">Isabella Tan</div><div class="student-email">isabella.tan@dlsu.edu.ph</div></td><td>12056789</td><td><span class="program-badge ece">BS-ECE</span></td><td>8</td><td><span class="failed-units safe">3 / 30</span></td><td><span class="status-badge cleared">Cleared</span></td><td><a href="#" class="btn-view">View</a></td></tr>
-                    <tr data-program="cpe" data-status="at-risk"><td><div class="student-name">Carlos Reyes</div><div class="student-email">carlos.reyes@dlsu.edu.ph</div></td><td>12076543</td><td><span class="program-badge cpe">BS-CpE</span></td><td>7</td><td><span class="failed-units warn">15 / 30</span></td><td><span class="status-badge at-risk">At-Risk</span></td><td><a href="#" class="btn-view">View</a></td></tr>
+                <tbody id="adviseeTbody">
+                    <tr><td colspan="7" class="text-center">Loading advisees...</td></tr>
                 </tbody>
             </table>
         </div>
