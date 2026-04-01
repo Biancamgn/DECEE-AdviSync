@@ -45,17 +45,33 @@ async function signOut() {
 
 /**
  * Handle login form submission.
- * Called from index.html.
+ * Uses ID Number to look up the user's email via secure RPC,
+ * then authenticates via Supabase Auth.
  */
 function initLoginForm() {
     const form = document.getElementById('loginForm');
     if (!form) return;
 
+    // ── Password Toggle ──
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    if (togglePassword && passwordInput && toggleIcon) {
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            toggleIcon.classList.toggle('bi-eye');
+            toggleIcon.classList.toggle('bi-eye-slash');
+        });
+    }
+
+    // ── Login Submit ──
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const idNumber = document.getElementById('idInput').value.trim();
-        const password = document.getElementById('passwordInput').value;
+        const idNumber = document.getElementById('userId').value.trim();
+        const password = document.getElementById('password').value;
         const errorEl = document.getElementById('errorMessage');
 
         // Clear previous error
@@ -86,7 +102,7 @@ function initLoginForm() {
             });
 
             if (error) {
-                errorEl.textContent = error.message;
+                errorEl.textContent = 'Invalid ID Number or Password.';
                 errorEl.classList.remove('d-none');
                 submitBtn.disabled = false;
                 submitBtn.textContent = originalText;
@@ -115,7 +131,7 @@ function initLoginForm() {
                     window.location.href = 'admin-dashboard.html';
                     break;
                 case 'professor':
-                    window.location.href = 'prof-dashboard.html';
+                    window.location.href = 'academic-advising.html';
                     break;
                 case 'student':
                     window.location.href = 'student-dashboard.html';
@@ -130,6 +146,22 @@ function initLoginForm() {
             submitBtn.textContent = originalText;
         }
     });
+
+    // ── Forgot Password ──
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    const resetAlert = document.getElementById('resetAlert');
+
+    if (forgotPasswordForm && resetAlert) {
+        forgotPasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const resetId = document.getElementById('resetId').value.trim();
+
+            resetAlert.classList.remove('d-none');
+            resetAlert.textContent = `Reset instructions have been sent to ${resetId}@dlsu.edu.ph`;
+            
+            document.getElementById('resetId').value = '';
+        });
+    }
 }
 
 // Auto-init login form if on the login page

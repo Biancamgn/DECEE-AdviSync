@@ -1,0 +1,67 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Login Page Styles — DECEE AdviSync
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root {
+    --dlsu-green: #00703C;
+    --dlsu-green-dark: #005a30;
+    --dlsu-green-light: #e8f5ee;
+    --dlsu-green-muted: #4a9e6f;
+    --dlsu-white: #ffffff;
+    --dlsu-gray-50: #f8faf9;
+    --dlsu-gray-100: #f0f4f2;
+    --dlsu-gray-200: #e2e8e5;
+    --dlsu-gray-400: #94a89c;
+    --dlsu-gray-600: #5a6b60;
+    --dlsu-gray-800: #2d3a32;
+    --dlsu-warning: #e6a817;
+    --dlsu-danger: #c0392b;
+    --dlsu-info: #2980b9;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body.dlsu-bg {
+    background-image: url('../assets/images/login-page-background.jpg');
+    background-size: cover;         
+    background-position: center;    
+    background-repeat: no-repeat;   
+    background-attachment: fixed;   
+    background-color: var(--dlsu-gray-200);
+}
+
+.login-card {
+    background-color: rgba(255, 255, 255, 0.92) !important; 
+    border: 1px solid var(--dlsu-gray-200) !important; 
+    backdrop-filter: blur(8px);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.text-muted {
+    color: var(--dlsu-gray-600) !important;
+}
+.form-label {
+    color: var(--dlsu-gray-800);
+}
+
+.text-success {
+    color: var(--dlsu-green) !important; 
+}
+
+.btn-success {
+    background-color: var(--dlsu-green) !important;
+    border-color: var(--dlsu-green) !important;
+}
+
+.btn-success:hover {
+    background-color: var(--dlsu-green-dark) !important; 
+    border-color: var(--dlsu-green-dark) !important;
+}
+
+.form-control:focus {
+    border-color: var(--dlsu-green-muted);
+    box-shadow: 0 0 0 0.25rem rgba(0, 112, 60, 0.25);
+}
