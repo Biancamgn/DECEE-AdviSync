@@ -27,7 +27,7 @@
                     <div><label class="form-label-custom">Type</label><select class="form-control-custom" id="slotType"><option value="zoom">Zoom</option><option value="in-person">In Person</option></select></div>
                     <button class="btn-add-slot" onclick="addSlot()"><i class="bi bi-plus-lg"></i> Add Slot</button>
                 </div>
-                <div class="slots-list" id="slotsList">
+                <div class="slots-list" id="slotsList"></div>
                     <div class="slot-card"><button class="slot-remove" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button><div class="slot-date">Mon, Mar 30</div><div class="slot-time">9:00 AM – 9:30 AM</div><div class="slot-type"><i class="bi bi-camera-video"></i> Zoom</div><div class="slot-booked available">Available</div></div>
                     <div class="slot-card"><button class="slot-remove" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button><div class="slot-date">Mon, Mar 30</div><div class="slot-time">10:00 AM – 10:30 AM</div><div class="slot-type"><i class="bi bi-camera-video"></i> Zoom</div><div class="slot-booked taken">Booked — B. Magsino</div></div>
                     <div class="slot-card"><button class="slot-remove" onclick="this.parentElement.remove()"><i class="bi bi-x"></i></button><div class="slot-date">Tue, Mar 31</div><div class="slot-time">1:00 PM – 1:30 PM</div><div class="slot-type"><i class="bi bi-building"></i> In Person</div><div class="slot-booked available">Available</div></div>
@@ -39,10 +39,8 @@
                 <div class="section-desc">View and manage appointments booked by your advisees.</div>
                 <table class="bookings-table">
                     <thead><tr><th>Student</th><th>Date</th><th>Time</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody>
-                        <tr><td><strong>Bianca Magsino</strong></td><td>Mar 30, 2026</td><td>10:00 AM</td><td><i class="bi bi-camera-video"></i> Zoom</td><td><span class="booking-status confirmed">Confirmed</span></td><td><button class="btn-action-sm btn-cancel-sm" onclick="this.closest('tr').style.opacity='0.4'">Cancel</button></td></tr>
-                        <tr><td><strong>Angelo Torres</strong></td><td>Apr 1, 2026</td><td>2:00 PM</td><td><i class="bi bi-camera-video"></i> Zoom</td><td><span class="booking-status pending">Pending</span></td><td><button class="btn-action-sm btn-confirm" onclick="this.textContent='Confirmed';this.disabled=true;">Confirm</button> <button class="btn-action-sm btn-cancel-sm" onclick="this.closest('tr').style.opacity='0.4'">Cancel</button></td></tr>
-                        <tr><td><strong>Rafael Garcia</strong></td><td>Apr 2, 2026</td><td>9:30 AM</td><td><i class="bi bi-building"></i> In Person</td><td><span class="booking-status pending">Pending</span></td><td><button class="btn-action-sm btn-confirm" onclick="this.textContent='Confirmed';this.disabled=true;">Confirm</button> <button class="btn-action-sm btn-cancel-sm" onclick="this.closest('tr').style.opacity='0.4'">Cancel</button></td></tr>
+                    <tbody id="bookingsTbody">
+                        <tr><td colspan="6" class="text-center">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>

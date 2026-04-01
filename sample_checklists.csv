@@ -1,0 +1,21 @@
+program_code,student_id_prefix,year_level,term,course_sequence,course_code,course_title,units,prerequisites
+BSCpE,122,1,1,1,NSTP101,National Service Training Program 1,3,
+BSCpE,122,1,1,2,FMATH,Foundation in Math,5,
+BSCpE,122,1,1,3,BASCHEM,Basic Chemistry,3,
+BSCpE,122,1,1,4,BASPHYS,Basic Physics,3,
+BSCpE,122,1,2,1,LBYCPD1,Computer Programming 1,3,
+BSCpE,122,1,2,2,ENGCHEM,Engineering Chemistry,3,
+BSCpE,122,1,2,3,ENGPHYS,Engineering Physics,3,
+BSCpE,122,2,1,1,LBYCPD2,Computer Programming 2,3,H:LBYCPD1
+BSCpE,122,2,1,2,DISCRETE,Discrete Mathematics,3,
+BSCpE,122,2,1,3,CALENG1,Calculus for Engineers 1,3,
+BSECE,123,1,1,1,NSTP101,National Service Training Program 1,3,
+BSECE,123,1,1,2,FMATH,Foundation in Math,5,
+BSECE,123,1,1,3,BASCHEM,Basic Chemistry,3,
+BSECE,123,1,1,4,BASPHYS,Basic Physics,3,
+BSECE,123,1,2,1,LBYCED1,Semiconductor Electronics,3,
+BSECE,123,1,2,2,ENGCHEM,Engineering Chemistry,3,
+BSECE,123,1,2,3,ENGPHYS,Engineering Physics,3,
+BSECE,123,2,1,1,LBYCED2,Electronic Circuits,3,H:LBYCED1
+BSECE,123,2,1,2,DISCRETE,Discrete Mathematics,3,
+BSECE,123,2,1,3,CALENG1,Calculus for Engineers 1,3,

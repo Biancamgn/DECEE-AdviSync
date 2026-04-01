@@ -50,59 +50,90 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ═══════════════════════════════════════════════════════════════════════
     const OVERLOAD_THRESHOLD = 50;
 
-    let professors = [];
+    let advisers = [];
     let students = [];
 
-    async function fetchProfessors() {
+    async function fetchAdvisers() {
         const { data, error } = await supabaseClient
             .from('profiles')
             .select('*, professors(*)')
-            .eq('role', 'professor')
+            .eq('role', 'adviser')
             .eq('status', 'active')
             .order('last_name');
 
         if (!error && data) {
-            professors = data.map(p => ({
+            advisers = data.map(p => ({
                 id: p.school_id,
                 uuid: p.id,
                 name: `${p.first_name} ${p.last_name}`,
                 dept: p.professors?.department || 'DECEE',
                 maxAdvisees: p.professors?.max_advisees || 50,
-                initials: p.first_name[0] + p.last_name[0]
+                initials: (p.first_name ? p.first_name[0] : '') + (p.last_name ? p.last_name[0] : '')
             }));
         }
     }
 
     async function fetchStudents() {
-        const { data, error } = await supabaseClient
+        // First get student profiles
+        const { data: studentProfiles, error: profileError } = await supabaseClient
             .from('profiles')
-            .select('*, students(*)')
+            .select('*')
             .eq('role', 'student')
+            .eq('status', 'active')
             .order('school_id');
 
-        if (!error && data) {
-            students = data.map(p => {
-                const adviserUuid = p.students?.adviser_id || null;
-                return {
-                    id: p.school_id,
-                    uuid: p.id,
-                    name: `${p.first_name} ${p.last_name}`,
-                    program: p.students?.program || 'BSCpE',
-                    year: p.students?.year_level || 1,
-                    adviserUuid: adviserUuid,
-                    adviserId: null // will be resolved after professors load
-                };
-            });
+        if (profileError || !studentProfiles) {
+            console.error('Error fetching student profiles:', profileError);
+            return;
         }
+
+        // Then get student details for these profiles
+        const studentIds = studentProfiles.map(p => p.id);
+        let { data: studentDetails, error: detailsError } = await supabaseClient
+            .from('students')
+            .select('*')
+            .in('id', studentIds);
+
+        if (detailsError) {
+            console.warn('Error fetching student details with filter, trying fallback to all students:', detailsError);
+            const fallback = await supabaseClient.from('students').select('*');
+            if (fallback.error) {
+                console.error('Fallback error fetching student details:', fallback.error);
+                return;
+            }
+            studentDetails = fallback.data;
+        }
+
+        if (!studentDetails || studentDetails.length === 0) {
+            console.warn('No student details found for student IDs, using profile-only fallback.');
+        }
+
+        console.debug('Fetched students:', studentProfiles.length, 'profiles,', studentDetails?.length || 0, 'details');
+
+        // Merge the data
+        students = studentProfiles.map(profile => {
+            const details = studentDetails?.find(s => s.id === profile.id) || {};
+            const adviserUuid = details.adviser_id || null;
+
+            return {
+                id: profile.school_id,
+                uuid: profile.id,
+                name: `${profile.first_name} ${profile.last_name}`,
+                program: details.program || 'BSCpE',
+                year: details.year_level || 1,
+                adviserUuid: adviserUuid,
+                adviserId: null // will be resolved after professors load
+            };
+        });
     }
 
-    await Promise.all([fetchProfessors(), fetchStudents()]);
+    await Promise.all([fetchAdvisers(), fetchStudents()]);
 
     // Resolve adviser school_id from UUID
     students.forEach(s => {
         if (s.adviserUuid) {
-            const prof = professors.find(p => p.uuid === s.adviserUuid);
-            s.adviserId = prof ? prof.id : null;
+            const adv = advisers.find(p => p.uuid === s.adviserUuid);
+            s.adviserId = adv ? adv.id : null;
         }
     });
 
@@ -135,9 +166,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderStats() {
         const assigned = students.filter(s => s.adviserId).length;
         const unassigned = students.filter(s => !s.adviserId).length;
-        const overloaded = professors.filter(p => getAdviseeCount(p.id) > OVERLOAD_THRESHOLD).length;
+        const overloaded = advisers.filter(p => getAdviseeCount(p.id) > OVERLOAD_THRESHOLD).length;
 
-        document.getElementById('totalAdvisers').textContent = professors.length;
+        document.getElementById('totalAdvisers').textContent = advisers.length;
         document.getElementById('assignedStudents').textContent = assigned;
         document.getElementById('unassignedStudents').textContent = unassigned;
         document.getElementById('overloadedAdvisers').textContent = overloaded;
@@ -154,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const q = facultySearch.value.toLowerCase();
         const wf = workloadFilter.value;
 
-        const filtered = professors.filter(p => {
+        const filtered = advisers.filter(p => {
             const count = getAdviseeCount(p.id);
             const status = getWorkloadStatus(count);
             const matchSearch = !q || p.name.toLowerCase().includes(q);
@@ -163,7 +194,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         if (filtered.length === 0) {
-            workloadGrid.innerHTML = `<div class="text-center py-4" style="color:var(--dlsu-gray-400); font-size:0.82rem;"><i class="bi bi-inbox fs-4 d-block mb-2"></i>No professors match the filter</div>`;
+            workloadGrid.innerHTML = `<div class="text-center py-4" style="color:var(--dlsu-gray-400); font-size:0.82rem;"><i class="bi bi-inbox fs-4 d-block mb-2"></i>No advisers match the filter</div>`;
             return;
         }
 
@@ -256,7 +287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         allBody.innerHTML = all.length === 0
             ? `<tr><td colspan="6" class="text-center py-4" style="color:var(--dlsu-gray-400); font-size:0.82rem;"><i class="bi bi-inbox fs-4 d-block mb-2"></i>No students found</td></tr>`
             : all.map(s => {
-                const adv = professors.find(p => p.id === s.adviserId);
+                const adv = advisers.find(p => p.id === s.adviserId);
                 return `
                     <tr>
                         <td class="prof-name">${s.id}</td>
@@ -332,8 +363,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!advId) { alert('Please choose an adviser.'); return; }
         if (selectedStudents.size === 0) return;
 
-        const prof = professors.find(p => p.id === advId);
-        if (!prof) return;
+        const adv = advisers.find(p => p.id === advId);
+        if (!adv) return;
 
         // Update all selected students in Supabase
         const studentUuids = [];
@@ -345,7 +376,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (const uuid of studentUuids) {
             await supabaseClient
                 .from('students')
-                .update({ adviser_id: prof.uuid })
+                .update({ adviser_id: adv.uuid })
                 .eq('id', uuid);
         }
 
@@ -354,7 +385,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const s = students.find(x => x.id === sId);
             if (s) {
                 s.adviserId = advId;
-                s.adviserUuid = prof.uuid;
+                s.adviserUuid = adv.uuid;
             }
         });
 
@@ -368,7 +399,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ADVISER DROPDOWN HELPERS
     // ═══════════════════════════════════════════════════════════════════════
     function populateAdviserDropdowns() {
-        const options = professors.map(p => {
+        const options = advisers.map(p => {
             const count = getAdviseeCount(p.id);
             const status = getWorkloadStatus(count);
             const warn = status === 'overloaded' ? ' ⚠' : '';
@@ -400,7 +431,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     document.getElementById('assignAdviserSelect').addEventListener('change', (e) => {
-        const p = professors.find(x => x.id === e.target.value);
+        const p = advisers.find(x => x.id === e.target.value);
         const preview = document.getElementById('adviserPreview');
         if (p) {
             preview.style.display = '';
@@ -419,15 +450,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!advId) { alert('Please select an adviser.'); return; }
 
         const s = students.find(x => x.id === sId);
-        const prof = professors.find(p => p.id === advId);
-        if (s && prof) {
+        const adv = advisers.find(p => p.id === advId);
+        if (s && adv) {
             await supabaseClient
                 .from('students')
-                .update({ adviser_id: prof.uuid })
+                .update({ adviser_id: adv.uuid })
                 .eq('id', s.uuid);
 
             s.adviserId = advId;
-            s.adviserUuid = prof.uuid;
+            s.adviserUuid = adv.uuid;
         }
 
         assignModal.hide();
@@ -443,7 +474,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const s = students.find(x => x.id === studentId);
         if (!s) return;
 
-        const currentAdv = professors.find(p => p.id === s.adviserId);
+        const currentAdv = advisers.find(p => p.id === s.adviserId);
 
         document.getElementById('reassignStudentId').value = s.id;
         document.getElementById('reassignStudentAvatar').textContent = s.name.split(' ').map(w => w[0]).join('');
@@ -461,15 +492,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!newAdvId) { alert('Please select a new adviser.'); return; }
 
         const s = students.find(x => x.id === sId);
-        const prof = professors.find(p => p.id === newAdvId);
-        if (s && prof) {
+        const adv = advisers.find(p => p.id === newAdvId);
+        if (s && adv) {
             await supabaseClient
                 .from('students')
-                .update({ adviser_id: prof.uuid })
+                .update({ adviser_id: adv.uuid })
                 .eq('id', s.uuid);
 
             s.adviserId = newAdvId;
-            s.adviserUuid = prof.uuid;
+            s.adviserUuid = adv.uuid;
         }
 
         reassignModal.hide();

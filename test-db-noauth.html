@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Test - No Auth</title>
+</head>
+<body>
+    <h1>Database Connection Test (No Authentication)</h1>
+    <div id="result"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script>
+        async function testDatabase() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>🔄 Testing database connection...</p>';
+
+            try {
+                console.log('Testing courses table access...');
+
+                const { data: courses, error } = await supabaseClient
+                    .from('courses')
+                    .select('*')
+                    .limit(10);
+
+                console.log('Courses query result:', { courses, error });
+
+                if (error) {
+                    resultDiv.innerHTML += `<p>❌ Courses Error: ${error.message}</p>`;
+                } else {
+                    resultDiv.innerHTML += `<p>✅ Courses Success! Found ${courses.length} courses</p>`;
+                    if (courses.length > 0) {
+                        resultDiv.innerHTML += '<h3>Sample Courses:</h3><ul>';
+                        courses.slice(0, 3).forEach(course => {
+                            resultDiv.innerHTML += `<li>${course.code} - ${course.title} (${course.program_code})</li>`;
+                        });
+                        resultDiv.innerHTML += '</ul>';
+                    }
+                }
+
+                // Test program_student_checklists table
+                console.log('Testing program_student_checklists table access...');
+                resultDiv.innerHTML += '<p>🔄 Testing program_student_checklists table...</p>';
+
+                const { data: checklists, error: checklistError } = await supabaseClient
+                    .from('program_student_checklists')
+                    .select('*')
+                    .limit(10);
+
+                console.log('Checklists query result:', { checklists, checklistError });
+
+                if (checklistError) {
+                    resultDiv.innerHTML += `<p>❌ Checklists Error: ${checklistError.message}</p>`;
+                    if (checklistError.message.includes('does not exist')) {
+                        resultDiv.innerHTML += '<p>💡 <strong>Table does not exist!</strong> Run the SQL script in Supabase dashboard.</p>';
+                    }
+                } else {
+                    resultDiv.innerHTML += `<p>✅ Checklists Success! Found ${checklists.length} checklist entries</p>`;
+                    if (checklists.length > 0) {
+                        resultDiv.innerHTML += '<h3>Sample Checklists:</h3><ul>';
+                        checklists.slice(0, 3).forEach(item => {
+                            resultDiv.innerHTML += `<li>${item.program_code} ID ${item.student_id_prefix} - ${item.course_code} (${item.year_level}-${item.term})</li>`;
+                        });
+                        resultDiv.innerHTML += '</ul>';
+                    } else {
+                        resultDiv.innerHTML += '<p>⚠️ <strong>No data in table!</strong> Import checklist data using the Python script.</p>';
+                    }
+                }
+
+            } catch (err) {
+                resultDiv.innerHTML += `<p>💥 Unexpected error: ${err.message}</p>`;
+                console.error('Unexpected error:', err);
+            }
+        }
+
+        // Run test when page loads
+        testDatabase();
+    </script>
+</body>
+</html>
