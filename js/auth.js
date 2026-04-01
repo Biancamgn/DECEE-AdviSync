@@ -97,7 +97,7 @@ function initLoginForm() {
             if (profile?.role) {
                 switch (profile.role) {
                     case 'admin':     window.location.href = 'admin-dashboard.html'; break;
-                    case 'professor': window.location.href = 'academic-advising.html'; break;
+                    case 'adviser': window.location.href = 'academic-advising.html'; break;
                     case 'student':   window.location.href = 'student-dashboard.html'; break;
                     default:          window.location.href = 'index.html';
                 }
