@@ -118,3 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('filterProgram')?.addEventListener('change', filterTable);
     document.getElementById('filterStatus')?.addEventListener('change', filterTable);
 });
+
+console.log('Advisees data:', data);
+console.log('Advisees error:', error);
