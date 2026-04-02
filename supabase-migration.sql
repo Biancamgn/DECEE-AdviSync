@@ -259,3 +259,52 @@ DROP POLICY IF EXISTS "System can insert notifications" ON notifications;
 CREATE POLICY "System can insert notifications" ON notifications FOR INSERT WITH CHECK (true);
 DROP POLICY IF EXISTS "Admins can manage notifications" ON notifications;
 CREATE POLICY "Admins can manage notifications" ON notifications FOR ALL USING (is_admin());
+
+-- ============================================================
+-- Availability Slots (for adviser-set scheduling)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS availability_slots (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    adviser_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+    slot_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    slot_type TEXT NOT NULL DEFAULT 'zoom' CHECK (slot_type IN ('zoom', 'in-person')),
+    is_booked BOOLEAN DEFAULT false,
+    booked_by UUID REFERENCES profiles(id),
+    appointment_id UUID REFERENCES appointments(id),
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_availability_slots_adviser ON availability_slots(adviser_id, slot_date);
+CREATE INDEX IF NOT EXISTS idx_availability_slots_date ON availability_slots(slot_date, is_booked);
+
+ALTER TABLE availability_slots ENABLE ROW LEVEL SECURITY;
+
+-- Advisers can manage their own slots
+DROP POLICY IF EXISTS "Advisers can insert own slots" ON availability_slots;
+CREATE POLICY "Advisers can insert own slots" ON availability_slots FOR INSERT WITH CHECK (auth.uid() = adviser_id);
+DROP POLICY IF EXISTS "Advisers can view own slots" ON availability_slots;
+CREATE POLICY "Advisers can view own slots" ON availability_slots FOR SELECT USING (auth.uid() = adviser_id);
+DROP POLICY IF EXISTS "Advisers can update own slots" ON availability_slots;
+CREATE POLICY "Advisers can update own slots" ON availability_slots FOR UPDATE USING (auth.uid() = adviser_id);
+DROP POLICY IF EXISTS "Advisers can delete own slots" ON availability_slots;
+CREATE POLICY "Advisers can delete own slots" ON availability_slots FOR DELETE USING (auth.uid() = adviser_id);
+
+-- Students can view their assigned adviser's available slots
+DROP POLICY IF EXISTS "Students can view adviser slots" ON availability_slots;
+CREATE POLICY "Students can view adviser slots" ON availability_slots FOR SELECT USING (
+    adviser_id IN (SELECT adviser_id FROM students WHERE id = auth.uid())
+);
+
+-- Students can update slots when booking (set is_booked, booked_by)
+DROP POLICY IF EXISTS "Students can book adviser slots" ON availability_slots;
+CREATE POLICY "Students can book adviser slots" ON availability_slots FOR UPDATE USING (
+    adviser_id IN (SELECT adviser_id FROM students WHERE id = auth.uid())
+) WITH CHECK (
+    adviser_id IN (SELECT adviser_id FROM students WHERE id = auth.uid())
+);
+
+-- Admins can manage all slots
+DROP POLICY IF EXISTS "Admins can manage availability slots" ON availability_slots;
+CREATE POLICY "Admins can manage availability slots" ON availability_slots FOR ALL USING (is_admin());
