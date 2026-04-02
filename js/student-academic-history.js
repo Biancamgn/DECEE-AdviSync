@@ -1,47 +1,122 @@
-const sidebar = document.getElementById('sidebar');
-const mainContent = document.getElementById('mainContent');
-const overlay = document.getElementById('sidebarOverlay');
-const hamburger = document.getElementById('hamburgerBtn');
-const isMobile = () => window.innerWidth < 992;
+initShared();
 
-sidebar.addEventListener('mouseenter', () => { if (!isMobile()) { sidebar.classList.add('expanded'); mainContent.classList.add('shifted'); } });
-sidebar.addEventListener('mouseleave', () => { if (!isMobile()) { sidebar.classList.remove('expanded'); mainContent.classList.remove('shifted'); } });
-hamburger.addEventListener('click', () => { sidebar.classList.toggle('expanded'); overlay.classList.toggle('active'); });
-overlay.addEventListener('click', () => { sidebar.classList.remove('expanded'); overlay.classList.remove('active'); });
+(async function () {
+    const profile = await requireAuth(['student']);
+    if (!profile) return;
+    await loadUserProfile();
 
-const clockEl = document.getElementById('topbarClock');
-function updateClock() {
-    const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    const s = String(now.getSeconds()).padStart(2, '0');
-    const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-    clockEl.textContent = `${dateStr} · ${h}:${m}:${s}`;
-}
-updateClock();
-setInterval(updateClock, 1000);
+    const { data: student } = await supabaseClient
+        .from('students')
+        .select('*')
+        .eq('id', profile.id)
+        .single();
 
-const filterYear = document.getElementById('filterYear');
-const filterTerm = document.getElementById('filterTerm');
-const resetBtn = document.getElementById('resetFilters');
-const termCards = document.querySelectorAll('.term-card');
+    const { data: records } = await supabaseClient
+        .from('academic_records')
+        .select('*, courses(*), terms(*)')
+        .eq('student_id', profile.id)
+        .order('created_at', { ascending: true });
 
-function applyFilters() {
-    const year = filterYear.value;
-    const term = filterTerm.value;
-    termCards.forEach(card => {
-        const cardYear = card.dataset.year;
-        const cardTerm = card.dataset.term;
-        const matchYear = year === 'all' || cardYear === year;
-        const matchTerm = term === 'all' || cardTerm === term;
-        card.style.display = (matchYear && matchTerm) ? '' : 'none';
+    if (!records || records.length === 0) return;
+
+    const allRecords = records || [];
+    const completedRecords = allRecords.filter(r => r.status === 'passed' || (r.grade && r.grade > 0 && r.grade <= 4.0));
+    const completedUnits = completedRecords.reduce((sum, r) => sum + (r.courses?.units || 0), 0);
+    const failedUnits = student?.failed_units || 0;
+    let cumulativeGpa = 0;
+    if (completedRecords.length > 0) {
+        const totalWeighted = completedRecords.reduce((sum, r) => sum + (r.grade || 0) * (r.courses?.units || 0), 0);
+        const totalUnitsTaken = completedRecords.reduce((sum, r) => sum + (r.courses?.units || 0), 0);
+        cumulativeGpa = totalUnitsTaken > 0 ? (totalWeighted / totalUnitsTaken).toFixed(2) : '0.00';
+    }
+
+    const chips = document.querySelectorAll('.chip-value');
+    if (chips[0]) chips[0].textContent = `${completedUnits}/200`;
+    if (chips[1]) chips[1].textContent = cumulativeGpa;
+    if (chips[2]) chips[2].textContent = `${failedUnits} units`;
+
+    const termMap = {};
+    allRecords.forEach(r => {
+        const termKey = r.terms ? `${r.terms.academic_year}__${r.terms.term_name}` : 'unknown';
+        if (!termMap[termKey]) termMap[termKey] = { term: r.terms, records: [] };
+        termMap[termKey].records.push(r);
     });
-}
 
-filterYear.addEventListener('change', applyFilters);
-filterTerm.addEventListener('change', applyFilters);
-resetBtn.addEventListener('click', () => {
-    filterYear.value = 'all';
-    filterTerm.value = 'all';
-    applyFilters();
-});
+    const container = document.getElementById('termCardsContainer');
+    if (!container) return;
+
+    const filterYear = document.getElementById('filterYear');
+    const filterTerm = document.getElementById('filterTerm');
+    const yearSet = new Set();
+
+    container.innerHTML = '';
+    Object.entries(termMap).sort((a, b) => b[0].localeCompare(a[0])).forEach(([key, { term, records: termRecords }]) => {
+        const ay = term?.academic_year || 'Unknown';
+        const termName = term?.term_name || 'Unknown';
+        yearSet.add(ay);
+
+        const termUnits = termRecords.reduce((s, r) => s + (r.courses?.units || 0), 0);
+        const termPassed = termRecords.filter(r => r.status === 'passed');
+        const termGpa = termPassed.length > 0
+            ? (termPassed.reduce((s, r) => s + (r.grade || 0) * (r.courses?.units || 0), 0) / termPassed.reduce((s, r) => s + (r.courses?.units || 0), 0)).toFixed(2)
+            : '—';
+        const termFailed = termRecords.filter(r => r.status === 'failed').reduce((s, r) => s + (r.courses?.units || 0), 0);
+
+        const card = document.createElement('div');
+        card.className = 'term-card';
+        card.dataset.year = ay;
+        card.dataset.term = termName.toLowerCase().includes('first') ? '1' : termName.toLowerCase().includes('second') ? '2' : '3';
+
+        card.innerHTML = `
+            <div class="term-card-header">
+                <div><span class="term-title">${termName}</span><span class="term-ay">AY ${ay}</span></div>
+                <span class="term-status approved">Completed</span>
+            </div>
+            <table class="term-table">
+                <thead><tr><th>Code</th><th>Course Name</th><th>Units</th><th>Grade</th></tr></thead>
+                <tbody>${termRecords.map(r => {
+                    const grade = r.grade !== null ? r.grade.toFixed(1) : '—';
+                    const isFail = r.status === 'failed';
+                    return `<tr>
+                        <td class="code-cell">${r.courses?.code || '—'}</td>
+                        <td>${r.courses?.title || '—'}</td>
+                        <td>${r.courses?.units || '—'}</td>
+                        <td><span class="grade-badge ${isFail ? 'fail' : 'pass'}">${grade}${isFail ? ' (F)' : ''}</span></td>
+                    </tr>`;
+                }).join('')}</tbody>
+            </table>
+            <div class="term-footer">
+                <div class="term-stat"><span class="ts-label">Term GPA</span><span class="ts-value">${termGpa}</span></div>
+                <div class="term-stat"><span class="ts-label">Units</span><span class="ts-value">${termUnits}</span></div>
+                <div class="term-stat"><span class="ts-label">Failures</span><span class="ts-value ${termFailed > 0 ? 'text-danger' : ''}">${termFailed}</span></div>
+            </div>`;
+        container.appendChild(card);
+    });
+
+    if (filterYear) {
+        filterYear.innerHTML = '<option value="all">All Years</option>';
+        [...yearSet].sort().reverse().forEach(y => {
+            filterYear.innerHTML += `<option value="${y}">AY ${y}</option>`;
+        });
+    }
+
+    const termCards = container.querySelectorAll('.term-card');
+    function applyFilters() {
+        const year = filterYear?.value || 'all';
+        const term = filterTerm?.value || 'all';
+        termCards.forEach(card => {
+            const matchYear = year === 'all' || card.dataset.year === year;
+            const matchTerm = term === 'all' || card.dataset.term === term;
+            card.style.display = (matchYear && matchTerm) ? '' : 'none';
+        });
+    }
+
+    if (filterYear) filterYear.addEventListener('change', applyFilters);
+    if (filterTerm) filterTerm.addEventListener('change', applyFilters);
+    const resetBtn = document.getElementById('resetFilters');
+    if (resetBtn) resetBtn.addEventListener('click', () => {
+        if (filterYear) filterYear.value = 'all';
+        if (filterTerm) filterTerm.value = 'all';
+        applyFilters();
+    });
+})();

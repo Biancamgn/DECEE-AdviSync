@@ -74,6 +74,8 @@
                         <div class="dropdown-divider"></div>
                         <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i>View Profile</a>
                         <a href="student-settings.html" class="dropdown-action"><i class="bi bi-gear"></i>Settings</a>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-action logout" onclick="signOut()"><i class="bi bi-box-arrow-left"></i> Sign out</button>
                     </div>
                 </div>
             </div>
@@ -122,6 +124,7 @@
 
             <!-- ══ TERM CARDS ══ -->
 
+            <div id="termCardsContainer">
             <!-- Term 7 (most recent completed) -->
             <div class="term-card" data-year="2025-2026" data-term="1">
                 <div class="term-card-header">
@@ -257,11 +260,16 @@
                     <div class="note-text">Two failed attempts in CSMCPRO (Microprocessors). Please schedule a meeting to discuss a retake plan and review study strategies. Accumulated failures now at 6 units — monitor carefully.</div>
                 </div>
             </div>
+            </div>
 
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/shared.js"></script>
     <script src="js/student-academic-history.js"></script>
     <script src="js/notifications.js"></script>
 </body>
