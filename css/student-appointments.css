@@ -475,6 +475,15 @@ body {
     color: var(--dlsu-gray-400);
     font-weight: 500;
 }
+.date-chip .slot-count {
+    font-size: 0.55rem;
+    color: var(--dlsu-gray-400);
+    font-weight: 500;
+    margin-top: 0.1rem;
+}
+.date-chip.selected .slot-count {
+    color: var(--dlsu-green);
+}
 .date-chip.selected .day-name,
 .date-chip.selected .day-month {
     color: var(--dlsu-green);
@@ -1008,4 +1017,24 @@ body.dark-mode .btn-cancel {
 body.dark-mode .btn-cancel:hover {
     background: #2e1515;
     border-color: #f87171;
+}
+body.dark-mode .booking-status.cancelled {
+    background: rgba(255, 255, 255, 0.06);
+    color: #6b7e70;
+}
+body.dark-mode .date-chip .slot-count {
+    color: #6b7e70;
+}
+body.dark-mode .date-chip.selected .slot-count {
+    color: #4ade80;
+}
+body.dark-mode .btn-book {
+    background: var(--dlsu-green);
+    color: white;
+}
+body.dark-mode .btn-book:disabled {
+    opacity: 0.3;
+}
+body.dark-mode .no-slots {
+    color: #6b7e70;
 }

@@ -197,6 +197,11 @@
     color: #b8860b;
 }
 
+.booking-status.cancelled {
+    background: var(--dlsu-gray-100);
+    color: var(--dlsu-gray-400);
+}
+
 .btn-action-sm {
     padding: 0.25rem 0.6rem;
     border-radius: 6px;
@@ -226,6 +231,216 @@
 
 .btn-cancel-sm:hover {
     background: #fce8e6;
+}
+
+/* Dark mode — greenish-tinted dark palette overrides shared.css */
+body.dark-mode {
+    background-color: #1a1f1c;
+    color: #d4ddd7;
+}
+body.dark-mode .main-content {
+    background: #1a1f1c;
+}
+body.dark-mode .topbar {
+    background: #232a25;
+    border-bottom-color: #2f3832;
+}
+body.dark-mode .topbar-circle-btn {
+    background: #2a332c;
+    border-color: #3a4a3e;
+    color: #94a89c;
+}
+body.dark-mode .topbar-circle-btn:hover {
+    background: #354038;
+    color: #b8ccbe;
+}
+body.dark-mode .topbar-clock {
+    background: #2a332c;
+    color: #94a89c;
+}
+body.dark-mode .profile-btn {
+    border-color: #3a4a3e;
+}
+body.dark-mode .profile-dropdown {
+    background: #232a25;
+    border-color: #3a4a3e;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+body.dark-mode .dropdown-header {
+    background: #1a1f1c;
+    border-bottom-color: #2f3832;
+}
+body.dark-mode .dropdown-name {
+    color: #d4ddd7;
+}
+body.dark-mode .dropdown-info-label {
+    color: #6b7e70;
+}
+body.dark-mode .dropdown-info-value {
+    color: #b8ccbe;
+}
+body.dark-mode .dropdown-info-row:not(:last-child) {
+    border-bottom-color: #2f3832;
+}
+body.dark-mode .dropdown-divider {
+    background: #2f3832;
+}
+body.dark-mode .dropdown-action {
+    color: #94a89c;
+}
+body.dark-mode .dropdown-action:hover {
+    background: #2a332c;
+    color: #d4ddd7;
+}
+body.dark-mode .dropdown-action.logout:hover {
+    background: #2e1515;
+}
+body.dark-mode .sidebar {
+    background: #0d3d1f;
+}
+body.dark-mode .section-card {
+    background: #232a25;
+    border-color: #2f3832;
+    color: #d4ddd7;
+}
+body.dark-mode .section-title {
+    color: #d4ddd7;
+}
+body.dark-mode .section-desc {
+    color: #6b7e70;
+}
+body.dark-mode .page-title {
+    color: #4a9e6f;
+}
+body.dark-mode .page-subtitle {
+    color: #6b7e70;
+}
+body.dark-mode .page-body {
+    background: #1a1f1c;
+}
+body.dark-mode .form-label-custom {
+    color: #b8ccbe;
+}
+body.dark-mode .form-control-custom,
+body.dark-mode select.form-control-custom {
+    background: #2a332c;
+    border-color: #3a4a3e;
+    color: #d4ddd7;
+}
+body.dark-mode .form-control-custom:focus {
+    border-color: var(--dlsu-green);
+    box-shadow: 0 0 0 3px rgba(0, 112, 60, 0.2);
+}
+body.dark-mode .slot-card {
+    background: #232a25;
+    border-color: #2f3832;
+}
+body.dark-mode .slot-card .slot-date,
+body.dark-mode .slot-card .slot-type {
+    color: #6b7e70;
+}
+body.dark-mode .slot-card .slot-time {
+    color: #d4ddd7;
+}
+body.dark-mode .slot-booked.available {
+    background: rgba(74, 222, 128, 0.08);
+    color: #4ade80;
+}
+body.dark-mode .slot-booked.taken {
+    background: rgba(251, 191, 36, 0.08);
+    color: #fbbf24;
+}
+body.dark-mode .slot-remove {
+    color: #6b7e70;
+}
+body.dark-mode .slot-remove:hover {
+    color: #f87171;
+}
+body.dark-mode .slot-tab {
+    background: #2a332c;
+    border-color: #3a4a3e;
+    color: #94a89c;
+}
+body.dark-mode .slot-tab:hover {
+    background: #354038;
+    color: #d4ddd7;
+}
+body.dark-mode .slot-tab.active {
+    background: var(--dlsu-green);
+    border-color: var(--dlsu-green);
+    color: white;
+}
+body.dark-mode .btn-confirm {
+    background: transparent;
+    border-color: #4a9e6f;
+    color: #4ade80;
+}
+body.dark-mode .btn-confirm:hover {
+    background: rgba(74, 222, 128, 0.08);
+}
+body.dark-mode .btn-cancel-sm {
+    background: transparent;
+    border-color: #6b3a3a;
+    color: #f87171;
+}
+body.dark-mode .btn-cancel-sm:hover {
+    background: rgba(248, 113, 113, 0.08);
+}
+body.dark-mode .bookings-table thead th {
+    background: #1a1f1c;
+    color: #6b7e70;
+    border-color: #2f3832;
+}
+body.dark-mode .bookings-table tbody td {
+    border-color: #2f3832;
+    color: #b8ccbe;
+}
+body.dark-mode .bookings-table tbody tr:hover {
+    background: #2a332c;
+}
+body.dark-mode .booking-status.confirmed {
+    background: rgba(74, 222, 128, 0.1);
+    color: #4ade80;
+}
+body.dark-mode .booking-status.pending {
+    background: rgba(251, 191, 36, 0.1);
+    color: #fbbf24;
+}
+body.dark-mode .booking-status.cancelled {
+    background: rgba(255, 255, 255, 0.06);
+    color: #6b7e70;
+}
+body.dark-mode .bulk-preview {
+    color: #6b7e70 !important;
+}
+
+/* Slot tab styles */
+.slot-tab {
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--dlsu-gray-200);
+    border-radius: 8px;
+    background: white;
+    color: var(--dlsu-gray-600);
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.slot-tab:hover {
+    border-color: var(--dlsu-green);
+    color: var(--dlsu-green);
+}
+.slot-tab.active {
+    background: var(--dlsu-green);
+    border-color: var(--dlsu-green);
+    color: white;
+}
+
+/* Table responsive */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 991.98px) {
