@@ -129,6 +129,17 @@ function fmtTime(t) {
     return ((hr % 12) || 12) + ':' + m + (hr >= 12 ? ' PM' : ' AM');
 }
 
+async function checkOverlap(adviserId, date, startTime, endTime) {
+    const { data: existing, error } = await supabaseClient
+        .from('availability_slots')
+        .select('start_time, end_time')
+        .eq('adviser_id', adviserId)
+        .eq('slot_date', date);
+    if (error) { console.error('Error checking overlaps:', error); return []; }
+    if (!existing || existing.length === 0) return [];
+    return existing.filter(s => s.start_time < endTime && startTime < s.end_time);
+}
+
 async function addSlot() {
     if (!_adviserProfile) return;
     const date = document.getElementById('slotDate').value;
@@ -137,6 +148,12 @@ async function addSlot() {
     const type = document.getElementById('slotType').value;
     if (!date || !start || !end) return alert('Please fill in all fields.');
     if (start >= end) return alert('End time must be after start time.');
+
+    const overlaps = await checkOverlap(_adviserProfile.id, date, start, end);
+    if (overlaps.length > 0) {
+        const conflicting = overlaps.map(s => `${fmtTime(s.start_time)} – ${fmtTime(s.end_time)}`).join(', ');
+        return alert(`This slot overlaps with existing slot(s): ${conflicting}`);
+    }
 
     const { error } = await supabaseClient
         .from('availability_slots')
@@ -164,6 +181,24 @@ async function generateSlots() {
 
     const slots = computeBulkSlots(from, to, dur);
     if (slots.length === 0) return alert('No slots can be generated with these settings. Check your time range and duration.');
+
+    // Check each generated slot for overlaps with existing slots
+    const { data: existing, error: fetchErr } = await supabaseClient
+        .from('availability_slots')
+        .select('start_time, end_time')
+        .eq('adviser_id', _adviserProfile.id)
+        .eq('slot_date', date);
+    if (fetchErr) { alert('Failed to check existing slots.'); console.error(fetchErr); return; }
+
+    if (existing && existing.length > 0) {
+        const conflicting = slots.filter(s =>
+            existing.some(e => e.start_time < s.end && s.start < e.end_time)
+        );
+        if (conflicting.length > 0) {
+            const conflictStr = conflicting.map(s => `${fmtTime(s.start)} – ${fmtTime(s.end)}`).join(', ');
+            return alert(`The following generated slots overlap with existing ones: ${conflictStr}`);
+        }
+    }
 
     const rows = slots.map(s => ({
         adviser_id: _adviserProfile.id,
