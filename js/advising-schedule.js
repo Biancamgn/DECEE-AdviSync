@@ -6,14 +6,14 @@ async function loadSchedule() {
         .from('appointments')
         .select(`
             *,
-            profiles!appointments_student_id_fkey (
+            student:profiles!student_id (
                 first_name, last_name, school_id
             )
         `)
         .eq('adviser_id', profile.id)
         .order('appointment_date', { ascending: true });
 
-    if (error) { console.error(error); return; }
+    if (error) { console.error('Error loading schedule:', error); return; }
 
     const tbody = document.getElementById('bookingsTbody');
     if (!tbody) return;
@@ -24,8 +24,8 @@ async function loadSchedule() {
     }
 
     tbody.innerHTML = data.map(appt => {
-        const p = appt.profiles;
-        const fullName = `${p.first_name} ${p.last_name}`;
+        const p = appt.student || {};
+        const fullName = `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Unknown';
         const date = new Date(appt.appointment_date);
         const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const timeStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });

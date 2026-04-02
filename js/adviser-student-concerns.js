@@ -6,15 +6,14 @@ async function loadConcerns() {
         .from('concerns')
         .select(`
             *,
-            profiles!concerns_student_id_fkey (
-                first_name, last_name, school_id
-            ),
-            students!inner ( program )
+            student:profiles!student_id (
+                first_name, last_name, school_id, program
+            )
         `)
         .eq('adviser_id', profile.id)
         .order('created_at', { ascending: false });
 
-    if (error) { console.error(error); return; }
+    if (error) { console.error('Error loading concerns:', error); return; }
 
     // Update summary chips
     const total = data.length;
@@ -38,10 +37,10 @@ function renderConcerns(data) {
     }
 
     container.innerHTML = data.map(concern => {
-        const p = concern.profiles;
-        const fullName = `${p.first_name} ${p.last_name}`;
-        const initials = (p.first_name[0] || '') + (p.last_name[0] || '');
-        const program = concern.students?.program || '—';
+        const p = concern.student || {};
+        const fullName = `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Unknown';
+        const initials = (p.first_name?.[0] || '') + (p.last_name?.[0] || '');
+        const program = p.program || '—';
         const date = new Date(concern.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const isUnread = concern.status === 'new';
 
@@ -62,6 +61,15 @@ function renderConcerns(data) {
                 </div>
             </div>
             <div class="concern-message">${concern.message}</div>
+            ${concern.status === 'replied' && concern.reply ? `
+                <div class="adviser-reply" style="margin-top:0.75rem;padding:0.85rem 1rem;background:var(--dlsu-green-light, rgba(0,112,60,0.06));border-left:3px solid var(--dlsu-green, #00703c);border-radius:0 8px 8px 0;">
+                    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem;">
+                        <i class="bi bi-reply-fill" style="color:var(--dlsu-green, #00703c);font-size:0.85rem;"></i>
+                        <span style="font-weight:600;font-size:0.78rem;color:var(--dlsu-green, #00703c);">Your Reply</span>
+                        ${concern.replied_at ? `<span style="font-size:0.7rem;color:var(--dlsu-gray-400, #94a89c);margin-left:auto;">${new Date(concern.replied_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>` : ''}
+                    </div>
+                    <div style="font-size:0.82rem;color:var(--dlsu-gray-600, #4a5e50);line-height:1.55;">${concern.reply}</div>
+                </div>` : ''}
             ${concern.status !== 'replied' ? `
                 <div style="display:flex;gap:0.5rem;margin-bottom:0.75rem;">
                     <button class="btn-mark-read" onclick="markRead('${concern.id}', this)">

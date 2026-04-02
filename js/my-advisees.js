@@ -37,14 +37,37 @@ async function loadAdvisees() {
 
         const studentIds = adviseeRows.map(r => r.student_id);
 
-        const { data: students, error: studentError } = await supabaseClient
+        // Fetch profiles and student records separately for reliability
+        const { data: profiles, error: profileError } = await supabaseClient
             .from('profiles')
-            .select('*, students(*)')
+            .select('*')
             .in('id', studentIds);
 
-        if (studentError) {
-            console.error('Error fetching student details:', studentError);
-            tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--dlsu-danger);">Failed to load student details.</td></tr>';
+        if (profileError) {
+            console.error('Error fetching profiles:', profileError);
+        }
+
+        const { data: studentRecords, error: studentRecError } = await supabaseClient
+            .from('students')
+            .select('*')
+            .in('id', studentIds);
+
+        if (studentRecError) {
+            console.error('Error fetching student records:', studentRecError);
+        }
+
+        // Merge profiles with student records
+        const studentMap = {};
+        (studentRecords || []).forEach(s => { studentMap[s.id] = s; });
+
+        const students = (profiles || []).map(p => ({
+            ...p,
+            students: studentMap[p.id] || {}
+        }));
+
+        if (!students.length) {
+            tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--dlsu-gray-400);">No student details found.</td></tr>';
+            updateCounts(0, 0, 0, 0);
             return;
         }
 

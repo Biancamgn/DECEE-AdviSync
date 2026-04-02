@@ -22,12 +22,9 @@ function setTheme(el, theme) {
 (function () {
     const dmBtn = document.getElementById('darkModeBtn');
     if (dmBtn) {
-        dmBtn._dmBound = true;
+        // Only sync theme cards on click; initShared() already handles the toggle
         dmBtn.addEventListener('click', () => {
-            document.body.classList.toggle('dark-mode');
             const isDark = document.body.classList.contains('dark-mode');
-            dmBtn.querySelector('i').className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-            localStorage.setItem('darkMode', isDark);
             document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
             const cards = document.querySelectorAll('.theme-card');
             cards.forEach(c => { if (c.textContent.trim() === (isDark ? 'Dark' : 'Light')) c.classList.add('selected'); });

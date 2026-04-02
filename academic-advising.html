@@ -26,7 +26,7 @@
                     <div class="form-group" style="margin-bottom:0;"><label class="form-label-custom">Academic Year</label><select class="form-control-custom"><option>2025–2026</option><option>2024–2025</option></select></div>
                     <div class="form-group" style="margin-bottom:0;"><label class="form-label-custom">Term</label><select class="form-control-custom"><option>Term 2</option><option>Term 1</option><option>Term 3</option></select></div>
                     <div class="form-group" style="margin-bottom:0;"><label class="form-label-custom">Deadline Date</label><input type="date" class="form-control-custom" value="2026-04-04"></div>
-                    <button class="btn-save" onclick="alert('Deadline updated successfully!')"><i class="bi bi-check-lg"></i> Save Deadline</button>
+                    <button class="btn-save" onclick="saveDeadline()"><i class="bi bi-check-lg"></i> Save Deadline</button>
                 </div>
             </div>
             <div class="section-card">
@@ -36,19 +36,13 @@
                 <table class="tracker-table">
                     <thead><tr><th>Student</th><th>ID</th><th>Program</th><th>Submission Status</th><th>Date</th></tr></thead>
                     <tbody>
-                        <tr><td><strong>Bianca Magsino</strong></td><td>12012345</td><td>BS-CpE</td><td><span class="sub-status-badge submitted">Submitted</span></td><td>Mar 25, 2026</td></tr>
-                        <tr><td><strong>Angelo Torres</strong></td><td>12023456</td><td>BS-CpE</td><td><span class="sub-status-badge submitted">Submitted</span></td><td>Mar 26, 2026</td></tr>
-                        <tr><td><strong>Patricia Lim</strong></td><td>12034567</td><td>BS-CpE</td><td><span class="sub-status-badge reviewed">Reviewed</span></td><td>Mar 24, 2026</td></tr>
-                        <tr><td><strong>Maria Santos</strong></td><td>12087654</td><td>BS-ECE</td><td><span class="sub-status-badge not-submitted">Not Submitted</span></td><td>—</td></tr>
-                        <tr><td><strong>Juan Dela Cruz</strong></td><td>12098765</td><td>BS-CpE</td><td><span class="sub-status-badge not-submitted">Not Submitted</span></td><td>—</td></tr>
-                        <tr><td><strong>Rafael Garcia</strong></td><td>12045678</td><td>BS-EE</td><td><span class="sub-status-badge submitted">Submitted</span></td><td>Mar 27, 2026</td></tr>
-                        <tr><td><strong>Isabella Tan</strong></td><td>12056789</td><td>BS-ECE</td><td><span class="sub-status-badge not-submitted">Not Submitted</span></td><td>—</td></tr>
-                        <tr><td><strong>Carlos Reyes</strong></td><td>12076543</td><td>BS-CpE</td><td><span class="sub-status-badge not-submitted">Not Submitted</span></td><td>—</td></tr>
+                        <tr><td colspan="5" style="text-align:center;opacity:0.6;">Loading advisees...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+    <div class="toast-notification" id="toast" style="display:none;"><i class="bi bi-check-circle-fill"></i> <span id="toastMsg"></span></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>

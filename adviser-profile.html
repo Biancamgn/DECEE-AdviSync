@@ -35,39 +35,39 @@
                     <div class="form-group"><label class="form-label-custom">Email Address</label><input type="email" class="form-control-custom" id="profileEmail" value=""></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Phone Number</label><input type="tel" class="form-control-custom" value="+63 917 555 1234"></div>
-                    <div class="form-group"><label class="form-label-custom">Office Location</label><input type="text" class="form-control-custom" value="Gokongwei Hall G302"></div>
+                    <div class="form-group"><label class="form-label-custom">Phone Number</label><input type="tel" class="form-control-custom" id="profilePhone" value=""></div>
+                    <div class="form-group"><label class="form-label-custom">Office Location</label><input type="text" class="form-control-custom" id="profileOffice" value=""></div>
                 </div>
             </div>
             <div class="section-card">
                 <div class="section-card-title"><i class="bi bi-building"></i> Academic Information</div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Department</label><input type="text" class="form-control-custom" value="DECEE" disabled></div>
+                    <div class="form-group"><label class="form-label-custom">Department</label><input type="text" class="form-control-custom" id="profileDept" value="" disabled></div>
                     <div class="form-group"><label class="form-label-custom">College</label><input type="text" class="form-control-custom" value="Gokongwei College of Engineering" disabled></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Program</label><input type="text" class="form-control-custom" value="BS Computer Engineering" disabled></div>
-                    <div class="form-group"><label class="form-label-custom">Total Advisees</label><input type="text" class="form-control-custom" value="24 students" disabled></div>
+                    <div class="form-group"><label class="form-label-custom">Program</label><input type="text" class="form-control-custom" id="profileProgram" value="" disabled></div>
+                    <div class="form-group"><label class="form-label-custom">Total Advisees</label><input type="text" class="form-control-custom" id="profileAdvisees" value="" disabled></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Specialization</label><input type="text" class="form-control-custom" value="Embedded Systems & IoT"></div>
-                    <div class="form-group"><label class="form-label-custom">Years of Service</label><input type="text" class="form-control-custom" value="12 years"></div>
+                    <div class="form-group"><label class="form-label-custom">Specialization</label><input type="text" class="form-control-custom" id="profileSpec" value=""></div>
+                    <div class="form-group"><label class="form-label-custom">Years of Service</label><input type="text" class="form-control-custom" id="profileYears" value=""></div>
                 </div>
             </div>
             <div class="section-card">
                 <div class="section-card-title"><i class="bi bi-clock"></i> Office Hours</div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Monday</label><input type="text" class="form-control-custom" value="9:00 AM – 12:00 PM"></div>
-                    <div class="form-group"><label class="form-label-custom">Wednesday</label><input type="text" class="form-control-custom" value="1:00 PM – 4:00 PM"></div>
+                    <div class="form-group"><label class="form-label-custom">Monday</label><input type="text" class="form-control-custom" id="officeMonday" value=""></div>
+                    <div class="form-group"><label class="form-label-custom">Wednesday</label><input type="text" class="form-control-custom" id="officeWednesday" value=""></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Friday</label><input type="text" class="form-control-custom" value="9:00 AM – 11:00 AM"></div>
-                    <div class="form-group"><label class="form-label-custom">Consultation Mode</label><select class="form-control-custom"><option>In-Person & Online</option><option>In-Person Only</option><option>Online Only</option></select></div>
+                    <div class="form-group"><label class="form-label-custom">Friday</label><input type="text" class="form-control-custom" id="officeFriday" value=""></div>
+                    <div class="form-group"><label class="form-label-custom">Consultation Mode</label><select class="form-control-custom" id="consultMode"><option>In-Person & Online</option><option>In-Person Only</option><option>Online Only</option></select></div>
                 </div>
             </div>
             <div class="btn-group-right">
                 <button class="btn-secondary" onclick="location.reload()"><i class="bi bi-arrow-counterclockwise"></i> Discard</button>
-                <button class="btn-save" onclick="showToast('Profile saved successfully!')"><i class="bi bi-check-lg"></i> Save Changes</button>
+                <button class="btn-save" onclick="saveProfile()"><i class="bi bi-check-lg"></i> Save Changes</button>
             </div>
         </div>
     </div>
@@ -81,16 +81,72 @@
     <script>
         function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = msg; t.style.display = 'flex'; setTimeout(() => t.style.display = 'none', 3000); }
 
-        // Populate profile form fields from Supabase after components load
+        let currentProfile = null;
+        let currentProf = null;
+
+        async function saveProfile() {
+            if (!currentProfile) return;
+            const uid = currentProfile.id;
+            const firstName = document.getElementById('profileFirstName').value.trim();
+            const lastName = document.getElementById('profileLastName').value.trim();
+            const title = document.getElementById('profileTitle').value;
+            const phone = document.getElementById('profilePhone').value.trim();
+            const office = document.getElementById('profileOffice').value.trim();
+            const spec = document.getElementById('profileSpec').value.trim();
+
+            const { error: pErr } = await supabaseClient.from('profiles').update({ first_name: firstName, last_name: lastName }).eq('id', uid);
+            if (pErr) { showToast('Failed to save profile.'); return; }
+
+            const { error: profErr } = await supabaseClient.from('professors').update({
+                phone_number: phone || null,
+                office_location: office || null,
+                specialization: spec || null
+            }).eq('id', uid);
+            if (profErr) { showToast('Failed to save professor info.'); return; }
+
+            showToast('Profile saved successfully!');
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             const profile = await loadUserProfile();
             if (!profile) return;
+            currentProfile = profile;
+
             const fn = document.getElementById('profileFirstName');
             const ln = document.getElementById('profileLastName');
             const em = document.getElementById('profileEmail');
             if (fn) fn.value = profile.first_name || '';
             if (ln) ln.value = profile.last_name || '';
             if (em) em.value = profile.email || '';
+
+            // Set title dropdown
+            const titleSel = document.getElementById('profileTitle');
+            if (titleSel && profile.first_name) {
+                // Try to match from name prefix if available
+            }
+
+            // Fetch professor details
+            const { data: prof } = await supabaseClient.from('professors').select('*').eq('id', profile.id).single();
+            if (prof) {
+                currentProf = prof;
+                const phone = document.getElementById('profilePhone');
+                const office = document.getElementById('profileOffice');
+                const dept = document.getElementById('profileDept');
+                const spec = document.getElementById('profileSpec');
+                if (phone) phone.value = prof.phone_number || '';
+                if (office) office.value = prof.office_location || '';
+                if (dept) dept.value = prof.department || '';
+                if (spec) spec.value = prof.specialization || '';
+            }
+
+            // Fetch advisee count
+            const { count } = await supabaseClient.from('students').select('id', { count: 'exact', head: true }).eq('adviser_id', profile.id);
+            const adviseesField = document.getElementById('profileAdvisees');
+            if (adviseesField) adviseesField.value = (count || 0) + ' students';
+
+            // Set program (from profile or default)
+            const programField = document.getElementById('profileProgram');
+            if (programField) programField.value = profile.program || 'BS Computer Engineering';
         });
     </script>
     <script src="js/notifications.js"></script>
