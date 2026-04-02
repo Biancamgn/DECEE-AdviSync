@@ -27,16 +27,24 @@
             <div class="section-card">
                 <div class="section-card-title"><i class="bi bi-person-vcard"></i> Personal Information</div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">First Name</label><input type="text" class="form-control-custom" id="profileFirstName" value=""></div>
-                    <div class="form-group"><label class="form-label-custom">Last Name</label><input type="text" class="form-control-custom" id="profileLastName" value=""></div>
+                    <div class="form-group"><label class="form-label-custom">First Name</label><input type="text" class="form-control-custom" id="profileFirstName"></div>
+                    <div class="form-group"><label class="form-label-custom">Last Name</label><input type="text" class="form-control-custom" id="profileLastName"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Title</label><select class="form-control-custom" id="profileTitle"><option value="dr">Dr.</option><option value="prof">Prof.</option><option value="engr">Engr.</option><option value="mr">Mr.</option><option value="ms">Ms.</option></select></div>
-                    <div class="form-group"><label class="form-label-custom">Email Address</label><input type="email" class="form-control-custom" id="profileEmail" value=""></div>
+                    <div class="form-group"><label class="form-label-custom">Title</label>
+                        <select class="form-control-custom" id="profileTitle">
+                            <option value="Dr.">Dr.</option>
+                            <option value="Prof.">Prof.</option>
+                            <option value="Engr.">Engr.</option>
+                            <option value="Mr.">Mr.</option>
+                            <option value="Ms.">Ms.</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label class="form-label-custom">Email Address</label><input type="email" class="form-control-custom" id="profileEmail"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Phone Number</label><input type="tel" class="form-control-custom" value="+63 917 555 1234"></div>
-                    <div class="form-group"><label class="form-label-custom">Office Location</label><input type="text" class="form-control-custom" value="Gokongwei Hall G302"></div>
+                    <div class="form-group"><label class="form-label-custom">Phone Number</label><input type="tel" class="form-control-custom" id="profilePhone" placeholder="+63 9XX XXX XXXX"></div>
+                    <div class="form-group"><label class="form-label-custom">Office Location</label><input type="text" class="form-control-custom" id="profileOffice" placeholder="e.g. Gokongwei Hall G302"></div>
                 </div>
             </div>
             <div class="section-card">
@@ -47,27 +55,33 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label class="form-label-custom">Program</label><input type="text" class="form-control-custom" value="BS Computer Engineering" disabled></div>
-                    <div class="form-group"><label class="form-label-custom">Total Advisees</label><input type="text" class="form-control-custom" value="24 students" disabled></div>
+                    <div class="form-group"><label class="form-label-custom">Total Advisees</label><input type="text" class="form-control-custom" id="profileTotalAdvisees" value="—" disabled></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Specialization</label><input type="text" class="form-control-custom" value="Embedded Systems & IoT"></div>
-                    <div class="form-group"><label class="form-label-custom">Years of Service</label><input type="text" class="form-control-custom" value="12 years"></div>
+                    <div class="form-group"><label class="form-label-custom">Specialization</label><input type="text" class="form-control-custom" id="profileSpecialization" placeholder="e.g. Embedded Systems & IoT"></div>
+                    <div class="form-group"><label class="form-label-custom">Years of Service</label><input type="text" class="form-control-custom" id="profileYearsService" placeholder="e.g. 12 years"></div>
                 </div>
             </div>
             <div class="section-card">
                 <div class="section-card-title"><i class="bi bi-clock"></i> Office Hours</div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Monday</label><input type="text" class="form-control-custom" value="9:00 AM – 12:00 PM"></div>
-                    <div class="form-group"><label class="form-label-custom">Wednesday</label><input type="text" class="form-control-custom" value="1:00 PM – 4:00 PM"></div>
+                    <div class="form-group"><label class="form-label-custom">Monday</label><input type="text" class="form-control-custom" id="profileMonHours" placeholder="e.g. 9:00 AM – 12:00 PM"></div>
+                    <div class="form-group"><label class="form-label-custom">Wednesday</label><input type="text" class="form-control-custom" id="profileWedHours" placeholder="e.g. 1:00 PM – 4:00 PM"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label-custom">Friday</label><input type="text" class="form-control-custom" value="9:00 AM – 11:00 AM"></div>
-                    <div class="form-group"><label class="form-label-custom">Consultation Mode</label><select class="form-control-custom"><option>In-Person & Online</option><option>In-Person Only</option><option>Online Only</option></select></div>
+                    <div class="form-group"><label class="form-label-custom">Friday</label><input type="text" class="form-control-custom" id="profileFriHours" placeholder="e.g. 9:00 AM – 11:00 AM"></div>
+                    <div class="form-group"><label class="form-label-custom">Consultation Mode</label>
+                        <select class="form-control-custom" id="profileConsultMode">
+                            <option>In-Person & Online</option>
+                            <option>In-Person Only</option>
+                            <option>Online Only</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="btn-group-right">
                 <button class="btn-secondary" onclick="location.reload()"><i class="bi bi-arrow-counterclockwise"></i> Discard</button>
-                <button class="btn-save" onclick="showToast('Profile saved successfully!')"><i class="bi bi-check-lg"></i> Save Changes</button>
+                <button class="btn-save" onclick="saveProfile()"><i class="bi bi-check-lg"></i> Save Changes</button>
             </div>
         </div>
     </div>
@@ -78,21 +92,7 @@
     <script src="js/auth.js"></script>
     <script src="js/shared.js"></script>
     <script src="js/load-components.js"></script>
-    <script>
-        function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = msg; t.style.display = 'flex'; setTimeout(() => t.style.display = 'none', 3000); }
-
-        // Populate profile form fields from Supabase after components load
-        document.addEventListener('DOMContentLoaded', async () => {
-            const profile = await loadUserProfile();
-            if (!profile) return;
-            const fn = document.getElementById('profileFirstName');
-            const ln = document.getElementById('profileLastName');
-            const em = document.getElementById('profileEmail');
-            if (fn) fn.value = profile.first_name || '';
-            if (ln) ln.value = profile.last_name || '';
-            if (em) em.value = profile.email || '';
-        });
-    </script>
+    <script src="js/adviser-profile.js"></script>
     <script src="js/notifications.js"></script>
 </body>
 </html>
