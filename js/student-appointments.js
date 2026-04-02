@@ -52,7 +52,7 @@
                     const d = new Date(b.appointment_date);
                     const month = d.toLocaleDateString('en-US', { month: 'short' });
                     const day = d.getDate();
-                    const time = b.appointment_time || '';
+                    const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
                     const statusClass = b.status || 'pending';
                     const statusLabel = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
                     return `<div class="booking-item" data-id="${b.id}">
@@ -60,7 +60,7 @@
                             <div class="booking-date-box"><span class="bdb-month">${month}</span><span class="bdb-day">${day}</span></div>
                             <div class="booking-info">
                                 <div class="bi-title">${b.purpose || 'Advising Meeting'}</div>
-                                <div class="bi-detail"><i class="bi bi-clock"></i> ${time} · <i class="bi bi-camera-video"></i> ${b.mode || 'TBD'}</div>
+                                <div class="bi-detail"><i class="bi bi-clock"></i> ${time}</div>
                             </div>
                         </div>
                         <div class="booking-actions">
@@ -91,26 +91,36 @@
         async function bookAppointment() {
             const date = document.querySelector('.date-chip.selected');
             const slot = document.querySelector('.time-slot.selected');
-            if (date && slot && _currentProfile && _studentData) {
+            if (!date || !slot) return;
+            if (!_currentProfile) { alert('Not authenticated. Please log in again.'); return; }
+            if (!_studentData || !_studentData.adviser_id) { alert('No adviser assigned. Please contact your department.'); return; }
+
                 const dateVal = date.dataset.date;
                 const slotTime = slot.querySelector('.slot-time').textContent;
                 const dayName = date.querySelector('.day-name').textContent;
                 const dayMonth = date.querySelector('.day-month').textContent;
                 const dayNum = date.querySelector('.day-num').textContent;
 
+                // Convert "9:30 AM" style time to 24h for TIMESTAMPTZ
+                const timeParts = slotTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
+                let hour = parseInt(timeParts[1]);
+                const min = timeParts[2];
+                const ampm = timeParts[3].toUpperCase();
+                if (ampm === 'PM' && hour !== 12) hour += 12;
+                if (ampm === 'AM' && hour === 12) hour = 0;
+                const time24 = `${String(hour).padStart(2,'0')}:${min}:00`;
+
                 const { error } = await supabaseClient
                     .from('appointments')
                     .insert({
                         student_id: _currentProfile.id,
                         adviser_id: _studentData.adviser_id,
-                        appointment_date: dateVal,
-                        appointment_time: slotTime,
+                        appointment_date: `${dateVal}T${time24}`,
                         purpose: 'Advising Meeting',
-                        status: 'pending',
-                        mode: 'Zoom'
+                        status: 'pending'
                     });
 
-                if (error) { alert('Failed to book appointment. Please try again.'); console.error(error); return; }
+                if (error) { alert('Failed to book appointment: ' + error.message); console.error('Booking error:', error); return; }
 
                 slot.classList.remove('selected');
                 slot.classList.add('booked');
@@ -124,7 +134,6 @@
                 document.getElementById('toastMsg').textContent = `Appointment booked for ${dayName}, ${dayMonth} ${dayNum} at ${slotTime}!`;
                 t.style.display = 'flex';
                 setTimeout(() => t.style.display = 'none', 4000);
-            }
         }
 
         async function cancelBooking(id, btn) {

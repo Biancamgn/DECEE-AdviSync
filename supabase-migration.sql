@@ -102,98 +102,160 @@ RETURNS BOOLEAN AS $$
 $$ LANGUAGE sql SECURITY DEFINER;
 
 -- ── profiles ──
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Admins can view all profiles" ON profiles;
 CREATE POLICY "Admins can view all profiles" ON profiles FOR SELECT USING (is_admin());
+DROP POLICY IF EXISTS "Admins can insert profiles" ON profiles;
 CREATE POLICY "Admins can insert profiles" ON profiles FOR INSERT WITH CHECK (is_admin());
+DROP POLICY IF EXISTS "Admins can update all profiles" ON profiles;
 CREATE POLICY "Admins can update all profiles" ON profiles FOR UPDATE USING (is_admin());
+DROP POLICY IF EXISTS "Admins can delete profiles" ON profiles;
 CREATE POLICY "Admins can delete profiles" ON profiles FOR DELETE USING (is_admin());
+DROP POLICY IF EXISTS "Advisers can view advisee profiles" ON profiles;
+CREATE POLICY "Advisers can view advisee profiles" ON profiles FOR SELECT USING (
+    is_adviser() AND (
+        id IN (SELECT id FROM students WHERE adviser_id = auth.uid())
+        OR id IN (SELECT student_id FROM advisees WHERE adviser_id = auth.uid())
+    )
+);
 
 -- ── students ──
+DROP POLICY IF EXISTS "Students can view own record" ON students;
 CREATE POLICY "Students can view own record" ON students FOR SELECT USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Advisers can view assigned students" ON students;
 CREATE POLICY "Advisers can view assigned students" ON students FOR SELECT USING (
     is_adviser() AND adviser_id = auth.uid()
 );
+DROP POLICY IF EXISTS "Admins can manage students" ON students;
 CREATE POLICY "Admins can manage students" ON students FOR ALL USING (is_admin());
 
 -- ── professors ──
+DROP POLICY IF EXISTS "Professors can view own record" ON professors;
 CREATE POLICY "Professors can view own record" ON professors FOR SELECT USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Admins can manage professors" ON professors;
 CREATE POLICY "Admins can manage professors" ON professors FOR ALL USING (is_admin());
 
 -- ── advisees ──
+DROP POLICY IF EXISTS "Advisers can view own advisees" ON advisees;
 CREATE POLICY "Advisers can view own advisees" ON advisees FOR SELECT USING (adviser_id = auth.uid());
+DROP POLICY IF EXISTS "Students can view own assignment" ON advisees;
 CREATE POLICY "Students can view own assignment" ON advisees FOR SELECT USING (student_id = auth.uid());
+DROP POLICY IF EXISTS "Admins can manage advisees" ON advisees;
 CREATE POLICY "Admins can manage advisees" ON advisees FOR ALL USING (is_admin());
 
 -- ── concerns ──
+DROP POLICY IF EXISTS "Students can insert own concerns" ON concerns;
 CREATE POLICY "Students can insert own concerns" ON concerns FOR INSERT WITH CHECK (auth.uid() = student_id);
+DROP POLICY IF EXISTS "Students can view own concerns" ON concerns;
 CREATE POLICY "Students can view own concerns" ON concerns FOR SELECT USING (auth.uid() = student_id);
+DROP POLICY IF EXISTS "Advisers can view assigned concerns" ON concerns;
 CREATE POLICY "Advisers can view assigned concerns" ON concerns FOR SELECT USING (auth.uid() = adviser_id);
+DROP POLICY IF EXISTS "Advisers can update assigned concerns" ON concerns;
 CREATE POLICY "Advisers can update assigned concerns" ON concerns FOR UPDATE USING (auth.uid() = adviser_id);
+DROP POLICY IF EXISTS "Admins can manage concerns" ON concerns;
 CREATE POLICY "Admins can manage concerns" ON concerns FOR ALL USING (is_admin());
 
 -- ── appointments ──
+DROP POLICY IF EXISTS "Students can insert own appointments" ON appointments;
 CREATE POLICY "Students can insert own appointments" ON appointments FOR INSERT WITH CHECK (auth.uid() = student_id);
+DROP POLICY IF EXISTS "Students can view own appointments" ON appointments;
 CREATE POLICY "Students can view own appointments" ON appointments FOR SELECT USING (auth.uid() = student_id);
+DROP POLICY IF EXISTS "Students can update own appointments" ON appointments;
 CREATE POLICY "Students can update own appointments" ON appointments FOR UPDATE USING (auth.uid() = student_id);
+DROP POLICY IF EXISTS "Advisers can view assigned appointments" ON appointments;
 CREATE POLICY "Advisers can view assigned appointments" ON appointments FOR SELECT USING (auth.uid() = adviser_id);
+DROP POLICY IF EXISTS "Advisers can update assigned appointments" ON appointments;
 CREATE POLICY "Advisers can update assigned appointments" ON appointments FOR UPDATE USING (auth.uid() = adviser_id);
+DROP POLICY IF EXISTS "Admins can manage appointments" ON appointments;
 CREATE POLICY "Admins can manage appointments" ON appointments FOR ALL USING (is_admin());
 
 -- ── advising_forms ──
+DROP POLICY IF EXISTS "Students can insert own forms" ON advising_forms;
 CREATE POLICY "Students can insert own forms" ON advising_forms FOR INSERT WITH CHECK (auth.uid() = student_id);
+DROP POLICY IF EXISTS "Students can view own forms" ON advising_forms;
 CREATE POLICY "Students can view own forms" ON advising_forms FOR SELECT USING (auth.uid() = student_id);
+DROP POLICY IF EXISTS "Advisers can view assigned forms" ON advising_forms;
 CREATE POLICY "Advisers can view assigned forms" ON advising_forms FOR SELECT USING (auth.uid() = adviser_id);
+DROP POLICY IF EXISTS "Advisers can update assigned forms" ON advising_forms;
 CREATE POLICY "Advisers can update assigned forms" ON advising_forms FOR UPDATE USING (auth.uid() = adviser_id);
+DROP POLICY IF EXISTS "Admins can manage forms" ON advising_forms;
 CREATE POLICY "Admins can manage forms" ON advising_forms FOR ALL USING (is_admin());
 
 -- ── academic_records ──
+DROP POLICY IF EXISTS "Students can view own records" ON academic_records;
 CREATE POLICY "Students can view own records" ON academic_records FOR SELECT USING (auth.uid() = student_id);
+DROP POLICY IF EXISTS "Advisers can view assigned student records" ON academic_records;
 CREATE POLICY "Advisers can view assigned student records" ON academic_records FOR SELECT USING (
     is_adviser() AND student_id IN (SELECT id FROM students WHERE adviser_id = auth.uid())
 );
+DROP POLICY IF EXISTS "Admins can manage records" ON academic_records;
 CREATE POLICY "Admins can manage records" ON academic_records FOR ALL USING (is_admin());
 
 -- ── courses (read for all authenticated) ──
+DROP POLICY IF EXISTS "Authenticated users can view courses" ON courses;
 CREATE POLICY "Authenticated users can view courses" ON courses FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Admins can manage courses" ON courses;
 CREATE POLICY "Admins can manage courses" ON courses FOR ALL USING (is_admin());
 
 -- ── terms (read for all authenticated) ──
+DROP POLICY IF EXISTS "Authenticated users can view terms" ON terms;
 CREATE POLICY "Authenticated users can view terms" ON terms FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Admins can manage terms" ON terms;
 CREATE POLICY "Admins can manage terms" ON terms FOR ALL USING (is_admin());
 
 -- ── programs (read for all authenticated) ──
+DROP POLICY IF EXISTS "Authenticated users can view programs" ON programs;
 CREATE POLICY "Authenticated users can view programs" ON programs FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Admins can manage programs" ON programs;
 CREATE POLICY "Admins can manage programs" ON programs FOR ALL USING (is_admin());
 
 -- ── prerequisites (read for all authenticated) ──
+DROP POLICY IF EXISTS "Authenticated users can view prerequisites" ON prerequisites;
 CREATE POLICY "Authenticated users can view prerequisites" ON prerequisites FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Admins can manage prerequisites" ON prerequisites;
 CREATE POLICY "Admins can manage prerequisites" ON prerequisites FOR ALL USING (is_admin());
 
 -- ── study_plans ──
+DROP POLICY IF EXISTS "Students can manage own plans" ON study_plans;
 CREATE POLICY "Students can manage own plans" ON study_plans FOR ALL USING (auth.uid() = student_id);
+DROP POLICY IF EXISTS "Advisers can view assigned plans" ON study_plans;
 CREATE POLICY "Advisers can view assigned plans" ON study_plans FOR SELECT USING (
     is_adviser() AND student_id IN (SELECT id FROM students WHERE adviser_id = auth.uid())
 );
+DROP POLICY IF EXISTS "Admins can manage plans" ON study_plans;
 CREATE POLICY "Admins can manage plans" ON study_plans FOR ALL USING (is_admin());
 
 -- ── study_plan_courses ──
+DROP POLICY IF EXISTS "Students can manage own plan courses" ON study_plan_courses;
 CREATE POLICY "Students can manage own plan courses" ON study_plan_courses FOR ALL USING (
     plan_id IN (SELECT id FROM study_plans WHERE student_id = auth.uid())
 );
+DROP POLICY IF EXISTS "Admins can manage plan courses" ON study_plan_courses;
 CREATE POLICY "Admins can manage plan courses" ON study_plan_courses FOR ALL USING (is_admin());
 
 -- ── program_student_checklists (read for all authenticated) ──
+DROP POLICY IF EXISTS "Authenticated users can view checklists" ON program_student_checklists;
 CREATE POLICY "Authenticated users can view checklists" ON program_student_checklists FOR SELECT USING (auth.uid() IS NOT NULL);
+DROP POLICY IF EXISTS "Admins can manage checklists" ON program_student_checklists;
 CREATE POLICY "Admins can manage checklists" ON program_student_checklists FOR ALL USING (is_admin());
 
 -- ── clearance_log ──
+DROP POLICY IF EXISTS "Admins can manage clearance log" ON clearance_log;
 CREATE POLICY "Admins can manage clearance log" ON clearance_log FOR ALL USING (is_admin());
 
 -- ── email_log ──
+DROP POLICY IF EXISTS "Admins can manage email log" ON email_log;
 CREATE POLICY "Admins can manage email log" ON email_log FOR ALL USING (is_admin());
 
 -- ── notifications ──
+DROP POLICY IF EXISTS "Users can view own notifications" ON notifications;
 CREATE POLICY "Users can view own notifications" ON notifications FOR SELECT USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Users can update own notifications" ON notifications;
 CREATE POLICY "Users can update own notifications" ON notifications FOR UPDATE USING (auth.uid() = user_id);
+DROP POLICY IF EXISTS "System can insert notifications" ON notifications;
 CREATE POLICY "System can insert notifications" ON notifications FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Admins can manage notifications" ON notifications;
 CREATE POLICY "Admins can manage notifications" ON notifications FOR ALL USING (is_admin());

@@ -1,5 +1,11 @@
 async function loadUserProfile() {
     try {
+        // Immediately apply cached profile to prevent flash
+        const cached = sessionStorage.getItem('_profileCache');
+        if (cached) {
+            try { _applyProfile(JSON.parse(cached)); } catch(e) {}
+        }
+
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) return null;
 
@@ -11,6 +17,19 @@ async function loadUserProfile() {
 
         if (error || !profile) return null;
 
+        // Cache for next page load
+        sessionStorage.setItem('_profileCache', JSON.stringify(profile));
+
+        _applyProfile(profile);
+
+        return profile;
+    } catch (err) {
+        console.error('loadUserProfile error:', err);
+        return null;
+    }
+}
+
+function _applyProfile(profile) {
         const firstName = profile.first_name || '';
         const lastName = profile.last_name || '';
         const fullName = `${firstName} ${lastName}`.trim();
@@ -21,7 +40,7 @@ async function loadUserProfile() {
             : '';
 
         document.querySelectorAll('.sidebar-footer .avatar').forEach(el => el.textContent = initials);
-        document.querySelectorAll('.sidebar-footer .user-name').forEach(el => el.textContent = `${firstName} ${lastName[0]}.`);
+        document.querySelectorAll('.sidebar-footer .user-name').forEach(el => el.textContent = `${firstName} ${lastName[0] || ''}.`);
         document.querySelectorAll('.sidebar-footer .user-id').forEach(el => {
             el.textContent = profile.program
                 ? `${schoolId} · ${profile.program}`
@@ -43,12 +62,6 @@ async function loadUserProfile() {
             else if (hour >= 18) greeting = 'Good evening';
             greetingEl.textContent = `${greeting}, ${firstName}!`;
         }
-
-        return profile;
-    } catch (err) {
-        console.error('loadUserProfile error:', err);
-        return null;
-    }
 }
 
 function initShared() {

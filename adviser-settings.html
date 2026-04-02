@@ -42,7 +42,7 @@
                     <div class="form-group"><label class="form-label-custom">New Password</label><input type="password" class="form-control-custom" placeholder="Enter new password"></div>
                     <div class="form-group"><label class="form-label-custom">Confirm New Password</label><input type="password" class="form-control-custom" placeholder="Confirm new password"></div>
                 </div>
-                <button class="btn-save" onclick="showToast('Password updated successfully!')"><i class="bi bi-check-lg"></i> Update Password</button>
+                <button class="btn-save" onclick="changePassword()"><i class="bi bi-check-lg"></i> Update Password</button>
             </div>
         </div>
     </div>
@@ -55,12 +55,33 @@
     <script src="js/load-components.js"></script>
     <script>
         function showToast(msg) { const t = document.getElementById('toast'); document.getElementById('toastMsg').textContent = msg; t.style.display = 'flex'; setTimeout(() => t.style.display = 'none', 3000); }
+        async function changePassword() {
+            const inputs = document.querySelectorAll('input[type="password"]');
+            const newPass = inputs[1]?.value;
+            const confirmPass = inputs[2]?.value;
+            if (!newPass || newPass.length < 6) { showToast('Password must be at least 6 characters.'); return; }
+            if (newPass !== confirmPass) { showToast('Passwords do not match.'); return; }
+            const { error } = await supabaseClient.auth.updateUser({ password: newPass });
+            if (error) { showToast('Failed: ' + error.message); return; }
+            inputs.forEach(i => i.value = '');
+            showToast('Password updated successfully!');
+        }
         function setTheme(el, theme) {
             document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
             el.classList.add('selected');
             const dmBtn = document.getElementById('darkModeBtn');
-            if (theme === 'dark') { document.body.classList.add('dark-mode'); if (dmBtn) dmBtn.querySelector('i').className = 'bi bi-sun-fill'; }
-            else if (theme === 'light') { document.body.classList.remove('dark-mode'); if (dmBtn) dmBtn.querySelector('i').className = 'bi bi-moon-fill'; }
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                if (dmBtn) dmBtn.querySelector('i').className = 'bi bi-sun-fill';
+            } else if (theme === 'light') {
+                document.body.classList.remove('dark-mode');
+                if (dmBtn) dmBtn.querySelector('i').className = 'bi bi-moon-fill';
+            } else {
+                // system theme
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) { document.body.classList.add('dark-mode'); if (dmBtn) dmBtn.querySelector('i').className = 'bi bi-sun-fill'; }
+                else { document.body.classList.remove('dark-mode'); if (dmBtn) dmBtn.querySelector('i').className = 'bi bi-moon-fill'; }
+            }
             localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
             showToast('Theme updated!');
         }
@@ -69,11 +90,9 @@
             document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
             document.querySelectorAll('.theme-card').forEach(c => { if (c.textContent.trim() === (isDark ? 'Dark' : 'Light')) c.classList.add('selected'); });
         }
-        window.addEventListener('load', () => {
-            syncThemeCards();
-            const dmBtn = document.getElementById('darkModeBtn');
-            if (dmBtn) dmBtn.addEventListener('click', () => setTimeout(syncThemeCards, 10));
-        });
+        // Observe dark-mode class changes to keep theme cards in sync with topbar button
+        new MutationObserver(syncThemeCards).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        window.addEventListener('load', syncThemeCards);
     </script>
     <script src="js/notifications.js"></script>
 </body>

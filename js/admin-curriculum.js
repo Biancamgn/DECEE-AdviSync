@@ -3,10 +3,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const currentUser = await requireAuth(['admin']);
     if (!currentUser) {
         console.log('❌ Authentication failed, but continuing for testing...');
-        // For testing purposes, continue without authentication
-        // return;
     } else {
         console.log('✅ User authenticated:', currentUser);
+        // Populate topbar with actual user data
+        const fullName = ((currentUser.first_name || '') + ' ' + (currentUser.last_name || '')).trim();
+        const initials = (currentUser.first_name?.[0] || '') + (currentUser.last_name?.[0] || '');
+        document.querySelectorAll('.profile-btn').forEach(el => el.textContent = initials);
+        document.querySelectorAll('.dropdown-avatar').forEach(el => el.textContent = initials);
+        document.querySelectorAll('.dropdown-name').forEach(el => el.textContent = fullName || 'System Admin');
     }
     console.log('Starting admin curriculum page...');
     console.log('Supabase client available:', typeof supabaseClient);
@@ -43,6 +47,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Track current student ID for each program (set early to avoid TDZ on initial renderAll)
     let currentStudentIds = { BSCpE: null, BSECE: null };
+
+    // Declare currentView early so renderAll() called from fetchCourses() can access it
+    let currentView = 'grid';
 
     async function fetchCourses() {
         console.log('🔄 Starting fetchCourses function...');
@@ -310,7 +317,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    let currentView = 'grid';
+    currentView = 'grid'; // reset (declared earlier)
     const viewGridBtn = document.getElementById('viewGrid');
     const viewTableBtn = document.getElementById('viewTable');
 

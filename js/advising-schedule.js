@@ -124,7 +124,7 @@ async function loadSchedule() {
         .from('appointments')
         .select(`
             *,
-            profiles!appointments_student_id_fkey (
+            student:profiles!student_id (
                 first_name, last_name, school_id
             )
         `)
@@ -140,8 +140,8 @@ async function loadSchedule() {
     }
 
     tbody.innerHTML = data.map(appt => {
-        const p         = appt.profiles;
-        const fullName  = p ? `${p.first_name} ${p.last_name}` : '—';
+        const p         = appt.student || {};
+        const fullName  = `${p.first_name || ''} ${p.last_name || ''}`.trim() || '—';
         const date      = new Date(appt.appointment_date);
         const dateStr   = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const timeStr   = appt.start_time ? formatTime(appt.start_time) : '—';
@@ -149,6 +149,7 @@ async function loadSchedule() {
         const typeIcon  = type === 'zoom' ? 'camera-video' : 'building';
         const typeLabel = type === 'zoom' ? 'Zoom' : 'In Person';
         const status    = appt.status || 'pending';
+
 
         const actions = status === 'pending'
             ? `<button class="btn-action-sm btn-confirm" onclick="updateAppt('${appt.id}','confirmed',this)">Confirm</button>

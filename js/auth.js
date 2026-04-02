@@ -31,6 +31,7 @@ async function requireAuth(allowedRoles = []) {
 }
 
 async function signOut() {
+    sessionStorage.removeItem('_profileCache');
     await supabaseClient.auth.signOut();
     window.location.href = 'index.html';
 }
