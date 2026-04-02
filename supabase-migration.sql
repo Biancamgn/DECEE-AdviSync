@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS notifications (
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, is_read, created_at DESC);
 
 -- 3. Create dashboard_stats view
-CREATE OR REPLACE VIEW dashboard_stats AS
+DROP VIEW IF EXISTS dashboard_stats;
+CREATE VIEW dashboard_stats AS
 SELECT
     COUNT(*) AS total_students,
     COUNT(*) FILTER (WHERE is_cleared = true) AS cleared,
@@ -30,7 +31,8 @@ SELECT
 FROM students;
 
 -- 4. Create faculty_workload view
-CREATE OR REPLACE VIEW faculty_workload AS
+DROP VIEW IF EXISTS faculty_workload;
+CREATE VIEW faculty_workload AS
 SELECT
     p.id,
     p.first_name,
