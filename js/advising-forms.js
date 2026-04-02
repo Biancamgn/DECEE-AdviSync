@@ -8,13 +8,10 @@ async function loadForms() {
             .select(`
                 *,
                 profiles!advising_forms_student_id_fkey (
-                    first_name,
-                    last_name,
-                    school_id
+                    first_name, last_name, school_id
                 ),
                 terms (
-                    term_name,
-                    academic_year
+                    term_name, academic_year
                 )
             `)
             .eq('adviser_id', profile.id)
@@ -24,7 +21,7 @@ async function loadForms() {
 
         const pending  = data.filter(f => f.status === 'pending');
         const approved = data.filter(f => f.status === 'approved');
-        const rejected = data.filter(f => f.status === 'rejected');
+        const rejected = data.filter(f => f.status === 'rejected' || f.status === 'for_revision');
 
         document.querySelector('.tab-item:nth-child(1) .tab-count').textContent = pending.length;
         document.querySelector('.tab-item:nth-child(2) .tab-count').textContent = approved.length;
@@ -54,13 +51,17 @@ function renderForms(containerId, forms, type) {
 
     container.innerHTML = forms.map(form => {
         const p = form.profiles;
-        const t = form.terms;
-        const fullName = `${p.first_name} ${p.last_name}`;
-        const initials = (p.first_name[0] || '') + (p.last_name[0] || '');
-        const termLabel = t ? `${t.term_name} · ${t.academic_year}` : '—';
-        const submittedDate = new Date(form.submitted_at).toLocaleDateString('en-US', {
-            month: 'short', day: 'numeric', year: 'numeric'
-        });
+        if (!p) return ''; // skip rows where profile join returned null
+
+        const t          = form.terms;
+        const fullName   = `${p.first_name} ${p.last_name}`;
+        const initials   = (p.first_name?.[0] || '') + (p.last_name?.[0] || '');
+        const termLabel  = t ? `${t.term_name} · ${t.academic_year}` : '—';
+        const submittedDate = form.submitted_at
+            ? new Date(form.submitted_at).toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric'
+              })
+            : '—';
 
         if (type === 'pending') {
             return `
@@ -73,7 +74,7 @@ function renderForms(containerId, forms, type) {
                             <div class="sub-meta">
                                 <span>${p.school_id}</span>
                                 <span>·</span>
-                                <span>${form.program} · ${termLabel}</span>
+                                <span>${form.program || '—'} · ${termLabel}</span>
                             </div>
                         </div>
                     </div>
@@ -112,7 +113,7 @@ function renderForms(containerId, forms, type) {
                             <div class="sub-meta">
                                 <span>${p.school_id}</span>
                                 <span>·</span>
-                                <span>${form.program} · ${termLabel}</span>
+                                <span>${form.program || '—'} · ${termLabel}</span>
                             </div>
                         </div>
                     </div>
@@ -136,11 +137,13 @@ function renderForms(containerId, forms, type) {
                             <div class="sub-meta">
                                 <span>${p.school_id}</span>
                                 <span>·</span>
-                                <span>${form.program} · ${termLabel}</span>
+                                <span>${form.program || '—'} · ${termLabel}</span>
                             </div>
                         </div>
                     </div>
-                    <span class="sub-status rejected"><i class="bi bi-x-circle"></i> Rejected</span>
+                    <span class="sub-status rejected"><i class="bi bi-x-circle"></i> 
+                        ${form.status === 'for_revision' ? 'Revision Requested' : 'Rejected'}
+                    </span>
                 </div>
                 <div style="font-size:0.78rem;color:var(--dlsu-gray-400);">
                     Submitted ${submittedDate}
@@ -165,7 +168,6 @@ async function updateFormStatus(formId, status, btn) {
         card.innerHTML = `<div style="padding:1rem;text-align:center;color:var(--dlsu-green);font-weight:600;">
             <i class="bi bi-check-circle-fill"></i> Form ${status} successfully.
         </div>`;
-
         setTimeout(() => loadForms(), 1000);
 
     } catch (err) {
@@ -174,23 +176,17 @@ async function updateFormStatus(formId, status, btn) {
 }
 
 async function submitFeedback(formId, btn) {
-    const card = btn.closest('.submission-card');
+    const card     = btn.closest('.submission-card');
     const textarea = card.querySelector('.feedback-area textarea');
-    const remarks = textarea.value.trim();
-
+    const remarks  = textarea.value.trim();
     if (!remarks) { alert('Please write feedback before sending.'); return; }
 
-    const isRejection = textarea.placeholder.includes('rejection');
-    const status = isRejection ? 'rejected' : 'for_revision';
+    const status = 'for_revision';
 
     try {
         const { error } = await supabaseClient
             .from('advising_forms')
-            .update({
-                status,
-                adviser_remarks: remarks,
-                reviewed_at: new Date().toISOString()
-            })
+            .update({ status, adviser_remarks: remarks, reviewed_at: new Date().toISOString() })
             .eq('id', formId);
 
         if (error) { console.error('Feedback error:', error); return; }
@@ -199,7 +195,6 @@ async function submitFeedback(formId, btn) {
         card.innerHTML = `<div style="padding:1rem;text-align:center;color:var(--dlsu-green);font-weight:600;">
             <i class="bi bi-send-check-fill"></i> Feedback sent successfully.
         </div>`;
-
         setTimeout(() => loadForms(), 1000);
 
     } catch (err) {
@@ -220,6 +215,4 @@ function switchTab(tab) {
     document.getElementById('tab-' + tab).style.display = '';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadForms();
-});
+document.addEventListener('DOMContentLoaded', () => { loadForms(); });

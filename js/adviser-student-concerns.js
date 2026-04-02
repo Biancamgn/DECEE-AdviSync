@@ -8,20 +8,18 @@ async function loadConcerns() {
             *,
             profiles!concerns_student_id_fkey (
                 first_name, last_name, school_id
-            ),
-            students!inner ( program )
+            )
         `)
         .eq('adviser_id', profile.id)
         .order('created_at', { ascending: false });
 
     if (error) { console.error(error); return; }
 
-    // Update summary chips
-    const total = data.length;
-    const newCount = data.filter(c => c.status === 'new').length;
+    const total       = data.length;
+    const newCount    = data.filter(c => c.status === 'new').length;
     const repliedCount = data.filter(c => c.status === 'replied').length;
     document.querySelector('.chip-count.amber').textContent = newCount;
-    document.querySelector('.chip-count.blue').textContent = repliedCount;
+    document.querySelector('.chip-count.blue').textContent  = repliedCount;
     document.querySelector('.chip-count.green').textContent = total;
 
     window._allConcerns = data;
@@ -39,10 +37,12 @@ function renderConcerns(data) {
 
     container.innerHTML = data.map(concern => {
         const p = concern.profiles;
+        if (!p) return ''; // skip if profile join failed
         const fullName = `${p.first_name} ${p.last_name}`;
-        const initials = (p.first_name[0] || '') + (p.last_name[0] || '');
-        const program = concern.students?.program || '—';
-        const date = new Date(concern.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const initials = (p.first_name?.[0] || '') + (p.last_name?.[0] || '');
+        const date = new Date(concern.created_at).toLocaleDateString('en-US', {
+            month: 'short', day: 'numeric', year: 'numeric'
+        });
         const isUnread = concern.status === 'new';
 
         return `
@@ -52,13 +52,15 @@ function renderConcerns(data) {
                     <div class="concern-avatar">${initials}</div>
                     <div>
                         <div class="concern-name">${fullName}</div>
-                        <div class="concern-id">${p.school_id} · ${program}</div>
+                        <div class="concern-id">${p.school_id}</div>
                     </div>
                 </div>
                 <div class="concern-meta">
                     <span class="concern-term">${concern.subject}</span>
                     <span class="concern-date">${date}</span>
-                    <span class="concern-status ${concern.status}">${concern.status.charAt(0).toUpperCase() + concern.status.slice(1)}</span>
+                    <span class="concern-status ${concern.status}">
+                        ${concern.status.charAt(0).toUpperCase() + concern.status.slice(1)}
+                    </span>
                 </div>
             </div>
             <div class="concern-message">${concern.message}</div>
@@ -73,7 +75,10 @@ function renderConcerns(data) {
                     <button class="btn-reply" onclick="sendReply('${concern.id}', this)">
                         <i class="bi bi-reply-fill"></i> Reply
                     </button>
-                </div>` : ''}
+                </div>` : `
+                <div class="replied-message">
+                    <i class="bi bi-reply-fill"></i> <strong>Your reply:</strong> ${concern.reply || ''}
+                </div>`}
         </div>`;
     }).join('');
 }
@@ -90,9 +95,9 @@ async function markRead(id, btn) {
 }
 
 async function sendReply(id, btn) {
-    const card = btn.closest('.concern-card');
+    const card     = btn.closest('.concern-card');
     const textarea = card.querySelector('textarea');
-    const reply = textarea.value.trim();
+    const reply    = textarea.value.trim();
     if (!reply) { alert('Please write a reply first.'); return; }
 
     const { error } = await supabaseClient
@@ -101,8 +106,8 @@ async function sendReply(id, btn) {
         .eq('id', id);
     if (error) { console.error(error); return; }
 
-    btn.textContent = '✓ Sent';
-    btn.disabled = true;
+    btn.textContent  = '✓ Sent';
+    btn.disabled     = true;
     textarea.disabled = true;
     setTimeout(() => loadConcerns(), 800);
 }
@@ -110,7 +115,7 @@ async function sendReply(id, btn) {
 function filterConcerns(chip, status) {
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
-    const all = window._allConcerns || [];
+    const all      = window._allConcerns || [];
     const filtered = status === 'all' ? all : all.filter(c => c.status === status);
     renderConcerns(filtered);
 }
