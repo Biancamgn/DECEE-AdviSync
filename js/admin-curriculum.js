@@ -51,6 +51,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Declare currentView early so renderAll() called from fetchCourses() can access it
     let currentView = 'grid';
 
+    // Declare search/filter elements early so filterCourses() can access them during initial render
+    const courseSearch = document.getElementById('courseSearch');
+    const termFilter = document.getElementById('termFilter');
+
     async function fetchCourses() {
         console.log('🔄 Starting fetchCourses function...');
         console.log('Supabase client available:', typeof supabaseClient);
@@ -338,9 +342,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         viewGridBtn.style.color = 'var(--dlsu-gray-600)';
         renderAll();
     });
-
-    const courseSearch = document.getElementById('courseSearch');
-    const termFilter = document.getElementById('termFilter');
 
     function prereqBadges(course) {
         let html = '';
