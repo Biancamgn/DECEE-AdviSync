@@ -104,9 +104,15 @@
                 <div class="section-title"><i class="bi bi-journal-check"></i> My Bookings</div>
                 <div class="section-desc">Your upcoming and past advising appointments.</div>
 
-                <div id="bookingsContainer">
-                    <div style="text-align:center;color:var(--dlsu-gray-400);padding:2rem;">Loading bookings...</div>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="upcoming" onclick="switchStudentBookingFilter('upcoming', this)">Upcoming <span class="tab-count">0</span></button>
+                    <button class="filter-tab" data-filter="completed" onclick="switchStudentBookingFilter('completed', this)">Completed <span class="tab-count">0</span></button>
+                    <button class="filter-tab" data-filter="cancelled" onclick="switchStudentBookingFilter('cancelled', this)">Cancelled <span class="tab-count">0</span></button>
+                    <button class="filter-tab" data-filter="all" onclick="switchStudentBookingFilter('all', this)">All <span class="tab-count">0</span></button>
                 </div>
+
+                <div id="bookingsList"></div>
+                <div class="pagination-bar" id="bookingsPagination"></div>
             </div>
         </div>
     </div>

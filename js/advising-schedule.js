@@ -233,61 +233,85 @@ async function removeSlot(id, btn) {
 
 // ── Student Bookings (from appointments table) ──
 
-async function loadBookings() {
-    const { data, error } = await supabaseClient
-        .from('appointments')
-        .select('*')
-        .eq('adviser_id', _adviserProfile.id)
-        .order('appointment_date', { ascending: false });
+let _allBookings = [];
+let _studentMap = {};
+let _slotMap = {};
+let _bookingsFilter = 'upcoming';
+let _bookingsPage = 1;
+const BOOKINGS_PER_PAGE = 8;
 
-    if (error) { console.error('Error loading bookings:', error); return; }
+function switchBookingFilter(filter, btn) {
+    _bookingsFilter = filter;
+    _bookingsPage = 1;
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderBookingsTable();
+}
 
+function getFilteredBookings() {
+    const now = new Date();
+    switch (_bookingsFilter) {
+        case 'upcoming':
+            return _allBookings.filter(a => a.status === 'confirmed' && new Date(a.appointment_date) >= now);
+        case 'completed':
+            return _allBookings.filter(a => a.status === 'completed');
+        case 'cancelled':
+            return _allBookings.filter(a => a.status === 'cancelled');
+        case 'all':
+        default:
+            return _allBookings;
+    }
+}
+
+function renderBookingsTable() {
     const tbody = document.getElementById('bookingsTbody');
     if (!tbody) return;
 
-    if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding:2rem;color:var(--dlsu-gray-400);">No appointments yet.</td></tr>';
+    const filtered = getFilteredBookings();
+
+    // Update tab counts
+    const now = new Date();
+    const counts = {
+        upcoming: _allBookings.filter(a => a.status === 'confirmed' && new Date(a.appointment_date) >= now).length,
+        completed: _allBookings.filter(a => a.status === 'completed').length,
+        cancelled: _allBookings.filter(a => a.status === 'cancelled').length,
+        all: _allBookings.length
+    };
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        const key = tab.dataset.filter;
+        const countEl = tab.querySelector('.tab-count');
+        if (countEl && counts[key] !== undefined) countEl.textContent = counts[key];
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center" style="padding:2rem;color:var(--dlsu-gray-400);">No ${_bookingsFilter} appointments.</td></tr>`;
+        renderBookingsPagination(0);
         return;
     }
 
-    // Fetch student profiles separately
-    const studentIds = [...new Set(data.map(a => a.student_id))];
-    let studentMap = {};
-    if (studentIds.length > 0) {
-        const { data: students } = await supabaseClient
-            .from('profiles')
-            .select('id, first_name, last_name, school_id')
-            .in('id', studentIds);
-        if (students) students.forEach(s => { studentMap[s.id] = s; });
-    }
+    // Pagination
+    const totalPages = Math.ceil(filtered.length / BOOKINGS_PER_PAGE);
+    if (_bookingsPage > totalPages) _bookingsPage = totalPages;
+    const start = (_bookingsPage - 1) * BOOKINGS_PER_PAGE;
+    const pageData = filtered.slice(start, start + BOOKINGS_PER_PAGE);
 
-    // Fetch slot info separately
-    const apptIds = data.map(a => a.id);
-    let slotMap = {};
-    if (apptIds.length > 0) {
-        const { data: slots } = await supabaseClient
-            .from('availability_slots')
-            .select('appointment_id, slot_type')
-            .in('appointment_id', apptIds);
-        if (slots) slots.forEach(s => { slotMap[s.appointment_id] = s; });
-    }
-
-    tbody.innerHTML = data.map(appt => {
-        const p = studentMap[appt.student_id] || {};
+    tbody.innerHTML = pageData.map(appt => {
+        const p = _studentMap[appt.student_id] || {};
         const fullName = `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Unknown';
         const date = new Date(appt.appointment_date);
         const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const timeStr = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
         const status = appt.status || 'confirmed';
 
-        const linkedSlot = slotMap[appt.id];
+        const linkedSlot = _slotMap[appt.id];
         const slotType = linkedSlot ? linkedSlot.slot_type : 'zoom';
         const typeIcon = slotType === 'in-person' ? 'building' : 'camera-video';
         const typeLabel = slotType === 'in-person' ? 'In Person' : 'Zoom';
 
         let actions = '';
         if (status === 'confirmed') {
-            actions = `<button class="btn-action-sm btn-cancel-sm" onclick="cancelAppt('${appt.id}', this)">Cancel</button>`;
+            actions = `<button class="btn-action-sm btn-complete-sm" onclick="completeAppt('${appt.id}', this)" title="Mark as completed"><i class="bi bi-check-lg"></i></button>
+                       <button class="btn-action-sm btn-cancel-sm" onclick="cancelAppt('${appt.id}', this)" title="Cancel">Cancel</button>`;
         } else {
             actions = '<span style="color:var(--dlsu-gray-400);font-size:0.72rem;">—</span>';
         }
@@ -301,6 +325,99 @@ async function loadBookings() {
             <td>${actions}</td>
         </tr>`;
     }).join('');
+
+    renderBookingsPagination(totalPages);
+}
+
+function renderBookingsPagination(totalPages) {
+    const container = document.getElementById('bookingsPagination');
+    if (!container) return;
+
+    if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+    let html = '';
+    html += `<button class="pg-btn" ${_bookingsPage <= 1 ? 'disabled' : ''} onclick="goBookingsPage(${_bookingsPage - 1})"><i class="bi bi-chevron-left"></i></button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        if (totalPages > 7 && i > 2 && i < totalPages - 1 && Math.abs(i - _bookingsPage) > 1) {
+            if (i === 3 || i === totalPages - 2) html += '<span class="pg-ellipsis">…</span>';
+            continue;
+        }
+        html += `<button class="pg-btn ${i === _bookingsPage ? 'active' : ''}" onclick="goBookingsPage(${i})">${i}</button>`;
+    }
+    html += `<button class="pg-btn" ${_bookingsPage >= totalPages ? 'disabled' : ''} onclick="goBookingsPage(${_bookingsPage + 1})"><i class="bi bi-chevron-right"></i></button>`;
+    container.innerHTML = html;
+}
+
+function goBookingsPage(page) {
+    _bookingsPage = page;
+    renderBookingsTable();
+}
+
+async function loadBookings() {
+    const { data, error } = await supabaseClient
+        .from('appointments')
+        .select('*')
+        .eq('adviser_id', _adviserProfile.id)
+        .order('appointment_date', { ascending: false });
+
+    if (error) { console.error('Error loading bookings:', error); return; }
+
+    if (!data || data.length === 0) {
+        _allBookings = [];
+        renderBookingsTable();
+        return;
+    }
+
+    // Auto-complete past confirmed appointments
+    const now = new Date();
+    const pastConfirmed = data.filter(a => a.status === 'confirmed' && new Date(a.appointment_date) < now);
+    if (pastConfirmed.length > 0) {
+        const ids = pastConfirmed.map(a => a.id);
+        await supabaseClient
+            .from('appointments')
+            .update({ status: 'completed' })
+            .in('id', ids);
+        pastConfirmed.forEach(a => { a.status = 'completed'; });
+    }
+
+    // Fetch student profiles separately
+    const studentIds = [...new Set(data.map(a => a.student_id))];
+    _studentMap = {};
+    if (studentIds.length > 0) {
+        const { data: students } = await supabaseClient
+            .from('profiles')
+            .select('id, first_name, last_name, school_id')
+            .in('id', studentIds);
+        if (students) students.forEach(s => { _studentMap[s.id] = s; });
+    }
+
+    // Fetch slot info separately
+    const apptIds = data.map(a => a.id);
+    _slotMap = {};
+    if (apptIds.length > 0) {
+        const { data: slots } = await supabaseClient
+            .from('availability_slots')
+            .select('appointment_id, slot_type')
+            .in('appointment_id', apptIds);
+        if (slots) slots.forEach(s => { _slotMap[s.appointment_id] = s; });
+    }
+
+    _allBookings = data;
+    renderBookingsTable();
+}
+
+async function completeAppt(id, btn) {
+    if (!confirm('Mark this appointment as completed?')) return;
+    const { error } = await supabaseClient
+        .from('appointments')
+        .update({ status: 'completed' })
+        .eq('id', id);
+    if (error) { console.error(error); alert('Failed to complete appointment.'); return; }
+
+    btn.closest('tr').style.opacity = '0.4';
+    setTimeout(async () => {
+        await Promise.all([loadBookings(), loadSlots()]);
+    }, 400);
 }
 
 async function cancelAppt(id, btn) {
@@ -320,7 +437,7 @@ async function cancelAppt(id, btn) {
     btn.closest('tr').style.opacity = '0.4';
     setTimeout(async () => {
         await Promise.all([loadBookings(), loadSlots()]);
-    }, 600);
+    }, 400);
 }
 
 document.addEventListener('DOMContentLoaded', () => { loadSchedule(); });
