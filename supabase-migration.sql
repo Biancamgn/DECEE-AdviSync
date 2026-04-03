@@ -308,3 +308,58 @@ CREATE POLICY "Students can book adviser slots" ON availability_slots FOR UPDATE
 -- Admins can manage all slots
 DROP POLICY IF EXISTS "Admins can manage availability slots" ON availability_slots;
 CREATE POLICY "Admins can manage availability slots" ON availability_slots FOR ALL USING (is_admin());
+
+-- ═══════════════════════════════════════════════════════════════════
+-- 10. Concern Replies Table (threaded messaging)
+-- ═══════════════════════════════════════════════════════════════════
+CREATE TABLE IF NOT EXISTS concern_replies (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    concern_id UUID NOT NULL REFERENCES concerns(id) ON DELETE CASCADE,
+    sender_id UUID NOT NULL REFERENCES profiles(id),
+    sender_role TEXT NOT NULL CHECK (sender_role IN ('student', 'adviser')),
+    message TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_concern_replies_concern ON concern_replies(concern_id);
+CREATE INDEX IF NOT EXISTS idx_concern_replies_created ON concern_replies(concern_id, created_at);
+
+ALTER TABLE concern_replies ENABLE ROW LEVEL SECURITY;
+
+-- Students can insert replies on their own concerns
+DROP POLICY IF EXISTS "Students can insert replies on own concerns" ON concern_replies;
+CREATE POLICY "Students can insert replies on own concerns" ON concern_replies
+    FOR INSERT WITH CHECK (
+        auth.uid() = sender_id AND
+        EXISTS (SELECT 1 FROM concerns WHERE concerns.id = concern_id AND concerns.student_id = auth.uid())
+    );
+
+-- Students can view replies on their own concerns
+DROP POLICY IF EXISTS "Students can view replies on own concerns" ON concern_replies;
+CREATE POLICY "Students can view replies on own concerns" ON concern_replies
+    FOR SELECT USING (
+        EXISTS (SELECT 1 FROM concerns WHERE concerns.id = concern_id AND concerns.student_id = auth.uid())
+    );
+
+-- Advisers can insert replies on their assigned concerns
+DROP POLICY IF EXISTS "Advisers can insert replies on assigned concerns" ON concern_replies;
+CREATE POLICY "Advisers can insert replies on assigned concerns" ON concern_replies
+    FOR INSERT WITH CHECK (
+        auth.uid() = sender_id AND
+        EXISTS (SELECT 1 FROM concerns WHERE concerns.id = concern_id AND concerns.adviser_id = auth.uid())
+    );
+
+-- Advisers can view replies on their assigned concerns
+DROP POLICY IF EXISTS "Advisers can view replies on assigned concerns" ON concern_replies;
+CREATE POLICY "Advisers can view replies on assigned concerns" ON concern_replies
+    FOR SELECT USING (
+        EXISTS (SELECT 1 FROM concerns WHERE concerns.id = concern_id AND concerns.adviser_id = auth.uid())
+    );
+
+-- Admins can manage all replies
+DROP POLICY IF EXISTS "Admins can manage concern replies" ON concern_replies;
+CREATE POLICY "Admins can manage concern replies" ON concern_replies FOR ALL USING (is_admin());
+
+-- Allow students to update their own concerns (to mark as resolved)
+DROP POLICY IF EXISTS "Students can update own concerns" ON concerns;
+CREATE POLICY "Students can update own concerns" ON concerns FOR UPDATE USING (auth.uid() = student_id);
