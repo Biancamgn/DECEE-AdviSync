@@ -1353,45 +1353,46 @@ body.dark-mode .reply-text {
 
 /* ── Dark Mode Extensions ── */
 body.dark-mode .btn-thread {
-    background: var(--dark-card, #1a2332);
+    background: #232a25;
     border-color: var(--dlsu-green);
     color: var(--dlsu-green);
 }
 body.dark-mode .btn-thread:hover { background: var(--dlsu-green); color: white; }
 
 body.dark-mode .btn-resolve {
-    background: var(--dark-card, #1a2332);
+    background: #232a25;
     border-color: #4caf50;
     color: #66bb6a;
 }
 body.dark-mode .btn-resolve:hover { background: #4caf50; color: white; }
 
 body.dark-mode .thread-modal {
-    background: var(--dark-card, #1a2332);
+    background: #232a25;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
 body.dark-mode .thread-header,
 body.dark-mode .thread-compose {
-    border-color: var(--dark-border, #2a3544);
+    border-color: #2f3832;
 }
 
 body.dark-mode .thread-header-subject { color: #d4ddd7; }
 
 body.dark-mode .thread-compose textarea {
-    background: var(--dark-bg, #0f1923);
-    border-color: var(--dark-border, #2a3544);
+    background: #1a1f1c;
+    border-color: #2f3832;
     color: #d4ddd7;
 }
 
 body.dark-mode .thread-close {
-    background: var(--dark-bg, #0f1923);
+    background: #1a1f1c;
     color: #6b7e70;
 }
 
 body.dark-mode .msg-sender { color: #94a89c; }
 
 body.dark-mode .msg-text {
-    background: var(--dark-bg, #0f1923);
+    background: #1a1f1c;
     color: #94a89c;
 }
 
@@ -1401,8 +1402,8 @@ body.dark-mode .thread-msg.adviser .msg-text {
 }
 
 body.dark-mode .pg-btn {
-    background: var(--dark-card, #1a2332);
-    border-color: var(--dark-border, #2a3544);
+    background: #232a25;
+    border-color: #2f3832;
     color: #6b7e70;
 }
 body.dark-mode .pg-btn.active {
@@ -1413,6 +1414,8 @@ body.dark-mode .pg-btn.active {
 
 body.dark-mode .concern-status.active { background: #121e2e; color: #5b9bd5; }
 body.dark-mode .concern-status.resolved { background: #1a2e1a; color: #66bb6a; }
+
+body.dark-mode .thread-modal-overlay { background: rgba(0,0,0,0.7); }
 
 body.dark-mode .resolved-notice { color: #66bb6a; }
 

@@ -574,8 +574,8 @@
 /* ── Dark Mode ── */
 body.dark-mode .concern-card,
 body.dark-mode .summary-chip {
-    background: var(--dlsu-dark-card);
-    border-color: var(--dlsu-dark-border);
+    background: #232a25;
+    border-color: #2f3832;
 }
 
 body.dark-mode .concern-card.unread {
@@ -584,12 +584,12 @@ body.dark-mode .concern-card.unread {
 }
 
 body.dark-mode .concern-name,
-body.dark-mode .thread-header-name { color: var(--dlsu-dark-text); }
+body.dark-mode .thread-header-name { color: #d4ddd7; }
 
 body.dark-mode .concern-message,
 body.dark-mode .msg-text {
-    background: var(--dlsu-dark-bg);
-    color: var(--dlsu-dark-text-secondary);
+    background: #1a1f1c;
+    color: #94a89c;
 }
 
 body.dark-mode .thread-msg.adviser .msg-text {
@@ -598,31 +598,32 @@ body.dark-mode .thread-msg.adviser .msg-text {
 }
 
 body.dark-mode .thread-modal {
-    background: var(--dlsu-dark-card);
+    background: #232a25;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
 body.dark-mode .thread-header,
 body.dark-mode .thread-compose {
-    border-color: var(--dlsu-dark-border);
+    border-color: #2f3832;
 }
 
 body.dark-mode .thread-compose textarea {
-    background: var(--dlsu-dark-bg);
-    border-color: var(--dlsu-dark-border);
-    color: var(--dlsu-dark-text);
+    background: #1a1f1c;
+    border-color: #2f3832;
+    color: #d4ddd7;
 }
 
 body.dark-mode .thread-close {
-    background: var(--dlsu-dark-bg);
-    color: var(--dlsu-dark-text-secondary);
+    background: #1a1f1c;
+    color: #6b7e70;
 }
 
-body.dark-mode .msg-sender { color: var(--dlsu-dark-text-secondary); }
+body.dark-mode .msg-sender { color: #94a89c; }
 
 body.dark-mode .filter-chip {
-    background: var(--dlsu-dark-card);
-    border-color: var(--dlsu-dark-border);
-    color: var(--dlsu-dark-text-secondary);
+    background: #232a25;
+    border-color: #3a4a3e;
+    color: #94a89c;
 }
 
 body.dark-mode .filter-chip.active {
@@ -632,35 +633,44 @@ body.dark-mode .filter-chip.active {
 }
 
 body.dark-mode .btn-thread {
-    background: var(--dlsu-dark-card);
+    background: #232a25;
     border-color: var(--dlsu-green);
     color: var(--dlsu-green);
 }
 body.dark-mode .btn-thread:hover { background: var(--dlsu-green); color: white; }
 
 body.dark-mode .btn-resolve {
-    background: var(--dlsu-dark-card);
+    background: #232a25;
     border-color: #4caf50;
     color: #66bb6a;
 }
 body.dark-mode .btn-resolve:hover { background: #4caf50; color: white; }
 
 body.dark-mode .btn-mark-read {
-    background: var(--dlsu-dark-card);
-    border-color: var(--dlsu-dark-border);
-    color: var(--dlsu-dark-text-secondary);
+    background: #2a332c;
+    border-color: #3a4a3e;
+    color: #94a89c;
 }
 
 body.dark-mode .pg-btn {
-    background: var(--dlsu-dark-card);
-    border-color: var(--dlsu-dark-border);
-    color: var(--dlsu-dark-text-secondary);
+    background: #232a25;
+    border-color: #2f3832;
+    color: #6b7e70;
 }
 body.dark-mode .pg-btn.active {
     background: var(--dlsu-green);
     color: white;
     border-color: var(--dlsu-green);
 }
+
+body.dark-mode .concern-status.active { background: #121e2e; color: #5b9bd5; }
+body.dark-mode .concern-status.resolved { background: #1a2e1a; color: #66bb6a; }
+
+body.dark-mode .concern-id { color: #6b7e70; }
+body.dark-mode .concern-date { color: #6b7e70; }
+body.dark-mode .concern-term { background: rgba(0, 112, 60, 0.15); }
+body.dark-mode .thread-header-subject { color: #6b7e70; }
+body.dark-mode .thread-modal-overlay { background: rgba(0,0,0,0.7); }
 
 body.dark-mode .resolved-notice { color: #66bb6a; }
 }
