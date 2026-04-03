@@ -310,8 +310,14 @@ DROP POLICY IF EXISTS "Admins can manage availability slots" ON availability_slo
 CREATE POLICY "Admins can manage availability slots" ON availability_slots FOR ALL USING (is_admin());
 
 -- ═══════════════════════════════════════════════════════════════════
--- 10. Concern Replies Table (threaded messaging)
+-- 10. Update concerns status constraint + Concern Replies Table
 -- ═══════════════════════════════════════════════════════════════════
+
+-- Update status check to include 'active' and 'resolved'
+ALTER TABLE concerns DROP CONSTRAINT IF EXISTS concerns_status_check;
+ALTER TABLE concerns ADD CONSTRAINT concerns_status_check
+    CHECK (status IN ('new', 'read', 'replied', 'active', 'resolved'));
+
 CREATE TABLE IF NOT EXISTS concern_replies (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     concern_id UUID NOT NULL REFERENCES concerns(id) ON DELETE CASCADE,

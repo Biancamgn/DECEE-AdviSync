@@ -17,6 +17,11 @@ CREATE TABLE IF NOT EXISTS concern_replies (
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- 2b. Update concerns status constraint to allow 'active' and 'resolved'
+ALTER TABLE concerns DROP CONSTRAINT IF EXISTS concerns_status_check;
+ALTER TABLE concerns ADD CONSTRAINT concerns_status_check
+    CHECK (status IN ('new', 'read', 'replied', 'active', 'resolved'));
+
 -- 3. Seed concerns for EVERY student that has an adviser assigned
 -- This creates 2-3 concerns per student with varying statuses
 DO $$
