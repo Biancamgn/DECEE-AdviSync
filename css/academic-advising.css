@@ -24,6 +24,7 @@
     border: 1px solid var(--dlsu-gray-200);
     padding: 1.5rem;
     margin-bottom: 1.5rem;
+    overflow-x: auto;
 }
 
 .section-title {
@@ -59,19 +60,16 @@
 
 .form-control-custom {
     padding: 0.55rem 0.85rem;
-    order: 1px solid var(--dlsu-gray-200);
+    border: 1px solid var(--dlsu-gray-200);
     border-radius: 8px;
     font-size: 0.82rem;
     font-family: inherit;
     color: var(--dlsu-gray-800);
     outline: none;
-    transition:
-        border-color 0.2s,
-        box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-control-custom:
-focus {
+.form-control-custom:focus {
     border-color: var(--dlsu-green);
     box-shadow: 0 0 0 3px var(--dlsu-green-light);
 }
@@ -91,8 +89,7 @@ focus {
     gap: 0.4rem;
 }
 
-.btn-save:
-hover {
+.btn-save:hover {
     background: var(--dlsu-green-dark);
 }
 
@@ -139,6 +136,7 @@ hover {
     border-radius: 12px;
     border: 1px solid var(--dlsu-gray-200);
     overflow: hidden;
+    min-width: 600px;
 }
 
 .tracker-table thead th {
@@ -208,10 +206,20 @@ hover {
     color: var(--dlsu-gray-800);
     white-space: nowrap;
 }
-
 @media (max-width: 991.98px) {
     .page-body {
         padding: 1.25rem 1rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .page-body {
+        padding: 1rem 0.75rem;
+    }
+
+    .deadline-display {
+        flex-direction: column;
+        text-align: center;
     }
 }
 
