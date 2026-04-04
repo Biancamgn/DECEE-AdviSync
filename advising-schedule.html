@@ -21,31 +21,57 @@
             <div class="section-card">
                 <div class="section-title"><i class="bi bi-plus-circle"></i> Create Time Slots</div>
                 <div class="section-desc">Add available dates and times for advising appointments.</div>
-                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+
+                <!-- Tab switcher -->
+                <div class="slot-tabs" style="display:flex;gap:0.5rem;margin-bottom:1.25rem;">
+                    <button class="slot-tab active" onclick="switchSlotTab('single', this)">Single Slot</button>
+                    <button class="slot-tab" onclick="switchSlotTab('bulk', this)">Generate Multiple</button>
+                </div>
+
+                <!-- Single slot form -->
+                <div id="singleSlotForm" style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
                     <div><label class="form-label-custom">Date</label><input type="date" class="form-control-custom" id="slotDate"></div>
                     <div><label class="form-label-custom">Start Time</label><input type="time" class="form-control-custom" id="slotStart" value="09:00"></div>
                     <div><label class="form-label-custom">End Time</label><input type="time" class="form-control-custom" id="slotEnd" value="09:30"></div>
-                    <div><label class="form-label-custom">Type</label>
-                        <select class="form-control-custom" id="slotType">
-                            <option value="zoom">Zoom</option>
-                            <option value="in-person">In Person</option>
-                        </select>
-                    </div>
+                    <div><label class="form-label-custom">Type</label><select class="form-control-custom" id="slotType"><option value="zoom">Zoom</option><option value="in-person">In Person</option></select></div>
                     <button class="btn-add-slot" onclick="addSlot()"><i class="bi bi-plus-lg"></i> Add Slot</button>
                 </div>
+
+                <!-- Bulk generation form -->
+                <div id="bulkSlotForm" style="display:none;">
+                    <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+                        <div><label class="form-label-custom">Date</label><input type="date" class="form-control-custom" id="bulkDate"></div>
+                        <div><label class="form-label-custom">From</label><input type="time" class="form-control-custom" id="bulkFrom" value="09:00"></div>
+                        <div><label class="form-label-custom">To</label><input type="time" class="form-control-custom" id="bulkTo" value="12:00"></div>
+                        <div><label class="form-label-custom">Duration</label><select class="form-control-custom" id="bulkDuration"><option value="30" selected>30 mins</option><option value="15">15 mins</option><option value="45">45 mins</option><option value="60">60 mins</option></select></div>
+                        <div><label class="form-label-custom">Type</label><select class="form-control-custom" id="bulkType"><option value="zoom">Zoom</option><option value="in-person">In Person</option></select></div>
+                        <button class="btn-add-slot" onclick="generateSlots()"><i class="bi bi-lightning-fill"></i> Generate Slots</button>
+                    </div>
+                    <div class="bulk-preview" id="bulkPreview" style="margin-top:0.75rem;font-size:0.75rem;color:var(--dlsu-gray-400);"></div>
+                </div>
+
                 <div class="slots-list" id="slotsList">
-                    <div class="empty-state" id="slotsEmpty">Loading slots...</div>
+                    <div class="text-center" style="grid-column:1/-1;padding:1.5rem;color:var(--dlsu-gray-400);font-size:0.82rem;">Loading slots...</div>
                 </div>
             </div>
             <div class="section-card">
                 <div class="section-title"><i class="bi bi-journal-check"></i> Student Bookings</div>
-                <div class="section-desc">View and manage appointments booked by your advisees.</div>
+                <div class="section-desc">View appointments booked by your advisees.</div>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="upcoming" onclick="switchBookingFilter('upcoming', this)">Upcoming <span class="tab-count">0</span></button>
+                    <button class="filter-tab" data-filter="completed" onclick="switchBookingFilter('completed', this)">Completed <span class="tab-count">0</span></button>
+                    <button class="filter-tab" data-filter="cancelled" onclick="switchBookingFilter('cancelled', this)">Cancelled <span class="tab-count">0</span></button>
+                    <button class="filter-tab" data-filter="all" onclick="switchBookingFilter('all', this)">All <span class="tab-count">0</span></button>
+                </div>
+                <div class="table-responsive">
                 <table class="bookings-table">
                     <thead><tr><th>Student</th><th>Date</th><th>Time</th><th>Type</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody id="bookingsTbody">
                         <tr><td colspan="6" class="text-center">Loading...</td></tr>
                     </tbody>
                 </table>
+                </div>
+                <div class="pagination-bar" id="bookingsPagination"></div>
             </div>
         </div>
     </div>

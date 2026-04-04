@@ -19,18 +19,37 @@
             <h2 class="page-title"><i class="bi bi-chat-left-text-fill"></i> Student Concerns</h2>
             <p class="page-subtitle">Review and respond to academic concerns submitted by your advisees.</p>
             <div class="summary-row">
-                <div class="summary-chip"><span class="chip-count amber">0</span> New / Unread</div>
-                <div class="summary-chip"><span class="chip-count blue">0</span> Replied</div>
-                <div class="summary-chip"><span class="chip-count green">0</span> Total</div>
+                <div class="summary-chip"><span class="chip-count amber">0</span> New</div>
+                <div class="summary-chip"><span class="chip-count blue">0</span> Active</div>
+                <div class="summary-chip"><span class="chip-count green">0</span> Resolved</div>
             </div>
             <div class="filter-row">
                 <div class="filter-chip active" onclick="filterConcerns(this,'all')">All</div>
                 <div class="filter-chip" onclick="filterConcerns(this,'new')">New</div>
-                <div class="filter-chip" onclick="filterConcerns(this,'read')">Read</div>
-                <div class="filter-chip" onclick="filterConcerns(this,'replied')">Replied</div>
+                <div class="filter-chip" onclick="filterConcerns(this,'active')">Active</div>
+                <div class="filter-chip" onclick="filterConcerns(this,'resolved')">Resolved</div>
             </div>
             <div id="concernsContainer">
                 <div class="empty-state">Loading...</div>
+            </div>
+            <div id="concernsPagination" class="pagination-bar"></div>
+
+            <!-- Thread Modal -->
+            <div class="thread-modal-overlay" id="threadModal">
+                <div class="thread-modal">
+                    <div class="thread-header">
+                        <div class="thread-header-info">
+                            <div class="thread-header-name" id="threadStudentName"></div>
+                            <div class="thread-header-subject" id="threadSubject"></div>
+                        </div>
+                        <div class="thread-header-actions">
+                            <span id="threadStatus" class="concern-status"></span>
+                            <button class="thread-close" onclick="closeThread()"><i class="bi bi-x-lg"></i></button>
+                        </div>
+                    </div>
+                    <div class="thread-messages" id="threadMessages"></div>
+                    <div class="thread-compose" id="threadCompose"></div>
+                </div>
             </div>
         </div>
     </div>

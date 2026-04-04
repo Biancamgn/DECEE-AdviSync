@@ -214,8 +214,45 @@
 
     const page = window.location.pathname.split('/').pop() || '';
     let notifications = [];
+    let notificationsLoaded = false;
 
-    if (page.startsWith('admin')) {
+    async function loadNotificationsFromDB() {
+        if (typeof supabaseClient === 'undefined') return false;
+        try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) return false;
+            const { data, error } = await supabaseClient
+                .from('notifications')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .order('created_at', { ascending: false })
+                .limit(20);
+            if (error || !data || data.length === 0) return false;
+            notifications = data.map(n => {
+                const iconMap = { info: 'bi-bell', success: 'bi-check-circle', warning: 'bi-exclamation-triangle', action: 'bi-lightning' };
+                const colorMap = { info: 'blue', success: 'green', warning: 'amber', action: 'red' };
+                const mins = Math.floor((Date.now() - new Date(n.created_at).getTime()) / 60000);
+                let timeStr = '';
+                if (mins < 60) timeStr = `${mins} min ago`;
+                else if (mins < 1440) timeStr = `${Math.floor(mins / 60)} hour${Math.floor(mins / 60) > 1 ? 's' : ''} ago`;
+                else if (mins < 10080) timeStr = `${Math.floor(mins / 1440)} day${Math.floor(mins / 1440) > 1 ? 's' : ''} ago`;
+                else timeStr = new Date(n.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                return {
+                    id: n.id,
+                    icon: iconMap[n.type] || 'bi-bell',
+                    iconClass: colorMap[n.type] || 'blue',
+                    title: n.title,
+                    desc: n.message,
+                    time: timeStr,
+                    unread: !n.is_read
+                };
+            });
+            return true;
+        } catch (e) { return false; }
+    }
+
+    function loadFallbackNotifications() {
+        if (page.startsWith('admin')) {
         notifications = [
             { icon: 'bi-person-plus', iconClass: 'green', title: 'New Student Registered', desc: 'Carlos Reyes (12023456) registered and is awaiting adviser assignment.', time: '10 min ago', unread: true },
             { icon: 'bi-exclamation-triangle', iconClass: 'amber', title: 'Advising Deadline Approaching', desc: 'The advising period ends on April 4, 2026. 23 students have not yet been advised.', time: '1 hour ago', unread: true },
@@ -244,7 +281,27 @@
             { icon: 'bi-bell', iconClass: 'amber', title: 'Deadline Reminder', desc: 'The enrollment period closes on April 4, 2026. Make sure to finalize your schedule.', time: '4 days ago', unread: false },
         ];
     }
+    }
 
+    // Initialize synchronously with fallback data first (buttons must bind immediately)
+    let renderItems;
+    let updateBadges;
+    loadFallbackNotifications();
+    initNotifPanel();
+
+    // Then try to load from DB and refresh the panel content if available
+    loadNotificationsFromDB().then(loaded => {
+        if (loaded && updateBadges) {
+            const listEl = document.getElementById('notifList');
+            const activeTab = document.querySelector('#notifPanel .notif-tab.active');
+            if (listEl && activeTab) {
+                listEl.innerHTML = renderItems(activeTab.dataset.filter);
+            }
+            updateBadges();
+        }
+    });
+
+    function initNotifPanel() {
     const unreadCount = notifications.filter(n => n.unread).length;
 
     const overlay = document.createElement('div');
@@ -255,14 +312,14 @@
     panel.className = 'notif-panel';
     panel.id = 'notifPanel';
 
-    const renderItems = (filter) => {
+    renderItems = (filter) => {
         let items = notifications;
         if (filter === 'unread') items = items.filter(n => n.unread);
         if (items.length === 0) {
             return `<div class="notif-empty"><i class="bi bi-bell-slash"></i><p>No ${filter === 'unread' ? 'unread ' : ''}notifications</p></div>`;
         }
-        return items.map(n => `
-            <div class="notif-item${n.unread ? ' unread' : ''}">
+        return items.map((n, idx) => `
+            <div class="notif-item${n.unread ? ' unread' : ''}" data-notif-idx="${notifications.indexOf(n)}" style="cursor:pointer;">
                 <div class="notif-icon ${n.iconClass}"><i class="bi ${n.icon}"></i></div>
                 <div class="notif-body">
                     <div class="notif-title">${n.title}</div>
@@ -272,6 +329,16 @@
                 ${n.unread ? '<div class="notif-dot"></div>' : ''}
             </div>
         `).join('');
+    };
+
+    updateBadges = () => {
+        const unread = notifications.filter(n => n.unread).length;
+        const badge = panel.querySelector('.notif-count-badge');
+        if (badge) badge.textContent = unread;
+        const tabUnread = panel.querySelector('[data-filter="unread"]');
+        if (tabUnread) tabUnread.textContent = `Unread (${unread})`;
+        const topBadge = document.getElementById('notifBtn')?.querySelector('.notif-badge');
+        if (topBadge) { topBadge.textContent = unread; topBadge.style.display = unread > 0 ? '' : 'none'; }
     };
 
     panel.innerHTML = `
@@ -346,21 +413,42 @@
         });
     });
 
+    // Click individual notification to mark as read
+    document.getElementById('notifList').addEventListener('click', async (e) => {
+        const item = e.target.closest('.notif-item');
+        if (!item) return;
+        const idx = parseInt(item.dataset.notifIdx);
+        if (isNaN(idx) || !notifications[idx] || !notifications[idx].unread) return;
+        notifications[idx].unread = false;
+        if (typeof supabaseClient !== 'undefined' && notifications[idx].id) {
+            try {
+                await supabaseClient.from('notifications').update({ is_read: true }).eq('id', notifications[idx].id);
+            } catch (e) { /* local only */ }
+        }
+        const activeFilter = panel.querySelector('.notif-tab.active').dataset.filter;
+        document.getElementById('notifList').innerHTML = renderItems(activeFilter);
+        updateBadges();
+    });
+
     // Mark all as read
-    document.getElementById('markAllRead').addEventListener('click', () => {
+    document.getElementById('markAllRead').addEventListener('click', async () => {
         notifications.forEach(n => n.unread = false);
+        if (typeof supabaseClient !== 'undefined') {
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    await supabaseClient
+                        .from('notifications')
+                        .update({ is_read: true })
+                        .eq('user_id', session.user.id)
+                        .eq('is_read', false);
+                }
+            } catch (e) { /* fallback: local only */ }
+        }
         document.getElementById('notifList').innerHTML = renderItems(
             panel.querySelector('.notif-tab.active').dataset.filter
         );
-        // Update badge
-        const badge = panel.querySelector('.notif-count-badge');
-        if (badge) badge.textContent = '0';
-        const tabUnread = panel.querySelector('[data-filter="unread"]');
-        if (tabUnread) tabUnread.textContent = 'Unread (0)';
-        // Update topbar badge
-        const notifBtnEl = document.getElementById('notifBtn');
-        const topBadge = notifBtnEl ? notifBtnEl.querySelector('.notif-badge') : null;
-        if (topBadge) { topBadge.textContent = '0'; topBadge.style.display = 'none'; }
+        updateBadges();
     });
 
     const profileWrapper = document.getElementById('profileWrapper');
@@ -411,4 +499,5 @@
         updateClock();
         setInterval(updateClock, 1000);
     }
+    } // end initNotifPanel
 })();

@@ -61,7 +61,7 @@
                         <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i> View Profile</a>
                         <a href="student-settings.html" class="dropdown-action"><i class="bi bi-gear"></i> Settings</a>
                         <div class="dropdown-divider"></div>
-                        <button class="dropdown-action logout" onclick="window.location.href='index.html'"><i class="bi bi-box-arrow-left"></i> Sign out</button>
+                        <button class="dropdown-action logout" onclick="signOut()"><i class="bi bi-box-arrow-left"></i> Sign out</button>
                     </div>
                 </div>
             </div>
@@ -111,54 +111,38 @@
 
             <div class="filter-row">
                 <div class="filter-chip active" onclick="filterConcerns(this, 'all')">All</div>
-                <div class="filter-chip" onclick="filterConcerns(this, 'replied')">Replied</div>
-                <div class="filter-chip" onclick="filterConcerns(this, 'read')">Read</div>
-                <div class="filter-chip" onclick="filterConcerns(this, 'unread')">Pending</div>
+                <div class="filter-chip" onclick="filterConcerns(this, 'active')">Active</div>
+                <div class="filter-chip" onclick="filterConcerns(this, 'new')">Pending</div>
+                <div class="filter-chip" onclick="filterConcerns(this, 'resolved')">Resolved</div>
             </div>
 
-            <!-- Concern 1 (replied) -->
-            <div class="concern-item" data-status="replied">
-                <div class="concern-top">
-                    <div class="concern-meta">
-                        <span class="concern-term">Term 1 · 2025–2026</span>
-                        <span class="concern-date">Submitted Oct 15, 2025</span>
-                    </div>
-                    <span class="concern-status replied">Replied</span>
-                </div>
-                <p class="concern-message">I failed CSMCPRO (Microprocessors) twice during AY 2024–2025. I want to ask about the retake policy and whether I should take it again this coming term or wait until I've completed more prerequisite foundation courses. I'm also concerned about how these 6 accumulated failure units will affect my standing.</p>
-                <div class="adviser-reply">
-                    <div class="reply-header"><i class="bi bi-reply-fill"></i> Dr. Roberto Cruz · Oct 17, 2025</div>
-                    <div class="reply-text">Thank you for reaching out, Bianca. I recommend retaking CSMCPRO in the upcoming term since LOGDSGN (which you've already passed) is the prerequisite. Your 6 accumulated failure units are still well within the 30-unit limit, so your standing is fine. Let's schedule a meeting to plan your course load — please book a slot through the Appointments page.</div>
-                </div>
-            </div>
+            <div id="concernsHistory"></div>
+            <div id="concernsPagination" class="pagination-bar"></div>
 
-            <!-- Concern 2 (read) -->
-            <div class="concern-item" data-status="read">
-                <div class="concern-top">
-                    <div class="concern-meta">
-                        <span class="concern-term">Term 3 · 2024–2025</span>
-                        <span class="concern-date">Submitted Jun 2, 2025</span>
+            <!-- Thread Modal -->
+            <div class="thread-modal-overlay" id="threadModal">
+                <div class="thread-modal">
+                    <div class="thread-header">
+                        <div class="thread-header-info">
+                            <div class="thread-header-subject" id="threadSubject"></div>
+                        </div>
+                        <div class="thread-header-actions">
+                            <span id="threadStatus" class="concern-status"></span>
+                            <button class="thread-close" onclick="closeThread()"><i class="bi bi-x-lg"></i></button>
+                        </div>
                     </div>
-                    <span class="concern-status read">Read</span>
+                    <div class="thread-messages" id="threadMessages"></div>
+                    <div class="thread-compose" id="threadCompose"></div>
                 </div>
-                <p class="concern-message">I'm planning to take CSYSARC and EMBDSYS together next term. Both require MICPROS as a prerequisite. Can you confirm if I'm eligible since I just completed MICPROS this term with a grade of 2.0?</p>
-            </div>
-
-            <!-- Concern 3 (unread / pending) -->
-            <div class="concern-item" data-status="unread">
-                <div class="concern-top">
-                    <div class="concern-meta">
-                        <span class="concern-term">Term 2 · 2025–2026</span>
-                        <span class="concern-date">Submitted Mar 26, 2026</span>
-                    </div>
-                    <span class="concern-status unread">Pending</span>
-                </div>
-                <p class="concern-message">I submitted my study plan for Term 9 last week. I included REMETHS which requires ENGDATA, GEPCOMM, and LOGDSGN. I've passed all three but I want to double-check since the prerequisite validation hasn't confirmed it yet. Also, is there a way to get an overload of 1 unit since I want to take LBYCPG3 as well?</p>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/shared.js"></script>
     <script src="js/student-concerns.js"></script>
     <script src="js/notifications.js"></script>
 </body>
