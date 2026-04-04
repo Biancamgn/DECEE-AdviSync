@@ -663,6 +663,138 @@
     gap: 0.45rem;
 }
 
+/* Student Academic Snapshot Bar */
+.sp-snapshot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.65rem 0;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--dlsu-gray-200);
+}
+
+.sp-snapshot-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 8px;
+    background: var(--dlsu-gray-50);
+    font-size: 0.78rem;
+    color: var(--dlsu-gray-500, #6b7280);
+}
+
+.sp-snapshot-item i {
+    font-size: 0.82rem;
+    color: var(--dlsu-gray-400);
+}
+
+.sp-snapshot-label {
+    font-weight: 600;
+    color: var(--dlsu-gray-500, #6b7280);
+}
+
+.sp-snapshot-value {
+    font-weight: 700;
+    color: var(--dlsu-gray-700);
+}
+
+.sp-standing--cleared {
+    color: var(--dlsu-green) !important;
+    background: #c6ecd4;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+}
+
+.sp-standing--regular {
+    color: #2c5282 !important;
+    background: #d0dcf8;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+}
+
+.sp-standing--at-risk {
+    color: #c0392b !important;
+    background: #fce8e8;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+}
+
+.sp-overload {
+    color: #c0392b !important;
+}
+
+/* Study Plan Notes */
+.sp-notes {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.6rem 0.85rem;
+    margin-bottom: 0.65rem;
+    border-radius: 8px;
+    background: #f0f4ff;
+    border: 1px solid #d0dcf8;
+    font-size: 0.82rem;
+    color: #2c5282;
+}
+
+.sp-notes > i {
+    margin-top: 0.15rem;
+    font-size: 0.85rem;
+}
+
+.sp-notes-label {
+    font-weight: 700;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    display: block;
+    color: #4a6fa5;
+    margin-bottom: 0.1rem;
+}
+
+.sp-notes-text {
+    display: block;
+    color: var(--dlsu-gray-700);
+}
+
+/* Table footer totals */
+.sp-table tfoot {
+    border-top: 1.5px solid var(--dlsu-gray-200);
+}
+
+.sp-table-total td {
+    padding: 0.4rem 0.85rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--dlsu-gray-500, #6b7280);
+    background: var(--dlsu-gray-50);
+}
+
+.sp-table-total td.sp-units {
+    text-align: center;
+}
+
+/* Unit total badge variants */
+.sp-units-total--failed {
+    background: #fce8e8 !important;
+    color: #c0392b !important;
+}
+
+.sp-units-total--current {
+    background: #fef3cd !important;
+    color: #b7791f !important;
+}
+
+/* Year level in card meta */
+.sub-year {
+    font-weight: 600;
+    color: var(--dlsu-green);
+}
+
 body.dark-mode .submission-card {
     background: var(--dlsu-dark-card, #1e2530);
     border-color: rgba(255, 255, 255, 0.08);
@@ -785,6 +917,64 @@ body.dark-mode .sp-meeting-pref {
     color: #90aee3;
 }
 
+body.dark-mode .sp-snapshot {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .sp-snapshot-item {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.55);
+}
+
+body.dark-mode .sp-snapshot-item i {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+body.dark-mode .sp-snapshot-label {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+body.dark-mode .sp-snapshot-value {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+body.dark-mode .sp-standing--cleared {
+    background: rgba(29, 93, 53, 0.3);
+    color: #6fcf97 !important;
+}
+
+body.dark-mode .sp-standing--regular {
+    background: rgba(44, 82, 130, 0.3);
+    color: #90aee3 !important;
+}
+
+body.dark-mode .sp-standing--at-risk {
+    background: rgba(192, 57, 43, 0.3);
+    color: #fc8181 !important;
+}
+
+body.dark-mode .sp-notes {
+    background: rgba(44, 82, 130, 0.12);
+    border-color: rgba(44, 82, 130, 0.25);
+}
+
+body.dark-mode .sp-notes-label {
+    color: #90aee3;
+}
+
+body.dark-mode .sp-notes-text {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+body.dark-mode .sp-table tfoot {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .sp-table-total td {
+    color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.03);
+}
+
 @media (max-width: 991.98px) {
     .page-body {
         padding: 1.25rem 1rem;
@@ -797,6 +987,15 @@ body.dark-mode .sp-meeting-pref {
     .sp-table thead th,
     .sp-table td {
         padding: 0.4rem 0.6rem;
+    }
+
+    .sp-snapshot {
+        gap: 0.35rem;
+    }
+
+    .sp-snapshot-item {
+        font-size: 0.72rem;
+        padding: 0.3rem 0.55rem;
     }
 }
 
@@ -815,4 +1014,31 @@ body.dark-mode .sp-meeting-pref {
         padding: 0.4rem 0.7rem;
         font-size: 0.74rem;
     }
+}
+
+/* Meeting preference badges */
+.sub-meeting-row {
+    padding: 0 1.25rem;
+    margin-top: -0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.sub-meeting-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.sub-meeting-badge.waive {
+    background: var(--dlsu-gray-100);
+    color: var(--dlsu-gray-500, #6b7280);
+}
+
+.sub-meeting-badge.schedule {
+    background: #fff3cd;
+    color: #856404;
 }

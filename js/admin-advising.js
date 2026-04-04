@@ -76,27 +76,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             .in('id', studentIds);
 
         if (detailsError) {
-            console.warn('Error fetching student details with filter, trying fallback to all students:', detailsError);
-            const fallback = await supabaseClient.from('students').select('*');
-            if (fallback.error) {
-                console.error('Fallback error fetching student details:', fallback.error);
-                return;
-            }
-            studentDetails = fallback.data;
+            console.warn('Error fetching student details:', detailsError);
+            studentDetails = [];
         }
 
         if (!studentDetails || studentDetails.length === 0) {
-            console.warn('No student details found for student IDs, using profile-only fallback.');
+            console.warn('No student details found for student IDs.');
         }
 
         console.debug('Fetched students:', studentProfiles.length, 'profiles,', studentDetails?.length || 0, 'details');
 
-        // Merge the data
-        students = studentProfiles.map(profile => {
-            const details = studentDetails?.find(s => s.id === profile.id) || {};
-            const adviserUuid = details.adviser_id || null;
+        // Also get adviser assignments from advisees table for accurate mapping
+        const { data: adviseeRows } = await supabaseClient
+            .from('advisees')
+            .select('student_id, adviser_id');
 
-            return {
+        const adviseeMap = {};
+        (adviseeRows || []).forEach(r => { adviseeMap[r.student_id] = r.adviser_id; });
+
+        // Merge the data - deduplicate by profile ID
+        const seen = new Set();
+        students = [];
+        studentProfiles.forEach(profile => {
+            if (seen.has(profile.id)) return;
+            seen.add(profile.id);
+            const details = studentDetails?.find(s => s.id === profile.id) || {};
+            const adviserUuid = adviseeMap[profile.id] || details.adviser_id || null;
+
+            students.push({
                 id: profile.school_id,
                 uuid: profile.id,
                 name: `${profile.first_name} ${profile.last_name}`,
@@ -104,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 year: details.year_level || 1,
                 adviserUuid: adviserUuid,
                 adviserId: null // will be resolved after professors load
-            };
+            });
         });
     }
 
@@ -343,6 +350,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .from('students')
                 .update({ adviser_id: adv.uuid })
                 .eq('id', uuid);
+
+            // Sync advisees table: remove old row, insert new
+            await supabaseClient
+                .from('advisees')
+                .delete()
+                .eq('student_id', uuid);
+            await supabaseClient
+                .from('advisees')
+                .insert({ adviser_id: adv.uuid, student_id: uuid });
+
+            // Migrate existing advising forms to new adviser
+            await supabaseClient
+                .from('advising_forms')
+                .update({ adviser_id: adv.uuid })
+                .eq('student_id', uuid);
         }
 
         selectedStudents.forEach(sId => {
@@ -416,6 +438,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .update({ adviser_id: adv.uuid })
                 .eq('id', s.uuid);
 
+            // Sync advisees table: remove old row, insert new
+            await supabaseClient
+                .from('advisees')
+                .delete()
+                .eq('student_id', s.uuid);
+            await supabaseClient
+                .from('advisees')
+                .insert({ adviser_id: adv.uuid, student_id: s.uuid });
+
+            // Migrate existing advising forms to new adviser
+            await supabaseClient
+                .from('advising_forms')
+                .update({ adviser_id: adv.uuid })
+                .eq('student_id', s.uuid);
+
             s.adviserId = advId;
             s.adviserUuid = adv.uuid;
         }
@@ -456,6 +493,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .update({ adviser_id: adv.uuid })
                 .eq('id', s.uuid);
 
+            // Sync advisees table: remove old row, insert new
+            await supabaseClient
+                .from('advisees')
+                .delete()
+                .eq('student_id', s.uuid);
+            await supabaseClient
+                .from('advisees')
+                .insert({ adviser_id: adv.uuid, student_id: s.uuid });
+
+            // Migrate existing advising forms to new adviser
+            await supabaseClient
+                .from('advising_forms')
+                .update({ adviser_id: adv.uuid })
+                .eq('student_id', s.uuid);
+
             s.adviserId = newAdvId;
             s.adviserUuid = adv.uuid;
         }
@@ -472,6 +524,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .from('students')
                 .update({ adviser_id: null })
                 .eq('id', s.uuid);
+
+            // Sync advisees table: remove old row
+            await supabaseClient
+                .from('advisees')
+                .delete()
+                .eq('student_id', s.uuid);
+
+            // Clear adviser from existing advising forms
+            await supabaseClient
+                .from('advising_forms')
+                .update({ adviser_id: null })
+                .eq('student_id', s.uuid);
 
             s.adviserId = null;
             s.adviserUuid = null;

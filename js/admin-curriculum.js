@@ -113,7 +113,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setTimeout(() => warningDiv.remove(), 10000);
             } else {
                 console.log(`📊 Processing ${courses.length} courses...`);
+                // Deduplicate by code (courses.code has UNIQUE constraint but guard against data issues)
+                const seenCodes = new Set();
                 courses.forEach((c, index) => {
+                    if (seenCodes.has(c.code)) {
+                        console.warn(`⚠️ Skipping duplicate course code: ${c.code}`);
+                        return;
+                    }
+                    seenCodes.add(c.code);
                     console.log(`🔍 Course ${index + 1}:`, {
                         id: c.id,
                         code: c.code,
@@ -600,18 +607,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById(`${otherProgram.toLowerCase()}Table`).classList.add('d-none');
 
         } else {
-            // Show regular course view
-            document.getElementById('bscpeGrid').classList.toggle('d-none', currentView !== 'grid');
-            document.getElementById('bscpeTable').classList.toggle('d-none', currentView !== 'table');
-            document.getElementById('bseceGrid').classList.toggle('d-none', currentView !== 'grid');
-            document.getElementById('bseceTable').classList.toggle('d-none', currentView !== 'table');
+            // Show regular course view — only render the active program
+            const otherProgram = activeProgram === 'BSCpE' ? 'BSECE' : 'BSCpE';
 
+            // Show active, hide other
+            document.getElementById(`${activeProgram.toLowerCase()}Grid`).classList.toggle('d-none', currentView !== 'grid');
+            document.getElementById(`${activeProgram.toLowerCase()}Table`).classList.toggle('d-none', currentView !== 'table');
+            document.getElementById(`${otherProgram.toLowerCase()}Grid`).classList.add('d-none');
+            document.getElementById(`${otherProgram.toLowerCase()}Table`).classList.add('d-none');
+
+            const activeCourses = activeProgram === 'BSCpE' ? bscpeCourses : bseceCourses;
             if (currentView === 'grid') {
-                renderGrid(bscpeCourses, document.getElementById('bscpeGrid'), 'BSCpE');
-                renderGrid(bseceCourses, document.getElementById('bseceGrid'), 'BSECE');
+                renderGrid(activeCourses, document.getElementById(`${activeProgram.toLowerCase()}Grid`), activeProgram);
             } else {
-                renderTable(bscpeCourses, document.getElementById('bscpeTableBody'), 'BSCpE');
-                renderTable(bseceCourses, document.getElementById('bseceTableBody'), 'BSECE');
+                renderTable(activeCourses, document.getElementById(`${activeProgram.toLowerCase()}TableBody`), activeProgram);
             }
         }
 

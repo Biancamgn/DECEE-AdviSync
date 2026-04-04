@@ -38,12 +38,12 @@ initShared();
     checklist.forEach(c => {
         const key = c.year_level;
         if (!yearGroups[key]) yearGroups[key] = {};
-        const termKey = c.term || '1';
+        const termKey = String(c.term || 1);
         if (!yearGroups[key][termKey]) yearGroups[key][termKey] = [];
         yearGroups[key][termKey].push(c);
     });
 
-    let totalRequired = 0, completedCount = 0, completedUnits = 0;
+    let totalRequired = 0, completedCount = 0, completedUnits = 0, totalUnits = 0;
 
     container.innerHTML = '';
     Object.entries(yearGroups).sort((a, b) => a[0] - b[0]).forEach(([yearLevel, terms]) => {
@@ -54,9 +54,24 @@ initShared();
         let yearHtml = `<div class="year-header"><h3>Year ${yearLevel} ${isCurrent ? '<span class="current-badge">Current</span>' : ''}</h3></div>`;
 
         Object.entries(terms).sort((a, b) => a[0] - b[0]).forEach(([term, courses]) => {
+            let termUnits = 0;
+            courses.forEach(c => { termUnits += c.units || 0; });
+
             yearHtml += `<div class="term-group"><h4 class="term-label">Term ${term}</h4><div class="checklist-table">`;
+
+            // Header row
+            yearHtml += `<div class="checklist-row header">
+                <div class="col-status"></div>
+                <div class="col-code">Code</div>
+                <div class="col-name">Course Name</div>
+                <div class="col-units">Units</div>
+                <div class="col-prereq">Prerequisite</div>
+                <div class="col-grade">Grade</div>
+            </div>`;
+
             courses.forEach(c => {
                 totalRequired++;
+                totalUnits += c.units || 0;
                 const record = gradeMap[c.course_code];
                 let status = 'not-taken';
                 let gradeText = '—';
@@ -84,11 +99,22 @@ initShared();
                     <div class="col-status ${status}">${statusIcon}</div>
                     <div class="col-code">${c.course_code || '—'}</div>
                     <div class="col-name">${c.course_title || '—'}</div>
-                    <div class="col-units">${c.units || '—'}</div>
-                    <div class="col-prereq">${c.prerequisite || '—'}</div>
+                    <div class="col-units">${c.units != null ? c.units : '—'}</div>
+                    <div class="col-prereq">${c.prerequisites || '—'}</div>
                     <div class="col-grade">${gradeText}</div>
                 </div>`;
             });
+
+            // Total units footer row
+            yearHtml += `<div class="checklist-row total-row">
+                <div class="col-status"></div>
+                <div class="col-code"></div>
+                <div class="col-name" style="font-weight:700;text-align:right;">Total Units</div>
+                <div class="col-units" style="font-weight:800;">${termUnits}</div>
+                <div class="col-prereq"></div>
+                <div class="col-grade"></div>
+            </div>`;
+
             yearHtml += '</div></div>';
         });
 
@@ -97,10 +123,10 @@ initShared();
     });
 
     const summaryValues = document.querySelectorAll('.summary-value');
-    if (summaryValues[0]) summaryValues[0].textContent = totalRequired;
-    if (summaryValues[1]) summaryValues[1].textContent = completedCount;
-    if (summaryValues[2]) summaryValues[2].textContent = totalRequired - completedCount;
-    const pct = totalRequired > 0 ? Math.round((completedCount / totalRequired) * 100) : 0;
+    if (summaryValues[0]) summaryValues[0].textContent = totalUnits;
+    if (summaryValues[1]) summaryValues[1].textContent = completedUnits;
+    if (summaryValues[2]) summaryValues[2].textContent = totalUnits - completedUnits;
+    const pct = totalUnits > 0 ? Math.round((completedUnits / totalUnits) * 100) : 0;
     if (summaryValues[3]) summaryValues[3].textContent = `${pct}%`;
     const progressFill = document.querySelector('.progress-bar-fill');
     if (progressFill) progressFill.style.width = `${pct}%`;

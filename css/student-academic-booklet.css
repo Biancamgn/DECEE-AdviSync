@@ -988,3 +988,77 @@ body.dark-mode .checklist-card {
     background: #232a25;
     border-color: #2f3832;
 }
+
+/* Form status alert banner */
+.form-status-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    font-size: 0.82rem;
+}
+
+.form-status-alert.warning {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    color: #6d4c00;
+}
+
+.form-status-alert.success {
+    background: #e8f5e9;
+    border: 1px solid #a5d6a7;
+    color: #1b5e20;
+}
+
+.form-status-alert.danger {
+    background: #fbe9e7;
+    border: 1px solid #ef9a9a;
+    color: #b71c1c;
+}
+
+.fsa-icon {
+    font-size: 1.3rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.fsa-label {
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 0.15rem;
+}
+
+.fsa-msg {
+    font-size: 0.78rem;
+    opacity: 0.85;
+}
+
+.deadline-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+body.dark-mode .form-status-alert.warning {
+    background: #3a3520;
+    border-color: #5c4d1b;
+    color: #ffe082;
+}
+
+body.dark-mode .form-status-alert.success {
+    background: #1a2e1a;
+    border-color: #2e5e2e;
+    color: #a5d6a7;
+}
+
+body.dark-mode .form-status-alert.danger {
+    background: #2e1a1a;
+    border-color: #5e2e2e;
+    color: #ef9a9a;
+}
+
+body.dark-mode .deadline-banner {
+    background: #1a2e1a !important;
+    color: #81c784 !important;
+}
