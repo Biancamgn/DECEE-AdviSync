@@ -20,6 +20,24 @@ const CONCERNS_PER_PAGE = 6;
         .single();
     _studentData = student;
 
+    // Populate term dropdown dynamically
+    const { data: terms } = await supabaseClient
+        .from('terms')
+        .select('*')
+        .order('academic_year', { ascending: false })
+        .order('term_name', { ascending: false });
+    const termSelect = document.querySelector('select.form-control-custom');
+    if (termSelect && terms) {
+        const activeTerm = terms.find(t => t.is_active);
+        terms.forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t.id;
+            opt.textContent = `${t.term_name} · AY ${t.academic_year}${t.is_active ? ' (Current)' : ''}`;
+            if (t.is_active) opt.selected = true;
+            termSelect.appendChild(opt);
+        });
+    }
+
     await loadConcerns();
 })();
 

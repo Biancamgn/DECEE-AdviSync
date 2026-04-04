@@ -706,6 +706,12 @@ body {
     border-bottom: none;
 }
 
+.term-table .total-units-row td {
+    background: var(--dlsu-gray-50, #f7faf8);
+    border-top: 2px solid var(--dlsu-gray-200, #e8ede9);
+    font-size: 0.78rem;
+}
+
 .term-table .course-code {
     font-weight: 700;
     color: var(--dlsu-green);

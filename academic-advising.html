@@ -18,21 +18,26 @@
         <div class="page-body">
             <h2 class="page-title"><i class="bi bi-clipboard2-check-fill"></i> Academic Advising Management</h2>
             <p class="page-subtitle">Set advising deadlines and monitor which students have submitted their requirements.</p>
-            <div class="deadline-display"><div class="dd-icon"><i class="bi bi-alarm"></i></div><div><div class="dd-label">Current Advising Deadline</div><div class="dd-value">April 4, 2026 · Term 2, AY 2025–2026</div></div></div>
+            <div class="deadline-display"><div class="dd-icon"><i class="bi bi-alarm"></i></div><div><div class="dd-label">Current Advising Deadline</div><div class="dd-value">Loading...</div></div></div>
             <div class="section-card">
                 <div class="section-title"><i class="bi bi-calendar-range"></i> Set Advising Deadline</div>
                 <div class="section-desc">Configure the submission window for students to submit their advising requirements.</div>
                 <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-end;">
-                    <div class="form-group" style="margin-bottom:0;"><label class="form-label-custom">Academic Year</label><select class="form-control-custom"><option>2025–2026</option><option>2024–2025</option></select></div>
-                    <div class="form-group" style="margin-bottom:0;"><label class="form-label-custom">Term</label><select class="form-control-custom"><option>Term 2</option><option>Term 1</option><option>Term 3</option></select></div>
-                    <div class="form-group" style="margin-bottom:0;"><label class="form-label-custom">Deadline Date</label><input type="date" class="form-control-custom" value="2026-04-04"></div>
-                    <button class="btn-save" onclick="alert('Deadline updated successfully!')"><i class="bi bi-check-lg"></i> Save Deadline</button>
+                    <div class="form-group" style="margin-bottom:0;"><label class="form-label-custom">Academic Year</label><select class="form-control-custom" id="aySelect"><option>2025-2026</option><option>2026-2027</option><option>2024-2025</option></select></div>
+                    <div class="form-group" style="margin-bottom:0;"><label class="form-label-custom">Term</label><select class="form-control-custom" id="termSelect"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></div>
+                    <div class="form-group" style="margin-bottom:0;"><label class="form-label-custom">Deadline Date</label><input type="date" class="form-control-custom" value=""></div>
+                    <button class="btn-save"><i class="bi bi-check-lg"></i> Save Deadline</button>
                 </div>
             </div>
             <div class="section-card">
                 <div class="section-title"><i class="bi bi-bar-chart-line"></i> Submission Progress</div>
                 <div class="section-desc">Track how many of your advisees have submitted their advising forms.</div>
-                <div class="progress-strip"><div class="progress-bar-custom"><div class="progress-fill" style="width:62.5%;"></div></div><div class="progress-label">15 / 24 submitted</div></div>
+                <div class="progress-strip"><div class="progress-bar-custom"><div class="progress-fill" style="width:0%;"></div></div><div class="progress-label">Loading...</div></div>
+                <div class="tracker-actions">
+                    <div class="search-box" style="flex:1;min-width:180px;"><i class="bi bi-search"></i><input type="text" placeholder="Search by name or ID..." id="trackerSearch" oninput="filterTracker()"></div>
+                    <select class="filter-select" id="trackerFilter" onchange="filterTracker()"><option value="all">All Status</option><option value="submitted">Submitted</option><option value="reviewed">Reviewed</option><option value="revision">For Revision</option><option value="not-submitted">Not Submitted</option></select>
+                    <button class="btn-remind" onclick="sendReminders()"><i class="bi bi-bell"></i> Remind Unsubmitted</button>
+                </div>
                 <table class="tracker-table">
                     <thead><tr><th>Student</th><th>ID</th><th>Program</th><th>Submission Status</th><th>Date</th></tr></thead>
                     <tbody>

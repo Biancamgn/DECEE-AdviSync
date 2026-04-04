@@ -175,7 +175,7 @@
 }
 .checklist-row {
     display: grid;
-    grid-template-columns: 36px 90px 1fr 60px 100px 60px;
+    grid-template-columns: 36px 90px 1fr 60px minmax(100px, 150px) 60px;
     align-items: center;
     padding: 0.65rem 1rem;
     font-size: 0.8rem;
@@ -232,6 +232,10 @@
 .col-prereq {
     font-size: 0.75rem;
     color: var(--dlsu-gray-400, #94a89c);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-right: 0.5rem;
 }
 .col-grade {
     text-align: center;
@@ -250,13 +254,22 @@
     color: var(--dlsu-gray-400, #94a89c);
 }
 
+/* ── Total Row ── */
+.checklist-row.total-row {
+    background: var(--dlsu-gray-50, #f7faf8);
+    border-top: 2px solid var(--dlsu-gray-200, #e8ede9);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--dlsu-gray-800, #1a2e22);
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
     .checklist-summary {
         grid-template-columns: repeat(2, 1fr);
     }
     .checklist-row {
-        grid-template-columns: 30px 70px 1fr 45px 80px 45px;
+        grid-template-columns: 30px 70px 1fr 45px minmax(70px, 100px) 45px;
         padding: 0.5rem 0.65rem;
         font-size: 0.72rem;
     }
@@ -374,4 +387,9 @@ body.dark-mode .checklist-row.not-taken .col-status i {
 body.dark-mode .checklist-row.not-taken .col-code,
 body.dark-mode .checklist-row.not-taken .col-name {
     color: #6b7e70;
+}
+body.dark-mode .checklist-row.total-row {
+    background: #1a1f1c;
+    border-top-color: #2f3832;
+    color: #d4ddd7;
 }

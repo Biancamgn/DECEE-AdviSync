@@ -950,6 +950,7 @@ body {
     gap: 0.85rem;
     padding: 1rem 1.25rem;
     border-radius: 10px;
+    border: 1px solid var(--dlsu-gray-200, #e2e8f0);
 }
 
 .advising-status.pending {
@@ -960,6 +961,12 @@ body {
 .advising-status.approved {
     background: var(--dlsu-green-light);
     border: 1px solid #b8e0c8;
+}
+
+.advising-status.rejected,
+.advising-status.for_revision {
+    background: #fef0f0;
+    border: 1px solid #f5b8b8;
 }
 
 .advising-status .status-icon {
@@ -983,11 +990,30 @@ body {
     color: white;
 }
 
+.advising-status.rejected .status-icon,
+.advising-status.for_revision .status-icon {
+    background: var(--dlsu-danger, #dc3545);
+    color: white;
+}
+
 .advising-status .status-label {
     font-size: 0.73rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.03em;
+}
+
+.advising-status.pending .status-label {
+    color: var(--dlsu-warning);
+}
+
+.advising-status.approved .status-label {
+    color: var(--dlsu-green);
+}
+
+.advising-status.rejected .status-label,
+.advising-status.for_revision .status-label {
+    color: var(--dlsu-danger, #dc3545);
 }
 
 .advising-status .status-desc {

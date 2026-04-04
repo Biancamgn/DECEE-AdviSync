@@ -215,3 +215,17 @@
         overflow-x: auto;
     }
 }
+
+/* Advising form status badges in my advisees table */
+.sub-status-badge {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.sub-status-badge.submitted { background: #e3f2fd; color: #1565c0; }
+.sub-status-badge.reviewed { background: #e8f5e9; color: #2e7d32; }
+.sub-status-badge.revision { background: #fff3e0; color: #e65100; }
+.sub-status-badge.not-submitted { background: var(--dlsu-gray-100); color: var(--dlsu-gray-400); }

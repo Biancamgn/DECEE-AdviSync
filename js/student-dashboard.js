@@ -5,19 +5,23 @@ initShared();
     if (!profile) return;
     await loadUserProfile();
 
-    const { data: student } = await supabaseClient
+    const { data: student, error: studentError } = await supabaseClient
         .from('students')
-        .select('*, profiles!inner(*)')
+        .select('*')
         .eq('id', profile.id)
         .single();
 
-    const { data: adviser } = student?.adviser_id
+    if (studentError) console.warn('Student fetch error:', studentError);
+
+    const { data: adviser, error: adviserError } = student?.adviser_id
         ? await supabaseClient
             .from('profiles')
             .select('*, professors(*)')
             .eq('id', student.adviser_id)
             .single()
-        : { data: null };
+        : { data: null, error: null };
+
+    if (adviserError) console.warn('Adviser fetch error:', adviserError);
 
     const { data: records } = await supabaseClient
         .from('academic_records')
@@ -29,15 +33,19 @@ initShared();
         .from('terms')
         .select('*')
         .eq('is_active', true)
-        .single();
-
-    const { data: latestForm } = await supabaseClient
-        .from('advising_forms')
-        .select('*, terms(*)')
-        .eq('student_id', profile.id)
-        .order('submitted_at', { ascending: false })
         .limit(1)
         .single();
+
+    const { data: latestForm } = activeTerm
+        ? await supabaseClient
+            .from('advising_forms')
+            .select('*, terms(*)')
+            .eq('student_id', profile.id)
+            .eq('term_id', activeTerm.id)
+            .order('submitted_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+        : { data: null };
 
     const failedUnits = student?.failed_units || 0;
     const yearLevel = student?.year_level || 1;
@@ -74,15 +82,31 @@ initShared();
     if (statValues[2]) { statValues[2].textContent = failedUnits; }
     if (statValues[3]) { statValues[3].textContent = yearLevel; statSubs[3].textContent = `Year Level`; }
 
+    // Dynamically update profile dropdown info rows
+    const infoValues = document.querySelectorAll('.dropdown-info-value');
+    if (infoValues[0]) infoValues[0].textContent = profile.school_id || '—';
+    if (infoValues[1]) infoValues[1].textContent = program;
+    if (infoValues[2]) infoValues[2].textContent = `Year ${yearLevel} of 4`;
+
     if (latestForm) {
         const statusContainer = document.querySelector('.advising-status');
         if (statusContainer) {
-            const statusMap = { pending: 'Pending Review', approved: 'Approved', rejected: 'Needs Revision', revision: 'Needs Revision' };
-            const iconMap = { pending: 'bi-hourglass-split', approved: 'bi-check-circle', rejected: 'bi-x-circle', revision: 'bi-arrow-repeat' };
+            const statusMap = { pending: 'Pending Review', approved: 'Approved', rejected: 'Needs Revision', for_revision: 'Needs Revision' };
+            const iconMap = { pending: 'bi-hourglass-split', approved: 'bi-check-circle', rejected: 'bi-x-circle', for_revision: 'bi-arrow-repeat' };
             statusContainer.className = `advising-status ${latestForm.status} mb-4`;
+            statusContainer.style.opacity = '1';
             statusContainer.querySelector('.status-label').textContent = statusMap[latestForm.status] || latestForm.status;
-            statusContainer.querySelector('.status-desc').textContent = latestForm.adviser_remarks || `Your study plan was submitted on ${new Date(latestForm.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.`;
+            statusContainer.querySelector('.status-desc').textContent = latestForm.adviser_remarks || `Your academic advising form was submitted on ${new Date(latestForm.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.`;
             statusContainer.querySelector('.status-icon i').className = `bi ${iconMap[latestForm.status] || 'bi-hourglass-split'}`;
+        }
+    } else {
+        const statusContainer = document.querySelector('.advising-status');
+        if (statusContainer) {
+            statusContainer.className = 'advising-status mb-4';
+            statusContainer.style.opacity = '1';
+            statusContainer.querySelector('.status-label').textContent = 'No Form Submitted';
+            statusContainer.querySelector('.status-desc').textContent = 'You have not yet submitted an advising form for the current term.';
+            statusContainer.querySelector('.status-icon i').className = 'bi bi-file-earmark-x';
         }
     }
 
@@ -110,6 +134,10 @@ initShared();
         document.querySelector('.adviser-avatar').textContent = advInitials;
         document.querySelector('.adviser-name').textContent = advName;
         document.querySelector('.adviser-dept').textContent = `${advDept} · ${program}`;
+    } else {
+        document.querySelector('.adviser-avatar').textContent = '—';
+        document.querySelector('.adviser-name').textContent = 'No adviser assigned';
+        document.querySelector('.adviser-dept').textContent = program;
     }
 
     const meterValue = document.querySelector('.meter-value');

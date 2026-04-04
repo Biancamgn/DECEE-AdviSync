@@ -22,6 +22,11 @@ async function loadUserProfile() {
 
         _applyProfile(profile);
 
+        // Enrich with student-specific data if the user is a student
+        if (profile.role === 'student') {
+            _enrichStudentProfile(session.user.id);
+        }
+
         return profile;
     } catch (err) {
         console.error('loadUserProfile error:', err);
@@ -54,6 +59,10 @@ function _applyProfile(profile) {
         document.querySelectorAll('.dropdown-name').forEach(el => el.textContent = fullName);
         document.querySelectorAll('.dropdown-role').forEach(el => el.textContent = role);
 
+        // Update dropdown info rows (ID Number, Program, Term)
+        const infoValues = document.querySelectorAll('.dropdown-info-value');
+        if (infoValues[0]) infoValues[0].textContent = schoolId || '—';
+
         const greetingEl = document.querySelector('.welcome-banner h2');
         if (greetingEl) {
             const hour = new Date().getHours();
@@ -62,6 +71,35 @@ function _applyProfile(profile) {
             else if (hour >= 18) greeting = 'Good evening';
             greetingEl.textContent = `${greeting}, ${firstName}!`;
         }
+}
+
+// Fetch student-specific data and update sidebar + dropdown with program info
+async function _enrichStudentProfile(userId) {
+    try {
+        const { data: student } = await supabaseClient
+            .from('students')
+            .select('program, year_level')
+            .eq('id', userId)
+            .single();
+
+        if (!student) return;
+
+        const program = student.program || '';
+        const yearLevel = student.year_level || 1;
+        const schoolId = document.querySelector('.dropdown-info-value')?.textContent || '';
+
+        // Update sidebar footer with program
+        document.querySelectorAll('.sidebar-footer .user-id').forEach(el => {
+            el.textContent = program ? `${schoolId} · ${program}` : schoolId;
+        });
+
+        // Update dropdown info rows
+        const infoValues = document.querySelectorAll('.dropdown-info-value');
+        if (infoValues[1]) infoValues[1].textContent = program || '—';
+        if (infoValues[2]) infoValues[2].textContent = `Year ${yearLevel} of 4`;
+    } catch (e) {
+        console.warn('Could not enrich student profile:', e);
+    }
 }
 
 function initShared() {
