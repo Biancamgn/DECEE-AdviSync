@@ -233,6 +233,14 @@ DROP POLICY IF EXISTS "Students can manage own plan courses" ON study_plan_cours
 CREATE POLICY "Students can manage own plan courses" ON study_plan_courses FOR ALL USING (
     plan_id IN (SELECT id FROM study_plans WHERE student_id = auth.uid())
 );
+DROP POLICY IF EXISTS "Advisers can view assigned plan courses" ON study_plan_courses;
+CREATE POLICY "Advisers can view assigned plan courses" ON study_plan_courses FOR SELECT USING (
+    is_adviser() AND plan_id IN (
+        SELECT id FROM study_plans WHERE student_id IN (
+            SELECT id FROM students WHERE adviser_id = auth.uid()
+        )
+    )
+);
 DROP POLICY IF EXISTS "Admins can manage plan courses" ON study_plan_courses;
 CREATE POLICY "Admins can manage plan courses" ON study_plan_courses FOR ALL USING (is_admin());
 
@@ -369,3 +377,20 @@ CREATE POLICY "Admins can manage concern replies" ON concern_replies FOR ALL USI
 -- Allow students to update their own concerns (to mark as resolved)
 DROP POLICY IF EXISTS "Students can update own concerns" ON concerns;
 CREATE POLICY "Students can update own concerns" ON concerns FOR UPDATE USING (auth.uid() = student_id);
+
+-- ═══════════════════════════════════════════════════════════════════
+-- 11. Add meeting_preference and notes columns to advising_forms and study_plans
+-- ═══════════════════════════════════════════════════════════════════
+ALTER TABLE advising_forms ADD COLUMN IF NOT EXISTS meeting_preference TEXT DEFAULT 'waive' CHECK (meeting_preference IN ('waive', 'schedule'));
+ALTER TABLE advising_forms ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE advising_forms ADD COLUMN IF NOT EXISTS program TEXT;
+
+ALTER TABLE study_plans ADD COLUMN IF NOT EXISTS meeting_preference TEXT DEFAULT 'waive' CHECK (meeting_preference IN ('waive', 'schedule'));
+ALTER TABLE study_plans ADD COLUMN IF NOT EXISTS notes TEXT;
+
+-- Add type column to study_plan_courses for categorizing (failed, current, planned)
+ALTER TABLE study_plan_courses ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'planned' CHECK (type IN ('failed', 'current', 'planned'));
+
+-- Allow students to update their own advising forms (for resubmission after revision)
+DROP POLICY IF EXISTS "Students can update own forms" ON advising_forms;
+CREATE POLICY "Students can update own forms" ON advising_forms FOR UPDATE USING (auth.uid() = student_id);

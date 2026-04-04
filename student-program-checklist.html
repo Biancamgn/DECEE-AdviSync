@@ -20,7 +20,7 @@
             <div class="nav-section-label">Main</div>
             <a href="student-dashboard.html" class="nav-link"><i class="bi bi-grid-1x2-fill"></i><span class="link-text">Dashboard</span></a>
             <a href="student-academic-history.html" class="nav-link"><i class="bi bi-journal-text"></i><span class="link-text">Academic History</span></a>
-            <a href="student-academic-booklet.html" class="nav-link"><i class="bi bi-file-earmark-check"></i><span class="link-text">Study Plan</span></a>
+            <a href="student-academic-booklet.html" class="nav-link"><i class="bi bi-file-earmark-check"></i><span class="link-text">Academic Advising Form</span></a>
             <a href="student-program-checklist.html" class="nav-link active"><i class="bi bi-list-check"></i><span class="link-text">Program Checklist</span></a>
             <div class="nav-divider"></div>
             <div class="nav-section-label">Advising</div>
@@ -31,7 +31,7 @@
             <a href="student-profile.html" class="nav-link"><i class="bi bi-person"></i><span class="link-text">Profile</span></a>
             <a href="student-settings.html" class="nav-link"><i class="bi bi-gear"></i><span class="link-text">Settings</span></a>
         </nav>
-        <div class="sidebar-footer"><div class="user-card"><div class="avatar">BM</div><div class="user-info"><div class="user-name">Bianca M.</div><div class="user-id">12012345 · BS-CpE</div></div></div></div>
+        <div class="sidebar-footer"><div class="user-card"><div class="avatar">—</div><div class="user-info"><div class="user-name">Loading...</div><div class="user-id">Loading...</div></div></div></div>
     </aside>
 
     <div class="main-content" id="mainContent">
@@ -42,21 +42,21 @@
             </div>
             <div class="topbar-right">
                 <button class="topbar-circle-btn" id="darkModeBtn"><i class="bi bi-moon-fill"></i></button>
-                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i><span class="notif-badge">4</span></button>
+                <button class="topbar-circle-btn" title="Notifications" id="notifBtn"><i class="bi bi-bell-fill"></i><span class="notif-badge" style="display:none">0</span></button>
                 <div class="profile-wrapper" id="profileWrapper">
                     <div class="d-flex align-items-center gap-1" style="cursor:pointer;" id="profileToggle">
-                        <div class="profile-btn">BM</div>
+                        <div class="profile-btn">—</div>
                         <i class="bi bi-chevron-down profile-chevron"></i>
                     </div>
                     <div class="profile-dropdown">
                         <div class="dropdown-header">
-                            <div class="dropdown-avatar">BM</div>
-                            <div><div class="dropdown-name">Bianca Magsino</div><div class="dropdown-role">Student</div></div>
+                            <div class="dropdown-avatar">—</div>
+                            <div><div class="dropdown-name">Loading...</div><div class="dropdown-role">Student</div></div>
                         </div>
                         <div class="dropdown-info">
-                            <div class="dropdown-info-row"><span class="dropdown-info-label">ID Number</span><span class="dropdown-info-value">12012345</span></div>
-                            <div class="dropdown-info-row"><span class="dropdown-info-label">Program</span><span class="dropdown-info-value">BS-CpE</span></div>
-                            <div class="dropdown-info-row"><span class="dropdown-info-label">Term</span><span class="dropdown-info-value">8 of 12</span></div>
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">ID Number</span><span class="dropdown-info-value">—</span></div>
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">Program</span><span class="dropdown-info-value">—</span></div>
+                            <div class="dropdown-info-row"><span class="dropdown-info-label">Term</span><span class="dropdown-info-value">—</span></div>
                         </div>
                         <div class="dropdown-divider"></div>
                         <a href="student-profile.html" class="dropdown-action"><i class="bi bi-person"></i> View Profile</a>
@@ -70,26 +70,26 @@
 
         <div class="page-body">
             <h2 class="page-title"><i class="bi bi-list-check"></i> Program Checklist</h2>
-            <p class="page-subtitle">Track your progress through the BS Computer Engineering curriculum. Completed courses are checked automatically based on your academic history.</p>
+            <p class="page-subtitle">Track your progress through your program curriculum. Completed courses are checked automatically based on your academic history.</p>
 
             <div class="checklist-summary">
                 <div class="summary-card">
-                    <div class="summary-value">96</div>
+                    <div class="summary-value">—</div>
                     <div class="summary-label">Total Units Required</div>
                 </div>
                 <div class="summary-card">
-                    <div class="summary-value completed">72</div>
+                    <div class="summary-value completed">—</div>
                     <div class="summary-label">Units Completed</div>
                 </div>
                 <div class="summary-card">
-                    <div class="summary-value remaining">24</div>
+                    <div class="summary-value remaining">—</div>
                     <div class="summary-label">Units Remaining</div>
                 </div>
                 <div class="summary-card">
-                    <div class="summary-value">75%</div>
+                    <div class="summary-value">—</div>
                     <div class="summary-label">Completion Rate</div>
                     <div class="progress-bar-wrapper">
-                        <div class="progress-bar-fill" style="width: 75%"></div>
+                        <div class="progress-bar-fill" style="width: 0%"></div>
                     </div>
                 </div>
             </div>
@@ -102,405 +102,10 @@
             </div>
 
             <div id="checklistContainer">
-            <!-- Year 1 -->
-            <div class="year-group">
-                <div class="year-header">
-                    <h3><i class="bi bi-mortarboard"></i> Year 1</h3>
-                    <span class="year-progress">24 / 24 units completed</span>
+                <div style="text-align:center; padding:3rem; color:var(--dlsu-gray-400)">
+                    <i class="bi bi-hourglass-split" style="font-size:2rem"></i>
+                    <p>Loading program checklist...</p>
                 </div>
-
-                <div class="term-group">
-                    <h4 class="term-label">Term 1</h4>
-                    <div class="checklist-table">
-                        <div class="checklist-row header">
-                            <div class="col-status"></div>
-                            <div class="col-code">Code</div>
-                            <div class="col-name">Course Name</div>
-                            <div class="col-units">Units</div>
-                            <div class="col-prereq">Prerequisite</div>
-                            <div class="col-grade">Grade</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CCPROG1</div>
-                            <div class="col-name">Logic Formulation and Introductory Programming</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">—</div>
-                            <div class="col-grade">3.0</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">LBYCPB1</div>
-                            <div class="col-name">Programming Lab 1</div>
-                            <div class="col-units">1</div>
-                            <div class="col-prereq">CCPROG1</div>
-                            <div class="col-grade">3.0</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CCICOMP</div>
-                            <div class="col-name">Introduction to Computing</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">—</div>
-                            <div class="col-grade">2.5</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">ENGDATA</div>
-                            <div class="col-name">Engineering Data Analysis</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">—</div>
-                            <div class="col-grade">2.0</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="term-group">
-                    <h4 class="term-label">Term 2</h4>
-                    <div class="checklist-table">
-                        <div class="checklist-row header">
-                            <div class="col-status"></div>
-                            <div class="col-code">Code</div>
-                            <div class="col-name">Course Name</div>
-                            <div class="col-units">Units</div>
-                            <div class="col-prereq">Prerequisite</div>
-                            <div class="col-grade">Grade</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CCPROG2</div>
-                            <div class="col-name">Programming with Structured Data Types</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCPROG1</div>
-                            <div class="col-grade">2.5</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">LBYCPB2</div>
-                            <div class="col-name">Programming Lab 2</div>
-                            <div class="col-units">1</div>
-                            <div class="col-prereq">CCPROG2</div>
-                            <div class="col-grade">3.0</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CCDISTR</div>
-                            <div class="col-name">Discrete Structures</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCPROG1</div>
-                            <div class="col-grade">2.0</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">GEPCOMM</div>
-                            <div class="col-name">Purposive Communication</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">—</div>
-                            <div class="col-grade">2.5</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Year 2 -->
-            <div class="year-group">
-                <div class="year-header">
-                    <h3><i class="bi bi-mortarboard"></i> Year 2</h3>
-                    <span class="year-progress">24 / 24 units completed</span>
-                </div>
-
-                <div class="term-group">
-                    <h4 class="term-label">Term 3</h4>
-                    <div class="checklist-table">
-                        <div class="checklist-row header">
-                            <div class="col-status"></div>
-                            <div class="col-code">Code</div>
-                            <div class="col-name">Course Name</div>
-                            <div class="col-units">Units</div>
-                            <div class="col-prereq">Prerequisite</div>
-                            <div class="col-grade">Grade</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CCPROG3</div>
-                            <div class="col-name">Object-Oriented Programming</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCPROG2</div>
-                            <div class="col-grade">2.0</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CCDATRCL</div>
-                            <div class="col-name">Data Structures and Algorithms</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCPROG2</div>
-                            <div class="col-grade">2.5</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CCNETCM</div>
-                            <div class="col-name">Networking and Communications</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCICOMP</div>
-                            <div class="col-grade">3.0</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">LOGDSGN</div>
-                            <div class="col-name">Logic Circuits and Design</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCDISTR</div>
-                            <div class="col-grade">2.0</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="term-group">
-                    <h4 class="term-label">Term 4</h4>
-                    <div class="checklist-table">
-                        <div class="checklist-row header">
-                            <div class="col-status"></div>
-                            <div class="col-code">Code</div>
-                            <div class="col-name">Course Name</div>
-                            <div class="col-units">Units</div>
-                            <div class="col-prereq">Prerequisite</div>
-                            <div class="col-grade">Grade</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CCDSALG</div>
-                            <div class="col-name">Design and Analysis of Algorithms</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCDATRCL</div>
-                            <div class="col-grade">2.0</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">MICPROS</div>
-                            <div class="col-name">Microprocessors</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">LOGDSGN</div>
-                            <div class="col-grade">2.5</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">STSWENG</div>
-                            <div class="col-name">Software Engineering</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCPROG3</div>
-                            <div class="col-grade">3.0</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">GEETHIC</div>
-                            <div class="col-name">Science, Technology, and Society</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">—</div>
-                            <div class="col-grade">3.5</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Year 3 -->
-            <div class="year-group">
-                <div class="year-header">
-                    <h3><i class="bi bi-mortarboard"></i> Year 3</h3>
-                    <span class="year-progress">24 / 24 units completed</span>
-                </div>
-
-                <div class="term-group">
-                    <h4 class="term-label">Term 5</h4>
-                    <div class="checklist-table">
-                        <div class="checklist-row header">
-                            <div class="col-status"></div>
-                            <div class="col-code">Code</div>
-                            <div class="col-name">Course Name</div>
-                            <div class="col-units">Units</div>
-                            <div class="col-prereq">Prerequisite</div>
-                            <div class="col-grade">Grade</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">OPESSYS</div>
-                            <div class="col-name">Operating Systems</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCDATRCL</div>
-                            <div class="col-grade">2.5</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">NSSECU1</div>
-                            <div class="col-name">Network Security 1</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCNETCM</div>
-                            <div class="col-grade">2.0</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CSARCH1</div>
-                            <div class="col-name">Computer Architecture 1</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">MICPROS</div>
-                            <div class="col-grade">2.5</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">LBYCPG2</div>
-                            <div class="col-name">CpE Lab 2</div>
-                            <div class="col-units">1</div>
-                            <div class="col-prereq">MICPROS</div>
-                            <div class="col-grade">3.0</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="term-group">
-                    <h4 class="term-label">Term 6</h4>
-                    <div class="checklist-table">
-                        <div class="checklist-row header">
-                            <div class="col-status"></div>
-                            <div class="col-code">Code</div>
-                            <div class="col-name">Course Name</div>
-                            <div class="col-units">Units</div>
-                            <div class="col-prereq">Prerequisite</div>
-                            <div class="col-grade">Grade</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CSARCH2</div>
-                            <div class="col-name">Computer Architecture 2</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CSARCH1</div>
-                            <div class="col-grade">2.0</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">NSSECU2</div>
-                            <div class="col-name">Network Security 2</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">NSSECU1</div>
-                            <div class="col-grade">2.5</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">CSADPRG</div>
-                            <div class="col-name">Advanced Programming</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CCDSALG</div>
-                            <div class="col-grade">2.5</div>
-                        </div>
-                        <div class="checklist-row completed" data-status="completed">
-                            <div class="col-status"><i class="bi bi-check-circle-fill"></i></div>
-                            <div class="col-code">LBYCPG3</div>
-                            <div class="col-name">CpE Lab 3</div>
-                            <div class="col-units">1</div>
-                            <div class="col-prereq">LBYCPG2</div>
-                            <div class="col-grade">3.5</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Year 4 (Current) -->
-            <div class="year-group current">
-                <div class="year-header">
-                    <h3><i class="bi bi-mortarboard"></i> Year 4 <span class="current-badge">Current</span></h3>
-                    <span class="year-progress">0 / 24 units completed</span>
-                </div>
-
-                <div class="term-group">
-                    <h4 class="term-label">Term 7 <span class="term-status in-progress">In Progress</span></h4>
-                    <div class="checklist-table">
-                        <div class="checklist-row header">
-                            <div class="col-status"></div>
-                            <div class="col-code">Code</div>
-                            <div class="col-name">Course Name</div>
-                            <div class="col-units">Units</div>
-                            <div class="col-prereq">Prerequisite</div>
-                            <div class="col-grade">Grade</div>
-                        </div>
-                        <div class="checklist-row in-progress" data-status="in-progress">
-                            <div class="col-status"><i class="bi bi-arrow-repeat"></i></div>
-                            <div class="col-code">EMBDSYS</div>
-                            <div class="col-name">Embedded Systems</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">MICPROS</div>
-                            <div class="col-grade">—</div>
-                        </div>
-                        <div class="checklist-row in-progress" data-status="in-progress">
-                            <div class="col-status"><i class="bi bi-arrow-repeat"></i></div>
-                            <div class="col-code">CSYSARC</div>
-                            <div class="col-name">System Architecture</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CSARCH2</div>
-                            <div class="col-grade">—</div>
-                        </div>
-                        <div class="checklist-row in-progress" data-status="in-progress">
-                            <div class="col-status"><i class="bi bi-arrow-repeat"></i></div>
-                            <div class="col-code">REMETHS</div>
-                            <div class="col-name">Methods of Research</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">ENGDATA</div>
-                            <div class="col-grade">—</div>
-                        </div>
-                        <div class="checklist-row in-progress" data-status="in-progress">
-                            <div class="col-status"><i class="bi bi-arrow-repeat"></i></div>
-                            <div class="col-code">LBYCPM3</div>
-                            <div class="col-name">CpE Lab — Embedded Systems</div>
-                            <div class="col-units">1</div>
-                            <div class="col-prereq">EMBDSYS</div>
-                            <div class="col-grade">—</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="term-group">
-                    <h4 class="term-label">Term 8 <span class="term-status not-taken">Upcoming</span></h4>
-                    <div class="checklist-table">
-                        <div class="checklist-row header">
-                            <div class="col-status"></div>
-                            <div class="col-code">Code</div>
-                            <div class="col-name">Course Name</div>
-                            <div class="col-units">Units</div>
-                            <div class="col-prereq">Prerequisite</div>
-                            <div class="col-grade">Grade</div>
-                        </div>
-                        <div class="checklist-row not-taken" data-status="not-taken">
-                            <div class="col-status"><i class="bi bi-circle"></i></div>
-                            <div class="col-code">CPETHSS</div>
-                            <div class="col-name">CpE Thesis/Capstone 1</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">REMETHS</div>
-                            <div class="col-grade">—</div>
-                        </div>
-                        <div class="checklist-row not-taken" data-status="not-taken">
-                            <div class="col-status"><i class="bi bi-circle"></i></div>
-                            <div class="col-code">DIGISIG</div>
-                            <div class="col-name">Digital Signal Processing</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">CSYSARC</div>
-                            <div class="col-grade">—</div>
-                        </div>
-                        <div class="checklist-row not-taken" data-status="not-taken">
-                            <div class="col-status"><i class="bi bi-circle"></i></div>
-                            <div class="col-code">CPEELEC</div>
-                            <div class="col-name">CpE Elective 1</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">—</div>
-                            <div class="col-grade">—</div>
-                        </div>
-                        <div class="checklist-row not-taken" data-status="not-taken">
-                            <div class="col-status"><i class="bi bi-circle"></i></div>
-                            <div class="col-code">GEWORLD</div>
-                            <div class="col-name">The Contemporary World</div>
-                            <div class="col-units">3</div>
-                            <div class="col-prereq">—</div>
-                            <div class="col-grade">—</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             </div>
 
         </div>

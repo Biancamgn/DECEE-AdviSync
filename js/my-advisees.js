@@ -9,10 +9,15 @@ async function loadAdvisees() {
 
         const adviserId = session.user.id;
 
-        // Step 1: get student_ids from advisees table
+        // Step 1: get student_ids from both advisees table and students.adviser_id
         const { data: adviseeRows, error: adviseeError } = await supabaseClient
             .from('advisees')
             .select('student_id')
+            .eq('adviser_id', adviserId);
+
+        const { data: studentAdvRows } = await supabaseClient
+            .from('students')
+            .select('id')
             .eq('adviser_id', adviserId);
 
         if (adviseeError) {
@@ -21,13 +26,18 @@ async function loadAdvisees() {
             return;
         }
 
-        if (!adviseeRows || adviseeRows.length === 0) {
+        // Merge both sources, deduplicate
+        const idSet = new Set();
+        (adviseeRows || []).forEach(r => idSet.add(r.student_id));
+        (studentAdvRows || []).forEach(r => idSet.add(r.id));
+
+        if (idSet.size === 0) {
             tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--dlsu-gray-400);">No advisees assigned.</td></tr>';
             updateCounts(0, 0, 0, 0);
             return;
         }
 
-        const studentIds = adviseeRows.map(r => r.student_id);
+        const studentIds = [...idSet];
 
         // Step 2: get profiles for those student IDs
         const { data: profileRows, error: profileError } = await supabaseClient
@@ -51,6 +61,34 @@ async function loadAdvisees() {
             console.error('Error fetching student records:', studentError);
         }
 
+        // Step 4: get active term for filtering
+        const { data: activeTerm } = await supabaseClient
+            .from('terms')
+            .select('id')
+            .eq('is_active', true)
+            .limit(1)
+            .single();
+
+        // Step 5: get advising form status for each student (active term only)
+        let formQuery = supabaseClient
+            .from('advising_forms')
+            .select('student_id, status, submitted_at, meeting_preference')
+            .eq('adviser_id', adviserId)
+            .in('student_id', studentIds)
+            .order('submitted_at', { ascending: false });
+
+        if (activeTerm) {
+            formQuery = formQuery.eq('term_id', activeTerm.id);
+        }
+
+        const { data: formRows } = await formQuery;
+
+        // Map latest form per student
+        const formMap = {};
+        (formRows || []).forEach(f => {
+            if (!formMap[f.student_id]) formMap[f.student_id] = f;
+        });
+
         // Map student records by id for easy lookup
         const studentMap = {};
         (studentRows || []).forEach(s => { studentMap[s.id] = s; });
@@ -66,23 +104,49 @@ async function loadAdvisees() {
             const studentInfo = studentMap[profile.id] || {};
             const failedUnits = studentInfo.failed_units ?? 0;
             const isCleared   = studentInfo.is_cleared   ?? false;
+            const latestForm  = formMap[profile.id];
 
-            let status      = 'cleared';
-            let statusLabel = 'Cleared';
-            let failedClass = 'safe';
+            // Unified status: form status takes priority when a form exists
+            let status, statusLabel, failedClass;
 
-            if (failedUnits >= 15) {
-                status      = 'at-risk';
-                statusLabel = 'At-Risk';
-                failedClass = failedUnits >= 24 ? 'danger' : 'warn';
-                riskCount++;
-            } else if (!isCleared) {
-                status      = 'pending';
-                statusLabel = 'Pending';
-                pendingCount++;
+            if (latestForm) {
+                // Use form status as primary
+                if (latestForm.status === 'approved') {
+                    status      = 'cleared';
+                    statusLabel = 'Approved';
+                    clearedCount++;
+                } else if (latestForm.status === 'for_revision') {
+                    status      = 'at-risk';
+                    statusLabel = 'For Revision';
+                    riskCount++;
+                } else if (latestForm.status === 'rejected') {
+                    status      = 'at-risk';
+                    statusLabel = 'Rejected';
+                    riskCount++;
+                } else {
+                    // pending (submitted)
+                    status      = 'pending';
+                    statusLabel = 'Submitted';
+                    pendingCount++;
+                }
             } else {
-                clearedCount++;
+                // No form: fall back to clearance status
+                if (failedUnits >= 15) {
+                    status      = 'at-risk';
+                    statusLabel = 'At-Risk';
+                    riskCount++;
+                } else if (!isCleared) {
+                    status      = 'pending';
+                    statusLabel = 'No Form';
+                    pendingCount++;
+                } else {
+                    status      = 'cleared';
+                    statusLabel = 'Cleared';
+                    clearedCount++;
+                }
             }
+
+            failedClass = failedUnits >= 24 ? 'danger' : failedUnits >= 15 ? 'warn' : 'safe';
 
             totalCount++;
 
@@ -94,7 +158,8 @@ async function loadAdvisees() {
             const fullName   = `${profile.first_name || ''} ${profile.last_name || ''}`.trim();
             const idNumber   = profile.school_id || '—';
             const email      = profile.email     || '—';
-            const currentTerm = studentInfo.current_term || '—';
+            const yearLvl    = studentInfo.year_level || 0;
+            const currentTerm = yearLvl > 0 ? `Year ${yearLvl}` : '—';
 
             const row = document.createElement('tr');
             row.dataset.program = programClass;
@@ -109,8 +174,10 @@ async function loadAdvisees() {
                 <td><span class="program-badge ${programClass}">${program}</span></td>
                 <td>${currentTerm}</td>
                 <td><span class="failed-units ${failedClass}">${failedUnits} / 30</span></td>
-                <td><span class="status-badge ${status}">${statusLabel}</span></td>
-                <td><a href="#" class="btn-view">View</a></td>
+                <td>
+                    <span class="status-badge ${status}">${statusLabel}</span>
+                </td>
+                <td><a href="advising-forms.html" class="btn-view">View Form</a></td>
             `;
             tableBody.appendChild(row);
         });

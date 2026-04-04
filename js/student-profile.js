@@ -54,6 +54,7 @@ initShared();
         .from('terms')
         .select('*')
         .eq('is_active', true)
+        .limit(1)
         .single();
     setInput(11, activeTerm ? `AY ${activeTerm.academic_year}` : '');
     setInput(12, '');

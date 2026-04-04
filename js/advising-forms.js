@@ -3,25 +3,42 @@ async function loadForms() {
     if (!profile) return;
 
     try {
+        // Fetch forms without ambiguous FK join to profiles
         const { data: forms, error } = await supabaseClient
             .from('advising_forms')
-            .select(`
-                *,
-                profiles!advising_forms_student_id_fkey (
-                    first_name, last_name, school_id, program
-                ),
-                terms (
-                    term_name, academic_year
-                )
-            `)
+            .select('*, terms(term_name, academic_year)')
             .eq('adviser_id', profile.id)
             .order('submitted_at', { ascending: false });
 
         if (error) { console.error('Error fetching forms:', error); return; }
 
+        // Fetch student profiles separately to avoid FK ambiguity
+        const studentIds = [...new Set(forms.map(f => f.student_id))];
+        let profileMap = {};
+        let studentMap = {};
+        if (studentIds.length > 0) {
+            const [{ data: profileRows }, { data: studentRows }] = await Promise.all([
+                supabaseClient
+                    .from('profiles')
+                    .select('id, first_name, last_name, school_id, program')
+                    .in('id', studentIds),
+                supabaseClient
+                    .from('students')
+                    .select('id, year_level, failed_units, is_cleared, program')
+                    .in('id', studentIds)
+            ]);
+            (profileRows || []).forEach(p => { profileMap[p.id] = p; });
+            (studentRows || []).forEach(s => { studentMap[s.id] = s; });
+        }
+
+        // Attach profiles and student data to forms
+        forms.forEach(f => {
+            f.profiles = profileMap[f.student_id] || null;
+            f.studentData = studentMap[f.student_id] || null;
+        });
+
         const formIds = forms.map(f => f.id);
 
-        const studentIds = [...new Set(forms.map(f => f.student_id))];
         const termIds    = [...new Set(forms.map(f => f.term_id).filter(Boolean))];
 
         let studyPlansMap = {}; 
@@ -40,17 +57,40 @@ async function loadForms() {
 
                 const planIds = plans.map(p => p.id);
                 if (planIds.length > 0) {
-                    const { data: planCourses, error: pcErr } = await supabaseClient
-                        .from('study_plan_courses')
-                        .select(`
-                            *,
-                            courses (
-                                code, name, units, type
-                            )
-                        `)
-                        .in('plan_id', planIds);
+                    // Use RPC (SECURITY DEFINER) to bypass RLS chain issues
+                    let planCourses = null;
+                    let pcErr = null;
 
-                    if (!pcErr && planCourses) {
+                    const { data: rpcData, error: rpcErr } = await supabaseClient
+                        .rpc('get_plan_courses_for_adviser', { p_plan_ids: planIds });
+
+                    if (!rpcErr && rpcData) {
+                        // Reshape RPC result to match the expected nested format
+                        planCourses = rpcData.map(row => ({
+                            id: row.id,
+                            plan_id: row.plan_id,
+                            course_id: row.course_id,
+                            type: row.type,
+                            courses: {
+                                code: row.course_code,
+                                title: row.course_title,
+                                units: row.course_units
+                            }
+                        }));
+                    } else {
+                        // Fallback: direct query (works if RLS policies are applied)
+                        console.warn('RPC get_plan_courses_for_adviser failed, trying direct query:', rpcErr);
+                        const { data: directData, error: directErr } = await supabaseClient
+                            .from('study_plan_courses')
+                            .select('*, courses(code, title, units)')
+                            .in('plan_id', planIds);
+                        planCourses = directData;
+                        pcErr = directErr;
+                    }
+
+                    if (pcErr) {
+                        console.warn('study_plan_courses query error:', pcErr);
+                    } else if (planCourses) {
                         plans.forEach(plan => {
                             const key = `${plan.student_id}::${plan.term_id}`;
                             const matched = planCourses.filter(pc => pc.plan_id === plan.id);
@@ -90,29 +130,40 @@ function formatDate(iso) {
     });
 }
 
-function buildStudyPlanDetail(studyPlan) {
+function buildStudyPlanDetail(studyPlan, studentData, form) {
     if (!studyPlan) {
         return `<div class="sp-no-plan">
             <i class="bi bi-exclamation-circle"></i>
-            No study plan data linked to this submission yet.
+            No advising form data linked to this submission yet.
         </div>`;
     }
 
     const courses = studyPlan.courses || [];
 
-    const failed  = courses.filter(pc => pc.courses?.type === 'failed'  || pc.type === 'failed');
-    const current = courses.filter(pc => pc.courses?.type === 'current' || pc.type === 'current');
-    const planned = courses.filter(pc => {
-        const t = pc.courses?.type || pc.type;
-        return !t || t === 'planned';
-    });
+    const failed  = courses.filter(pc => pc.type === 'failed');
+    const current = courses.filter(pc => pc.type === 'current');
+    const planned = courses.filter(pc => !pc.type || pc.type === 'planned');
 
     const meetingPref = studyPlan.meeting_preference || studyPlan.preferred_meeting || null;
+
+    const failedUnits  = failed.reduce((s, pc) => s + (pc.courses?.units || 0), 0);
+    const currentUnits = current.reduce((s, pc) => s + (pc.courses?.units || 0), 0);
+    const plannedUnits = planned.reduce((s, pc) => s + (pc.courses?.units || 0), 0);
+    const totalCourses = courses.length;
+
+    // Student academic snapshot
+    const sd = studentData || {};
+    const yearLevel = form?.year_level || sd.year_level || null;
+    const failedUnitsRecord = sd.failed_units || 0;
+    const isCleared = sd.is_cleared || false;
+    const standing = isCleared ? 'Cleared' : (failedUnitsRecord >= 15 ? 'At Risk' : 'Regular');
+    const standingClass = isCleared ? 'cleared' : (failedUnitsRecord >= 15 ? 'at-risk' : 'regular');
 
     function courseTable(list, emptyMsg) {
         if (!list.length) {
             return `<p class="sp-empty-group">${emptyMsg}</p>`;
         }
+        const sectionUnits = list.reduce((s, pc) => s + (pc.courses?.units || 0), 0);
         return `
         <table class="sp-table">
             <thead>
@@ -120,7 +171,6 @@ function buildStudyPlanDetail(studyPlan) {
                     <th>Code</th>
                     <th>Course Name</th>
                     <th>Units</th>
-                    ${list[0].courses?.prerequisite !== undefined ? '<th>Prerequisite</th>' : ''}
                 </tr>
             </thead>
             <tbody>
@@ -128,19 +178,64 @@ function buildStudyPlanDetail(studyPlan) {
                     const c = pc.courses || {};
                     return `<tr>
                         <td><code>${c.code || '—'}</code></td>
-                        <td>${c.name || '—'}</td>
+                        <td>${c.title || '—'}</td>
                         <td class="sp-units">${c.units ?? '—'}</td>
-                        ${c.prerequisite !== undefined ? `<td>${c.prerequisite || 'None'}</td>` : ''}
                     </tr>`;
                 }).join('')}
             </tbody>
+            <tfoot>
+                <tr class="sp-table-total">
+                    <td colspan="2">Total</td>
+                    <td class="sp-units">${sectionUnits} units</td>
+                </tr>
+            </tfoot>
         </table>`;
     }
 
-    const totalUnits = planned.reduce((sum, pc) => sum + (pc.courses?.units || 0), 0);
+    // Study plan notes
+    const planNotes = studyPlan.notes || '';
 
     return `
     <div class="sp-detail">
+
+        <!-- Student Academic Snapshot -->
+        <div class="sp-snapshot">
+            <div class="sp-snapshot-item">
+                <i class="bi bi-mortarboard-fill"></i>
+                <span class="sp-snapshot-label">Year Level</span>
+                <span class="sp-snapshot-value">${yearLevel ? 'Year ' + yearLevel : '—'}</span>
+            </div>
+            <div class="sp-snapshot-item">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span class="sp-snapshot-label">Failed Units</span>
+                <span class="sp-snapshot-value">${failedUnitsRecord}</span>
+            </div>
+            <div class="sp-snapshot-item">
+                <i class="bi bi-shield-check"></i>
+                <span class="sp-snapshot-label">Standing</span>
+                <span class="sp-snapshot-value sp-standing sp-standing--${standingClass}">${standing}</span>
+            </div>
+            <div class="sp-snapshot-item">
+                <i class="bi bi-layers-fill"></i>
+                <span class="sp-snapshot-label">Total Courses</span>
+                <span class="sp-snapshot-value">${totalCourses}</span>
+            </div>
+            <div class="sp-snapshot-item">
+                <i class="bi bi-calculator"></i>
+                <span class="sp-snapshot-label">Planned Load</span>
+                <span class="sp-snapshot-value ${plannedUnits > 24 ? 'sp-overload' : ''}">${plannedUnits} units${plannedUnits > 24 ? ' <i class="bi bi-exclamation-circle-fill"></i>' : ''}</span>
+            </div>
+        </div>
+
+        ${planNotes ? `
+        <div class="sp-notes">
+            <i class="bi bi-chat-left-text-fill"></i>
+            <div>
+                <span class="sp-notes-label">Student Notes</span>
+                <span class="sp-notes-text">${planNotes}</span>
+            </div>
+        </div>` : ''}
+
         <div class="sp-sections">
 
             ${ failed.length ? `
@@ -149,6 +244,7 @@ function buildStudyPlanDetail(studyPlan) {
                     <span class="sp-section-icon"><i class="bi bi-x-circle-fill"></i></span>
                     <span class="sp-section-title">Failed / Incomplete Courses</span>
                     <span class="sp-badge sp-badge--failed">${failed.length} course${failed.length !== 1 ? 's' : ''}</span>
+                    <span class="sp-units-total sp-units-total--failed">${failedUnits} units</span>
                 </div>
                 ${courseTable(failed, 'No failed courses listed.')}
             </div>` : '' }
@@ -159,6 +255,7 @@ function buildStudyPlanDetail(studyPlan) {
                     <span class="sp-section-icon"><i class="bi bi-journals"></i></span>
                     <span class="sp-section-title">Currently Enrolled Subjects</span>
                     <span class="sp-badge sp-badge--current">${current.length} subject${current.length !== 1 ? 's' : ''}</span>
+                    <span class="sp-units-total sp-units-total--current">${currentUnits} units</span>
                 </div>
                 ${courseTable(current, 'No current subjects listed.')}
             </div>` : '' }
@@ -168,7 +265,7 @@ function buildStudyPlanDetail(studyPlan) {
                     <span class="sp-section-icon"><i class="bi bi-calendar2-check-fill"></i></span>
                     <span class="sp-section-title">Planned Courses for Next Term</span>
                     <span class="sp-badge sp-badge--planned">${planned.length} course${planned.length !== 1 ? 's' : ''}</span>
-                    ${totalUnits ? `<span class="sp-units-total">${totalUnits} units total</span>` : ''}
+                    ${plannedUnits ? `<span class="sp-units-total">${plannedUnits} units</span>` : ''}
                 </div>
                 ${courseTable(planned, 'No planned courses listed.')}
             </div>
@@ -180,7 +277,7 @@ function buildStudyPlanDetail(studyPlan) {
                     <span class="sp-section-title">Preferred Meeting</span>
                 </div>
                 <div class="sp-meeting-pref">
-                    <i class="bi bi-clock"></i> ${meetingPref}
+                    <i class="bi bi-clock"></i> ${meetingPref === 'schedule' ? 'In-person / Virtual Meeting' : meetingPref === 'waive' ? 'Waived (No Meeting)' : meetingPref}
                 </div>
             </div>` : '' }
 
@@ -210,7 +307,12 @@ function renderForms(containerId, forms, type) {
         const initials    = (p.first_name?.[0] || '') + (p.last_name?.[0] || '');
         const termLabel   = t ? `${t.term_name} · ${t.academic_year}` : '—';
         const submittedDate = formatDate(form.submitted_at);
-        const spDetail    = buildStudyPlanDetail(form.studyPlan);
+        const spDetail    = buildStudyPlanDetail(form.studyPlan, form.studentData, form);
+        const yearLevel   = form.year_level || form.studentData?.year_level || null;
+        const meetPref    = form.meeting_preference || form.studyPlan?.meeting_preference || 'waive';
+        const meetBadge   = meetPref === 'schedule'
+            ? '<span class="sub-meeting-badge schedule"><i class="bi bi-camera-video-fill"></i> Meeting Requested</span>'
+            : '<span class="sub-meeting-badge waive"><i class="bi bi-check-circle-fill"></i> Appointment Waived</span>';
 
         if (type === 'pending') {
             return `
@@ -225,6 +327,7 @@ function renderForms(containerId, forms, type) {
                                 <span>${p.school_id}</span>
                                 <span class="dot">·</span>
                                 <span>${form.program || p.program || '—'}</span>
+                                ${yearLevel ? `<span class="dot">·</span><span class="sub-year">Year ${yearLevel}</span>` : ''}
                                 <span class="dot">·</span>
                                 <span>${termLabel}</span>
                             </div>
@@ -232,6 +335,9 @@ function renderForms(containerId, forms, type) {
                     </div>
                     <div class="sub-date"><i class="bi bi-clock"></i> ${submittedDate}</div>
                 </div>
+
+                <!-- Meeting Preference -->
+                <div class="sub-meeting-row">${meetBadge}</div>
 
                 <!-- Student Notes -->
                 ${form.notes ? `
@@ -242,7 +348,7 @@ function renderForms(containerId, forms, type) {
 
                 <!-- Study Plan Detail (collapsible) -->
                 <div class="sp-toggle-bar" onclick="toggleStudyPlan(this)">
-                    <span><i class="bi bi-journal-bookmark-fill"></i> View Full Study Plan</span>
+                    <span><i class="bi bi-journal-bookmark-fill"></i> View Full Advising Form</span>
                     <i class="bi bi-chevron-down sp-chevron"></i>
                 </div>
                 <div class="sp-collapsible">
@@ -294,6 +400,7 @@ function renderForms(containerId, forms, type) {
                                 <span>${p.school_id}</span>
                                 <span class="dot">·</span>
                                 <span>${form.program || p.program || '—'}</span>
+                                ${yearLevel ? `<span class="dot">·</span><span class="sub-year">Year ${yearLevel}</span>` : ''}
                                 <span class="dot">·</span>
                                 <span>${termLabel}</span>
                             </div>
@@ -308,7 +415,7 @@ function renderForms(containerId, forms, type) {
                 </div>
 
                 <div class="sp-toggle-bar" onclick="toggleStudyPlan(this)">
-                    <span><i class="bi bi-journal-bookmark-fill"></i> View Study Plan</span>
+                    <span><i class="bi bi-journal-bookmark-fill"></i> View Advising Form</span>
                     <i class="bi bi-chevron-down sp-chevron"></i>
                 </div>
                 <div class="sp-collapsible">
@@ -330,6 +437,7 @@ function renderForms(containerId, forms, type) {
                                 <span>${p.school_id}</span>
                                 <span class="dot">·</span>
                                 <span>${form.program || p.program || '—'}</span>
+                                ${yearLevel ? `<span class="dot">·</span><span class="sub-year">Year ${yearLevel}</span>` : ''}
                                 <span class="dot">·</span>
                                 <span>${termLabel}</span>
                             </div>
@@ -346,7 +454,7 @@ function renderForms(containerId, forms, type) {
                 </div>
 
                 <div class="sp-toggle-bar" onclick="toggleStudyPlan(this)">
-                    <span><i class="bi bi-journal-bookmark-fill"></i> View Study Plan</span>
+                    <span><i class="bi bi-journal-bookmark-fill"></i> View Advising Form</span>
                     <i class="bi bi-chevron-down sp-chevron"></i>
                 </div>
                 <div class="sp-collapsible">
@@ -365,8 +473,8 @@ function toggleStudyPlan(toggleBar) {
     collapsible.classList.toggle('open', !isOpen);
     chevron.classList.toggle('rotated', !isOpen);
     toggleBar.querySelector('span').innerHTML = isOpen
-        ? '<i class="bi bi-journal-bookmark-fill"></i> View Full Study Plan'
-        : '<i class="bi bi-journal-bookmark-fill"></i> Hide Study Plan';
+        ? '<i class="bi bi-journal-bookmark-fill"></i> View Full Advising Form'
+        : '<i class="bi bi-journal-bookmark-fill"></i> Hide Advising Form';
 }
 
 async function updateFormStatus(formId, status, btn) {
@@ -375,12 +483,49 @@ async function updateFormStatus(formId, status, btn) {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span>';
 
     try {
+        // Get the form details first
+        const { data: form } = await supabaseClient
+            .from('advising_forms')
+            .select('student_id, term_id, meeting_preference')
+            .eq('id', formId)
+            .single();
+
         const { error } = await supabaseClient
             .from('advising_forms')
             .update({ status, reviewed_at: new Date().toISOString() })
             .eq('id', formId);
 
         if (error) { console.error('Update error:', error); btn.disabled = false; return; }
+
+        // If approved, also update study_plan status and mark student as cleared
+        if (status === 'approved' && form) {
+            // Update study plan status
+            await supabaseClient
+                .from('study_plans')
+                .update({ status: 'approved' })
+                .eq('student_id', form.student_id)
+                .eq('term_id', form.term_id);
+
+            // Mark student as cleared for advising
+            await supabaseClient
+                .from('students')
+                .update({
+                    is_cleared: true,
+                    cleared_at: new Date().toISOString()
+                })
+                .eq('id', form.student_id);
+
+            // Send notification to student
+            await supabaseClient
+                .from('notifications')
+                .insert({
+                    user_id: form.student_id,
+                    title: 'Advising Form Approved',
+                    message: 'Your academic advising form has been approved by your adviser.',
+                    type: 'success',
+                    link: 'student-academic-booklet.html'
+                });
+        }
 
         showCardSuccess(card, `Form ${status} successfully.`);
         setTimeout(() => loadForms(), 1200);
@@ -411,6 +556,13 @@ async function submitFeedback(formId, btn) {
     btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Sending...';
 
     try {
+        // Get form details for notification
+        const { data: form } = await supabaseClient
+            .from('advising_forms')
+            .select('student_id')
+            .eq('id', formId)
+            .single();
+
         const { error } = await supabaseClient
             .from('advising_forms')
             .update({
@@ -421,6 +573,23 @@ async function submitFeedback(formId, btn) {
             .eq('id', formId);
 
         if (error) { console.error('Feedback error:', error); btn.disabled = false; return; }
+
+        // Send notification to student
+        if (form) {
+            const notifTitle = pendingStatus === 'rejected' ? 'Advising Form Rejected' : 'Revision Requested';
+            const notifMsg = pendingStatus === 'rejected'
+                ? `Your academic advising form was rejected. Reason: ${remarks}`
+                : `Your adviser requested revisions on your academic advising form: ${remarks}`;
+            await supabaseClient
+                .from('notifications')
+                .insert({
+                    user_id: form.student_id,
+                    title: notifTitle,
+                    message: notifMsg,
+                    type: pendingStatus === 'rejected' ? 'error' : 'warning',
+                    link: 'student-academic-booklet.html'
+                });
+        }
 
         showCardSuccess(card, 'Feedback sent successfully.');
         setTimeout(() => loadForms(), 1200);

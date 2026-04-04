@@ -65,11 +65,12 @@ initShared();
         const card = document.createElement('div');
         card.className = 'term-card';
         card.dataset.year = ay;
-        card.dataset.term = termName.toLowerCase().includes('first') ? '1' : termName.toLowerCase().includes('second') ? '2' : '3';
+        const termLower = termName.toLowerCase();
+        card.dataset.term = (termLower.includes('first') || termLower.includes('1')) ? '1' : (termLower.includes('second') || termLower.includes('2')) ? '2' : '3';
 
         card.innerHTML = `
             <div class="term-card-header">
-                <div><span class="term-title">${termName}</span><span class="term-ay">AY ${ay}</span></div>
+                <div><span class="term-title">${termName}</span> &middot; <span class="term-ay">AY ${ay}</span></div>
                 <span class="term-status approved">Completed</span>
             </div>
             <table class="term-table">
@@ -83,11 +84,17 @@ initShared();
                         <td>${r.courses?.units || '—'}</td>
                         <td><span class="grade-badge ${isFail ? 'fail' : 'pass'}">${grade}${isFail ? ' (F)' : ''}</span></td>
                     </tr>`;
-                }).join('')}</tbody>
+                }).join('')}
+                <tr class="total-units-row">
+                    <td colspan="2" style="text-align:right;font-weight:700;color:var(--dlsu-gray-600);">Total Units</td>
+                    <td style="font-weight:800;">${termUnits}</td>
+                    <td></td>
+                </tr>
+                </tbody>
             </table>
             <div class="term-footer">
                 <div class="term-stat"><span class="ts-label">Term GPA</span><span class="ts-value">${termGpa}</span></div>
-                <div class="term-stat"><span class="ts-label">Units</span><span class="ts-value">${termUnits}</span></div>
+                <div class="term-stat"><span class="ts-label">Units Taken</span><span class="ts-value">${termUnits}</span></div>
                 <div class="term-stat"><span class="ts-label">Failures</span><span class="ts-value ${termFailed > 0 ? 'text-danger' : ''}">${termFailed}</span></div>
             </div>`;
         container.appendChild(card);
