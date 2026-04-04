@@ -1,3 +1,27 @@
+/* ── Split Actions for Student Concerns ── */
+.split-actions {
+    display: flex;
+    width: 100%;
+    gap: 0.5rem;
+}
+.left-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+.right-actions {
+    display: flex;
+    margin-left: auto;
+    gap: 0.5rem;
+}
+/* ── Concern Actions Flex Layout ── */
+.concern-actions.d-flex {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 0.5rem;
+}
 .page-body {
     padding: 1.75rem 2rem;
     max-width: 960px;

@@ -80,7 +80,7 @@ function renderConcernsList() {
             : concern.status === 'resolved' ? 'Resolved'
             : concern.status;
 
-        return '<div class="concern-card ' + (isNew ? 'unread' : '') + ' ' + (isResolved ? 'resolved' : '') + '" data-id="' + concern.id + '">'
+        return '<div class="concern-card ' + (isNew ? 'unread' : '') + ' ' + (isResolved ? 'resolved' : '') + '" data-id="' + concern.id + '">' 
             + '<div class="concern-top">'
             + '<div class="concern-student">'
             + '<div class="concern-avatar">' + esc(initials) + '</div>'
@@ -93,10 +93,14 @@ function renderConcernsList() {
             + '<span class="concern-status ' + concern.status + '">' + statusLabel + '</span>'
             + '</div></div>'
             + '<div class="concern-message">' + esc(concern.message) + '</div>'
-            + '<div class="concern-actions">'
-            + '<button class="btn-thread" onclick="openThread(\'' + concern.id + '\')"><i class="bi bi-chat-dots"></i> View Thread</button>'
-            + (isNew ? '<button class="btn-mark-read" onclick="markRead(\'' + concern.id + '\', this)"><i class="bi bi-check"></i> Mark as Read</button>' : '')
-            + (!isResolved ? '<button class="btn-resolve" onclick="resolveConcern(\'' + concern.id + '\', this)"><i class="bi bi-check-circle"></i> Resolve</button>' : '')
+            + '<div class="concern-actions split-actions d-flex flex-wrap gap-2 align-items-center mt-2">'
+            + '<div class="left-actions">'
+            + '<button class="btn btn-outline-primary btn-sm btn-thread" onclick="openThread(\'' + concern.id + '\')"><i class="bi bi-chat-dots"></i> View Thread</button>'
+            + (isNew ? '<button class="btn btn-outline-secondary btn-sm btn-mark-read" onclick="markRead(\'' + concern.id + '\', this)"><i class="bi bi-check"></i> Mark as Read</button>' : '')
+            + '</div>'
+            + '<div class="right-actions ms-auto">'
+            + (!isResolved ? '<button class="btn btn-success btn-sm btn-resolve" onclick="resolveConcern(\'' + concern.id + '\', this)"><i class="bi bi-check-circle"></i> Resolve</button>' : '')
+            + '</div>'
             + '</div></div>';
     }).join('');
 
