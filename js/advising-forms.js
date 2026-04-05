@@ -47,22 +47,27 @@ async function loadForms() {
             const { data: plans, error: planErr } = await supabaseClient
                 .from('study_plans')
                 .select('*')
-                .in('student_id', studentIds);
+                .in('student_id', studentIds)
+                .order('submitted_at', { ascending: false, nullsFirst: false });
 
             if (!planErr && plans) {
+                // Keep only the latest plan per student+term
                 plans.forEach(plan => {
                     const key = `${plan.student_id}::${plan.term_id}`;
-                    studyPlansMap[key] = plan;
+                    if (!studyPlansMap[key]) {
+                        studyPlansMap[key] = plan;
+                    }
                 });
 
-                const planIds = plans.map(p => p.id);
-                if (planIds.length > 0) {
+                // Only fetch courses for the plans we're actually using
+                const selectedPlanIds = Object.values(studyPlansMap).map(p => p.id);
+                if (selectedPlanIds.length > 0) {
                     // Use RPC (SECURITY DEFINER) to bypass RLS chain issues
                     let planCourses = null;
                     let pcErr = null;
 
                     const { data: rpcData, error: rpcErr } = await supabaseClient
-                        .rpc('get_plan_courses_for_adviser', { p_plan_ids: planIds });
+                        .rpc('get_plan_courses_for_adviser', { p_plan_ids: selectedPlanIds });
 
                     if (!rpcErr && rpcData) {
                         // Reshape RPC result to match the expected nested format
@@ -83,7 +88,7 @@ async function loadForms() {
                         const { data: directData, error: directErr } = await supabaseClient
                             .from('study_plan_courses')
                             .select('*, courses(code, title, units)')
-                            .in('plan_id', planIds);
+                            .in('plan_id', selectedPlanIds);
                         planCourses = directData;
                         pcErr = directErr;
                     }
@@ -91,10 +96,11 @@ async function loadForms() {
                     if (pcErr) {
                         console.warn('study_plan_courses query error:', pcErr);
                     } else if (planCourses) {
-                        plans.forEach(plan => {
-                            const key = `${plan.student_id}::${plan.term_id}`;
-                            const matched = planCourses.filter(pc => pc.plan_id === plan.id);
-                            studyPlansMap[key].courses = matched;
+                        console.log('[advising-forms] Total plan courses fetched:', planCourses.length,
+                            'Types:', planCourses.reduce((acc, pc) => { acc[pc.type] = (acc[pc.type] || 0) + 1; return acc; }, {}));
+                        // Assign courses only to the selected (latest) plans
+                        Object.entries(studyPlansMap).forEach(([key, plan]) => {
+                            plan.courses = planCourses.filter(pc => pc.plan_id === plan.id);
                         });
                     }
                 }
@@ -103,7 +109,12 @@ async function loadForms() {
 
         const enrichedForms = forms.map(form => {
             const key = `${form.student_id}::${form.term_id}`;
-            return { ...form, studyPlan: studyPlansMap[key] || null };
+            const sp = studyPlansMap[key] || null;
+            if (sp) {
+                console.log(`[advising-forms] Form ${form.id} → plan ${sp.id}, courses: ${(sp.courses || []).length}`,
+                    (sp.courses || []).map(c => `${c.type}:${c.courses?.code}`));
+            }
+            return { ...form, studyPlan: sp };
         });
 
         const pending  = enrichedForms.filter(f => f.status === 'pending');
@@ -249,16 +260,15 @@ function buildStudyPlanDetail(studyPlan, studentData, form) {
                 ${courseTable(failed, 'No failed courses listed.')}
             </div>` : '' }
 
-            ${ current.length ? `
             <div class="sp-section sp-section--current">
                 <div class="sp-section-header">
                     <span class="sp-section-icon"><i class="bi bi-journals"></i></span>
                     <span class="sp-section-title">Currently Enrolled Subjects</span>
                     <span class="sp-badge sp-badge--current">${current.length} subject${current.length !== 1 ? 's' : ''}</span>
-                    <span class="sp-units-total sp-units-total--current">${currentUnits} units</span>
+                    ${currentUnits ? `<span class="sp-units-total sp-units-total--current">${currentUnits} units</span>` : ''}
                 </div>
                 ${courseTable(current, 'No current subjects listed.')}
-            </div>` : '' }
+            </div>
 
             <div class="sp-section sp-section--planned">
                 <div class="sp-section-header">
@@ -270,19 +280,52 @@ function buildStudyPlanDetail(studyPlan, studentData, form) {
                 ${courseTable(planned, 'No planned courses listed.')}
             </div>
 
-            ${ meetingPref ? `
-            <div class="sp-section sp-section--meeting">
-                <div class="sp-section-header">
-                    <span class="sp-section-icon"><i class="bi bi-calendar-event-fill"></i></span>
-                    <span class="sp-section-title">Preferred Meeting</span>
-                </div>
-                <div class="sp-meeting-pref">
-                    <i class="bi bi-clock"></i> ${meetingPref === 'schedule' ? 'In-person / Virtual Meeting' : meetingPref === 'waive' ? 'Waived (No Meeting)' : meetingPref}
-                </div>
-            </div>` : '' }
 
         </div>
     </div>`;
+}
+
+function buildCardCourseSummary(studyPlan) {
+    if (!studyPlan || !studyPlan.courses || !studyPlan.courses.length) return '';
+    const courses = studyPlan.courses || [];
+    const failed  = courses.filter(pc => pc.type === 'failed');
+    const current = courses.filter(pc => pc.type === 'current');
+
+    let html = '';
+
+    if (failed.length) {
+        const failedUnits = failed.reduce((s, pc) => s + (pc.courses?.units || 0), 0);
+        html += `
+        <div class="card-courses-section card-courses--failed">
+            <div class="card-courses-header">
+                <i class="bi bi-x-circle-fill"></i>
+                <span>Failed / Incomplete Courses</span>
+                <span class="card-courses-badge card-courses-badge--failed">${failed.length}</span>
+                <span class="card-courses-units card-courses-units--failed">${failedUnits} units</span>
+            </div>
+            <div class="card-courses-list">
+                ${failed.map(pc => `<span class="card-course-tag card-course-tag--failed"><code>${pc.courses?.code || '—'}</code> ${pc.courses?.title || ''}</span>`).join('')}
+            </div>
+        </div>`;
+    }
+
+    if (current.length) {
+        const currentUnits = current.reduce((s, pc) => s + (pc.courses?.units || 0), 0);
+        html += `
+        <div class="card-courses-section card-courses--current">
+            <div class="card-courses-header">
+                <i class="bi bi-journals"></i>
+                <span>Currently Enrolled Subjects</span>
+                <span class="card-courses-badge card-courses-badge--current">${current.length}</span>
+                <span class="card-courses-units card-courses-units--current">${currentUnits} units</span>
+            </div>
+            <div class="card-courses-list">
+                ${current.map(pc => `<span class="card-course-tag card-course-tag--current"><code>${pc.courses?.code || '—'}</code> ${pc.courses?.title || ''}</span>`).join('')}
+            </div>
+        </div>`;
+    }
+
+    return html;
 }
 
 function renderForms(containerId, forms, type) {
@@ -408,6 +451,7 @@ function renderForms(containerId, forms, type) {
                     </div>
                     <span class="sub-status approved"><i class="bi bi-check-circle-fill"></i> Approved</span>
                 </div>
+                <div class="sub-meeting-row">${meetBadge}</div>
                 <div class="sub-footer-meta">
                     <span><i class="bi bi-calendar3"></i> Submitted ${submittedDate}</span>
                     ${form.reviewed_at ? `<span><i class="bi bi-check2-all"></i> Reviewed ${formatDate(form.reviewed_at)}</span>` : ''}
@@ -448,6 +492,7 @@ function renderForms(containerId, forms, type) {
                         ${isRevision ? 'Revision Requested' : 'Rejected'}
                     </span>
                 </div>
+                <div class="sub-meeting-row">${meetBadge}</div>
                 <div class="sub-footer-meta">
                     <span><i class="bi bi-calendar3"></i> Submitted ${submittedDate}</span>
                     ${form.adviser_remarks ? `<span class="sub-remarks"><i class="bi bi-chat-left"></i> ${form.adviser_remarks}</span>` : ''}

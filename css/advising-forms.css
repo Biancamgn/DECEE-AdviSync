@@ -1016,6 +1016,170 @@ body.dark-mode .sp-table-total td {
     }
 }
 
+/* Card-level course summary sections */
+.card-courses-section {
+    border-radius: 10px;
+    border: 1px solid var(--dlsu-gray-200);
+    margin-bottom: 0.65rem;
+    overflow: hidden;
+}
+
+.card-courses-header {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.76rem;
+    font-weight: 700;
+}
+
+.card-courses--failed .card-courses-header {
+    background: #fff5f5;
+    color: #c0392b;
+    border-bottom: 1px solid #fce8e8;
+}
+
+.card-courses--current .card-courses-header {
+    background: #fffbf0;
+    color: #b7791f;
+    border-bottom: 1px solid #fef3cd;
+}
+
+.card-courses-badge {
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
+    font-weight: 700;
+}
+
+.card-courses-badge--failed {
+    background: #fce8e8;
+    color: #c0392b;
+}
+
+.card-courses-badge--current {
+    background: #fef3cd;
+    color: #b7791f;
+}
+
+.card-courses-units {
+    margin-left: auto;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+}
+
+.card-courses-units--failed {
+    background: #fce8e8;
+    color: #c0392b;
+}
+
+.card-courses-units--current {
+    background: #fef3cd;
+    color: #b7791f;
+}
+
+.card-courses-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.card-course-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--dlsu-gray-700);
+}
+
+.card-course-tag code {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+}
+
+.card-course-tag--failed {
+    background: #fff5f5;
+}
+
+.card-course-tag--failed code {
+    background: #fce8e8;
+    color: #c0392b;
+}
+
+.card-course-tag--current {
+    background: #fffbf0;
+}
+
+.card-course-tag--current code {
+    background: #fef3cd;
+    color: #b7791f;
+}
+
+/* Dark mode card course sections */
+body.dark-mode .card-courses-section {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body.dark-mode .card-courses--failed .card-courses-header {
+    background: rgba(192, 57, 43, 0.12);
+    border-color: rgba(192, 57, 43, 0.2);
+}
+
+body.dark-mode .card-courses--current .card-courses-header {
+    background: rgba(183, 121, 31, 0.12);
+    border-color: rgba(183, 121, 31, 0.2);
+}
+
+body.dark-mode .card-course-tag {
+    color: rgba(255, 255, 255, 0.82);
+}
+
+body.dark-mode .card-course-tag--failed {
+    background: rgba(192, 57, 43, 0.08);
+}
+
+body.dark-mode .card-course-tag--failed code {
+    background: rgba(192, 57, 43, 0.2);
+    color: #fc8181;
+}
+
+body.dark-mode .card-course-tag--current {
+    background: rgba(183, 121, 31, 0.08);
+}
+
+body.dark-mode .card-course-tag--current code {
+    background: rgba(183, 121, 31, 0.2);
+    color: #f6c560;
+}
+
+body.dark-mode .card-courses-badge--failed {
+    background: rgba(192, 57, 43, 0.3);
+    color: #fc8181;
+}
+
+body.dark-mode .card-courses-badge--current {
+    background: rgba(183, 121, 31, 0.3);
+    color: #f6c560;
+}
+
+body.dark-mode .card-courses-units--failed {
+    background: rgba(192, 57, 43, 0.3);
+    color: #fc8181;
+}
+
+body.dark-mode .card-courses-units--current {
+    background: rgba(183, 121, 31, 0.3);
+    color: #f6c560;
+}
+
 /* Meeting preference badges */
 .sub-meeting-row {
     padding: 0 1.25rem;

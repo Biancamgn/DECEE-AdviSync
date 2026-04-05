@@ -394,3 +394,36 @@ ALTER TABLE study_plan_courses ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'plann
 -- Allow students to update their own advising forms (for resubmission after revision)
 DROP POLICY IF EXISTS "Students can update own forms" ON advising_forms;
 CREATE POLICY "Students can update own forms" ON advising_forms FOR UPDATE USING (auth.uid() = student_id);
+
+-- ═══════════════════════════════════════════════════════════════════
+-- 12. RPC: upsert_course_for_student (SECURITY DEFINER)
+-- ═══════════════════════════════════════════════════════════════════
+-- Allows students to find or create a course entry when it doesn't exist
+-- (e.g. manually typed course codes in advising form).
+CREATE OR REPLACE FUNCTION upsert_course_for_student(
+    p_code varchar,
+    p_title varchar,
+    p_units int
+)
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_id uuid;
+BEGIN
+    SELECT id INTO v_id FROM courses WHERE code = p_code LIMIT 1;
+    IF v_id IS NOT NULL THEN RETURN v_id; END IF;
+    SELECT id INTO v_id FROM courses WHERE UPPER(code) = UPPER(p_code) LIMIT 1;
+    IF v_id IS NOT NULL THEN RETURN v_id; END IF;
+    INSERT INTO courses (code, title, units)
+    VALUES (p_code, p_title, COALESCE(p_units, 0))
+    RETURNING id INTO v_id;
+    RETURN v_id;
+EXCEPTION
+    WHEN unique_violation THEN
+        SELECT id INTO v_id FROM courses WHERE code = p_code LIMIT 1;
+        RETURN v_id;
+END;
+$$;

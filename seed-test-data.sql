@@ -1018,6 +1018,48 @@ CREATE POLICY "Students can manage own plan courses" ON study_plan_courses FOR A
 
 
 -- ═══════════════════════════════════════════════════════════════════
+-- 17b. RPC: upsert_course_for_student (SECURITY DEFINER)
+-- ═══════════════════════════════════════════════════════════════════
+-- Allows students to create a course entry when it doesn't exist
+-- in the courses table (e.g. manually typed course codes).
+-- Returns the course UUID (existing or newly created).
+
+CREATE OR REPLACE FUNCTION upsert_course_for_student(
+    p_code varchar,
+    p_title varchar,
+    p_units int
+)
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_id uuid;
+BEGIN
+    -- Try exact match
+    SELECT id INTO v_id FROM courses WHERE code = p_code LIMIT 1;
+    IF v_id IS NOT NULL THEN RETURN v_id; END IF;
+
+    -- Try case-insensitive match
+    SELECT id INTO v_id FROM courses WHERE UPPER(code) = UPPER(p_code) LIMIT 1;
+    IF v_id IS NOT NULL THEN RETURN v_id; END IF;
+
+    -- Insert new course
+    INSERT INTO courses (code, title, units)
+    VALUES (p_code, p_title, COALESCE(p_units, 0))
+    RETURNING id INTO v_id;
+
+    RETURN v_id;
+EXCEPTION
+    WHEN unique_violation THEN
+        -- Race condition: another request inserted it
+        SELECT id INTO v_id FROM courses WHERE code = p_code LIMIT 1;
+        RETURN v_id;
+END;
+$$;
+
+-- ═══════════════════════════════════════════════════════════════════
 -- 18. RPC: get_plan_courses_for_adviser (SECURITY DEFINER)
 -- ═══════════════════════════════════════════════════════════════════
 -- Bypasses RLS for advisers fetching study_plan_courses.
