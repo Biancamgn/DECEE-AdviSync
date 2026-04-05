@@ -357,17 +357,38 @@ async function submitStudyPlan() {
         // Insert study plan courses (for all types: failed, current, planned)
         const allCourseInserts = [];
 
+        async function findOrCreateCourse(c) {
+            // Try exact match first
+            let { data: course } = await supabaseClient
+                .from('courses').select('id').eq('code', c.code.toUpperCase().trim()).maybeSingle();
+            if (course) return course.id;
+            // Try case-insensitive match
+            const { data: iCourse } = await supabaseClient
+                .from('courses').select('id').ilike('code', c.code.trim()).maybeSingle();
+            if (iCourse) return iCourse.id;
+            // Not found — create via RPC (SECURITY DEFINER bypasses RLS)
+            const { data: newId, error: rpcErr } = await supabaseClient
+                .rpc('upsert_course_for_student', {
+                    p_code: c.code.toUpperCase().trim(),
+                    p_title: c.name || c.code,
+                    p_units: c.units || 0
+                });
+            if (!rpcErr && newId) return newId;
+            console.warn('Could not find or create course:', c.code, rpcErr);
+            return null;
+        }
+
         for (const c of failedCourses) {
-            const { data: course } = await supabaseClient.from('courses').select('id').eq('code', c.code).maybeSingle();
-            if (course) allCourseInserts.push({ plan_id: planId, course_id: course.id, type: 'failed' });
+            const courseId = await findOrCreateCourse(c);
+            if (courseId) allCourseInserts.push({ plan_id: planId, course_id: courseId, type: 'failed' });
         }
         for (const c of currentCourses) {
-            const { data: course } = await supabaseClient.from('courses').select('id').eq('code', c.code).maybeSingle();
-            if (course) allCourseInserts.push({ plan_id: planId, course_id: course.id, type: 'current' });
+            const courseId = await findOrCreateCourse(c);
+            if (courseId) allCourseInserts.push({ plan_id: planId, course_id: courseId, type: 'current' });
         }
         for (const c of plannedCourses) {
-            const { data: course } = await supabaseClient.from('courses').select('id').eq('code', c.code).maybeSingle();
-            if (course) allCourseInserts.push({ plan_id: planId, course_id: course.id, type: 'planned' });
+            const courseId = await findOrCreateCourse(c);
+            if (courseId) allCourseInserts.push({ plan_id: planId, course_id: courseId, type: 'planned' });
         }
 
         if (allCourseInserts.length > 0) {
