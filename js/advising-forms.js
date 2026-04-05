@@ -177,6 +177,11 @@ function buildStudyPlanDetail(studyPlan, studentData, form) {
         const sectionUnits = list.reduce((s, pc) => s + (pc.courses?.units || 0), 0);
         return `
         <table class="sp-table">
+            <colgroup>
+                <col class="col-code">
+                <col class="col-name">
+                <col class="col-units">
+            </colgroup>
             <thead>
                 <tr>
                     <th>Code</th>
