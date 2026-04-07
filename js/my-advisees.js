@@ -5,7 +5,7 @@ async function loadAdvisees() {
 
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) { window.location.href = 'index.html'; return; }
+        if (!session) { window.location.href = '../index.html'; return; }
 
         const adviserId = session.user.id;
 

@@ -12,8 +12,8 @@ async function loadComponent(containerId, filePath) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await loadComponent('sidebar-container', 'components/sidebar.html');
-    await loadComponent('topbar-container', 'components/topbar.html');
+    await loadComponent('sidebar-container', '../components/sidebar.html');
+    await loadComponent('topbar-container', '../components/topbar.html');
 
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     document.querySelectorAll('.sidebar-nav .nav-link').forEach(link => {

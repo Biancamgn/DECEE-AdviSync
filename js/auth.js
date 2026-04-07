@@ -1,9 +1,14 @@
+function _authPrefix() {
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    return parts.length > 1 ? '../' : '';
+}
+
 async function requireAuth(allowedRoles = []) {
     try {
         const { data: { session }, error } = await supabaseClient.auth.getSession();
 
         if (error || !session) {
-            window.location.href = 'index.html';
+            window.location.href = _authPrefix() + 'index.html';
             return null;
         }
 
@@ -14,18 +19,18 @@ async function requireAuth(allowedRoles = []) {
             .single();
 
         if (profileError || !profile) {
-            window.location.href = 'index.html';
+            window.location.href = _authPrefix() + 'index.html';
             return null;
         }
 
         if (allowedRoles.length > 0 && !allowedRoles.includes(profile.role)) {
-            window.location.href = 'index.html';
+            window.location.href = _authPrefix() + 'index.html';
             return null;
         }
 
         return profile;
     } catch (err) {
-        window.location.href = 'index.html';
+        window.location.href = _authPrefix() + 'index.html';
         return null;
     }
 }
@@ -33,7 +38,7 @@ async function requireAuth(allowedRoles = []) {
 async function signOut() {
     sessionStorage.removeItem('_profileCache');
     await supabaseClient.auth.signOut();
-    window.location.href = 'index.html';
+    window.location.href = _authPrefix() + 'index.html';
 }
 
 function initLoginForm() {
@@ -97,9 +102,9 @@ function initLoginForm() {
 
             if (profile?.role) {
                 switch (profile.role) {
-                    case 'admin':     window.location.href = 'admin-dashboard.html'; break;
-                    case 'adviser': window.location.href = 'academic-advising.html'; break;
-                    case 'student':   window.location.href = 'student-dashboard.html'; break;
+                    case 'admin':     window.location.href = 'admin/admin-dashboard.html'; break;
+                    case 'adviser': window.location.href = 'adviser/academic-advising.html'; break;
+                    case 'student':   window.location.href = 'student/student-dashboard.html'; break;
                     default:          window.location.href = 'index.html';
                 }
             } else {
