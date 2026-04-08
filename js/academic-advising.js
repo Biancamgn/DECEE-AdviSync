@@ -1,3 +1,10 @@
+/**
+ * File:        academic-advising.js
+ * Description: Academic Advising Management page: loads active term deadline, displays and filters advisee submission progress, saves deadline updates, and sends in-app reminder notifications.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-05
+ */
+
 async function loadAcademicAdvising() {
     try {
         const profile = await requireAuth(['adviser']);

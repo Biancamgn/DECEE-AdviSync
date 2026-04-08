@@ -1,3 +1,10 @@
+/**
+ * File:        admin-reports.js
+ * Description: Admin Reports: generates and displays enrollment statistics, failed units analysis, course performance, and adviser workload reports.
+ * Author:      Renjovil Joseph V. Lascano
+ * Date:        2026-04-03
+ */
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     // ═══════════════════════════════════════════════════════════════════════

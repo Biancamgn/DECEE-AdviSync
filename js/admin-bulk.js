@@ -1,3 +1,11 @@
+/**
+ * File:        admin-bulk.js
+ * Description: Admin Bulk Operations: handles CSV upload for bulk student account creation, bulk clearance status updates, and mass email dispatch.
+ * Author:      Renjovil Joseph V. Lascano
+ * Date:        2026-04-03
+ */
+
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     // ═══════════════════════════════════════════════════════════════════════

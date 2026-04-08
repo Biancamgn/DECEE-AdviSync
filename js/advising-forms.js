@@ -1,3 +1,10 @@
+/**
+ * File:        advising-forms.js
+ * Description: Advising Forms page: loads submitted student advising booklets, allows adviser to review, update status, and add comment threads per form submission.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-05
+ */
+
 async function loadForms() {
     const profile = await requireAuth(['adviser']);
     if (!profile) return;
@@ -289,7 +296,6 @@ function buildStudyPlanDetail(studyPlan, studentData, form) {
         </div>
     </div>`;
 }
-
 function buildCardCourseSummary(studyPlan) {
     if (!studyPlan || !studyPlan.courses || !studyPlan.courses.length) return '';
     const courses = studyPlan.courses || [];

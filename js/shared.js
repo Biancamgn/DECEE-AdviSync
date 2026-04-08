@@ -1,3 +1,10 @@
+/**
+ * File:        shared.js
+ * Description: Shared UI behaviors: sidebar expand/collapse, dark mode toggle with localStorage persistence, live topbar clock, profile dropdown, and user profile loading with sessionStorage cache.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-05
+ */
+
 async function loadUserProfile() {
     try {
         // Immediately apply cached profile to prevent flash

@@ -1,3 +1,10 @@
+/**
+ * File:        adviser-settings.css
+ * Description: Adviser Settings page: notification toggle switches, password change form, and settings row layout.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-02
+ */
+
 .page-body {
     padding: 1.75rem 2rem;
     max-width: 900px;

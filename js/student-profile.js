@@ -1,3 +1,10 @@
+/**
+ * File:        student-profile.js
+ * Description: Student Profile page: loads and displays the student's profile data from the Supabase profiles and students tables.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-05
+ */
+
 initShared();
 
 (async function () {

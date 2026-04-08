@@ -1,3 +1,10 @@
+/**
+ * File:        adviser-student-concerns.js
+ * Description: Adviser Student Concerns page: loads, filters, paginates, and threads concern messages between advisers and students. Handles status updates and replies.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-05
+ */
+
 let _adviserProfile = null;
 let _allConcerns = [];
 let _concernFilter = 'all';

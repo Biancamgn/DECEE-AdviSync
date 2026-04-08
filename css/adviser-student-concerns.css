@@ -1,3 +1,10 @@
+/**
+ * File:        adviser-student-concerns.css
+ * Description: Adviser Student Concerns page: concern cards, thread panel slide-in, status chips, pagination controls, and reply form.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-05
+ */
+
 /* ── Split Actions for Student Concerns ── */
 .split-actions {
     display: flex;
@@ -697,4 +704,4 @@ body.dark-mode .thread-header-subject { color: #6b7e70; }
 body.dark-mode .thread-modal-overlay { background: rgba(0,0,0,0.7); }
 
 body.dark-mode .resolved-notice { color: #66bb6a; }
-}
+

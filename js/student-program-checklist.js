@@ -1,3 +1,10 @@
+/**
+ * File:        student-program-checklist.js
+ * Description: Student Program Checklist: fetches the student's curriculum checklist from Supabase and renders it with completion tracking and visual progress.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-05
+ */
+
 initShared();
 
 (async function () {

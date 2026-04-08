@@ -1,3 +1,10 @@
+/**
+ * File:        shared.css
+ * Description: Global design tokens (CSS custom properties), sidebar layout, topbar, profile dropdown, dark mode overrides, skeleton placeholders, and utility classes shared across all portal pages.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-02
+ */
+
 :root {
     --dlsu-green: #00703c;
     --dlsu-green-dark: #005a30;

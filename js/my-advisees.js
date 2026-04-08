@@ -1,3 +1,10 @@
+/**
+ * File:        my-advisees.js
+ * Description: My Advisees page: fetches advisee IDs from two sources (advisees table and students.adviser_id), merges and deduplicates, enriches with profile/form data, renders the table, and supports live search and multi-filter.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-07
+ */
+
 async function loadAdvisees() {
     const tableBody = document.querySelector('#adviseeTable tbody');
 

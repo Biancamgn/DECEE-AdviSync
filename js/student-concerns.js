@@ -1,3 +1,10 @@
+/**
+ * File:        student-concerns.js
+ * Description: Student Concerns page: allows students to submit new academic concerns and view threaded replies from their assigned adviser.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-05
+ */
+
 initShared();
 
 let _currentProfile = null;

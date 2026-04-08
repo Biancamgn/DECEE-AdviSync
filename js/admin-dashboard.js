@@ -1,3 +1,10 @@
+/**
+ * File:        admin-dashboard.js
+ * Description: Admin Dashboard: renders department-level statistics, enrollment charts via Chart.js, and recent activity summary for the admin overview.
+ * Author:      Renjovil Joseph V. Lascano
+ * Date:        2026-04-02
+ */
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     const currentUser = await requireAuth(['admin']);

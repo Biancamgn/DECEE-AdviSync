@@ -1,3 +1,10 @@
+/**
+ * File:        email-system.js
+ * Description: Email System page: sends bulk announcements to all advisees or individual emails to a selected student via the Supabase notifications table.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-02
+ */
+
 async function loadEmailSystem() {
     const profile = await requireAuth(['adviser']);
     if (!profile) return;

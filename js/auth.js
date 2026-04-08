@@ -1,3 +1,10 @@
+/**
+ * File:        auth.js
+ * Description: Authentication logic: session validation, role-based routing, sign-out, login form handling (school ID→email→password), and password reset flow.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-07
+ */
+
 function _authPrefix() {
     const parts = window.location.pathname.split('/').filter(Boolean);
     return parts.length > 1 ? '../' : '';

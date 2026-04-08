@@ -1,3 +1,10 @@
+/**
+ * File:        student-academic-history.js
+ * Description: Student Academic History page: fetches the student's full academic record from Supabase and renders it grouped by term with grades and status.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-05
+ */
+
 initShared();
 
 (async function () {

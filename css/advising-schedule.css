@@ -1,3 +1,10 @@
+/**
+ * File:        advising-schedule.css
+ * Description: Advising Schedule page: slot cards, tab switcher, bulk slot preview, bookings list, and time slot grid.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-03
+ */
+
 .page-body {
     padding: 1.75rem 2rem;
 }

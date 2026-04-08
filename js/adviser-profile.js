@@ -1,3 +1,10 @@
+/**
+ * File:        adviser-profile.js
+ * Description: Adviser Profile page: loads profile data from Supabase into form fields, saves edits back to the profiles table, and refreshes shared topbar UI on save.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-02
+ */
+
 function showToast(msg) {
     const t = document.getElementById('toast');
     document.getElementById('toastMsg').textContent = msg;

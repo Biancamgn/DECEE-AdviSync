@@ -1,3 +1,10 @@
+/**
+ * File:        student-academic-history.css
+ * Description: Student Academic History: term accordion sections, grade table, course status color coding, and GPA display.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-05
+ */
+
 :root {
     --dlsu-green: #00703c;
     --dlsu-green-dark: #005a30;

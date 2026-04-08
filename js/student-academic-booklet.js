@@ -1,3 +1,10 @@
+/**
+ * File:        student-academic-booklet.js
+ * Description: Student Academic Advising Form (booklet): multi-step wizard for submitting failed courses, currently enrolled subjects, planned next-term subjects, and study load. Handles form validation and Supabase upsert.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-05
+ */
+
 initShared();
 
 let _currentProfile = null;

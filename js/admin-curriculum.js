@@ -1,3 +1,11 @@
+/**
+ * File:        admin-curriculum.js
+ * Description: Admin Curriculum Manager: displays and edits the BSCpE and BSECE course listings, units, prerequisites, and term assignments.
+ * Author:      Renjovil Joseph V. Lascano
+ * Date:        2026-04-05
+ */
+
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     const currentUser = await requireAuth(['admin']);

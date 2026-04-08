@@ -1,3 +1,10 @@
+/**
+ * File:        student-dashboard.js
+ * Description: Student Dashboard: fetches and renders academic stats (units completed, GPA, failed units, current term), advising form status, enrolled subjects, assigned adviser info, and notifications.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-05
+ */
+
 initShared();
 
 (async function () {

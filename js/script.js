@@ -1,3 +1,10 @@
+/**
+ * File:        script.js
+ * Description: Legacy sidebar interaction script for pages not using the shared component loader. Handles hover expand, hamburger toggle, overlay, and time-based greeting.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-02
+ */
+
 const sidebar = document.getElementById('sidebar');
 const mainContent = document.getElementById('mainContent');
 const overlay = document.getElementById('sidebarOverlay');

@@ -1,3 +1,10 @@
+/**
+ * File:        admin-advising.js
+ * Description: Admin Advising page: manages adviser-to-student assignment across the DECEE department, including unassigned student listing and bulk assignment.
+ * Author:      Renjovil Joseph V. Lascano
+ * Date:        2026-04-05
+ */
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     const currentUser = await requireAuth(['admin']);

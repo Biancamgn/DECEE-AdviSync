@@ -1,3 +1,10 @@
+/**
+ * File:        student-settings.js
+ * Description: Student Settings page: handles password change via Supabase auth and notification preference toggle persistence.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-03
+ */
+
 initShared();
 
 let _currentProfile = null;

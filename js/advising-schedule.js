@@ -1,3 +1,10 @@
+/**
+ * File:        advising-schedule.js
+ * Description: Advising Schedule page: creates single and bulk appointment time slots, displays upcoming bookings, and manages slot availability for student booking.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-03
+ */
+
 let _adviserProfile = null;
 
 async function loadSchedule() {

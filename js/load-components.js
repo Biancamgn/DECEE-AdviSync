@@ -1,3 +1,10 @@
+/**
+ * File:        load-components.js
+ * Description: Fetches and injects the shared sidebar and topbar HTML fragments at runtime. Handles active nav link highlighting and page title injection.
+ * Author:      Erin M. Quiazon
+ * Date:        2026-04-07
+ */
+
 async function loadComponent(containerId, filePath) {
     const container = document.getElementById(containerId);
     if (!container) return;

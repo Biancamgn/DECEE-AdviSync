@@ -1,3 +1,10 @@
+/**
+ * File:        student-appointments.js
+ * Description: Student Appointments page: fetches available adviser time slots, displays them for selection, and handles the booking submission to Supabase.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-03
+ */
+
         initShared();
 
         let _currentProfile = null;

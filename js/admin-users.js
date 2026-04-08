@@ -1,3 +1,11 @@
+/**
+ * File:        admin-users.js
+ * Description: Admin Users page: lists, searches, and manages student and professor accounts including creation, role assignment, and deactivation.
+ * Author:      Renjovil Joseph V. Lascano
+ * Date:        2026-04-03
+ */
+
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     // ═══════════════════════════════════════════════════════════════════════

@@ -1,3 +1,10 @@
+/**
+ * File:        style.css
+ * Description: Admin portal global styles: admin sidebar, topbar, data tables, modal overlays, chart containers, and card layouts.
+ * Author:      Renjovil Joseph V. Lascano
+ * Date:        2026-04-02
+ */
+
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 :root {

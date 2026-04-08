@@ -1,3 +1,10 @@
+/**
+ * File:        notifications.js
+ * Description: Shared notification system: injects profile dropdown CSS, loads and renders in-app notifications in the topbar panel, manages unread badge count.
+ * Author:      Renjovil Joseph V. Lascano
+ * Date:        2026-04-03
+ */
+
 (function () {
     if (localStorage.getItem('darkMode') === 'true') {
         document.body.classList.add('dark-mode');

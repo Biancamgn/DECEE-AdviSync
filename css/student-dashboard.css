@@ -1,3 +1,10 @@
+/**
+ * File:        student-dashboard.css
+ * Description: Student Dashboard: welcome banner, stat cards with color variants, subjects table, quick action grid, adviser card, and failed units meter.
+ * Author:      Bianca Louise V. Manganaan
+ * Date:        2026-04-05
+ */
+
 :root {
     --dlsu-green: #00703c;
     --dlsu-green-dark: #005a30;
