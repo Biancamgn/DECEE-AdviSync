@@ -220,7 +220,7 @@ Role-based routing is handled by `js/auth.js` upon login.
 
 | Name | Role |
 |---|---|
-| **Erin M. Quiazon** | Adviser Portal & Login Page (frontend) |
+| **Erin M. Quiazon** | Adviser Portal & Login Page (RBAC) |
 | **Renjovil Joseph V. Lascano** | Admin Portal (frontend) |
 | **Bianca Louise V. Manganaan** | Student Portal (frontend) |
 
