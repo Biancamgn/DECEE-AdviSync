@@ -2,6 +2,9 @@
 
 DECEE AdviSync is a web-based academic advising management system designed for the Department of Electronics, Computer, and Electrical Engineering (DECEE). It streamlines the advising process between students, faculty advisers, and department administrators — covering everything from scheduling appointments and submitting advising forms to curriculum management and clearance tracking.
 
+Login Credentials
+Test account credentials for evaluating the system are not included in this repository as it is publicly accessible. Please refer to the project documentation submitted alongside this project (see the provided Excel file via link) for the login credentials for each user role.
+
 ---
 
 ## Table of Contents
